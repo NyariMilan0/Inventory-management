@@ -25,11 +25,15 @@
     top: 0;
     left: 0;
 } */
+
+.row{
+    height: 100vh;
+}
  .Loginpanel{
    /* padding-top: 250px;  */
-  
-  
   width: 40%; 
+
+  text-align: center;
  }
 
  .content{
@@ -37,15 +41,60 @@
     
  } 
 
-  .wholePage{
-   
-  }
-
-.col-4{
-    padding-top: 300px;
+.col-5{
+    padding-top: 350px;
 }
 
-.col-8{
+.col-7{
     padding-top: 100px;
     padding-left: 200px;
+}
+
+.signIn{
+    border-radius: 8px;
+    width: 178px;
+    height: 40px;
+    background-color: #457B9D;
+    color: white;
+    text-align: center;
+    border: none;
+    transition: 1s;
+    
+}
+
+.signIn:hover{
+    background-color: #1D3557;
+    color: white;
+}
+
+.login-input{
+    align-items: center;
+    width: 372px;
+    height: 52px;
+    border: none;
+    border-radius: 10px;
+    /* box-shadow: 2px 10px 20px #888888; */
+    box-shadow: 5px 7px 15px #888888   ;
+}
+
+.title{
+    margin-right: 10px;
+    font-size:40px;
+    font-weight: bolder;
+    color:#1D3557;
+    height: 63px;
+    width: 221px;
+    padding-top: 50 px;
+
+}
+
+sub{
+    width: 302px;
+    height: 29px;
+    color: #1D3557;
+    font-size: large;
+}
+
+#text{
+    color: #1D3557;
 }

@@ -2,14 +2,16 @@
     <!-- <img src="/src/assets/Desktop - 21.png" alt="" class="bg"> -->
 <div class="row">
     
-        <div class="col-8">
+        <div class="col-7">
             <div class="content">
                 
                     <span style="margin-right: 10px;" class="icon-container"><img src="/assets/Vector.svg" alt="Login Icon" width="56" height="56" /></span>
                
-                <span style="margin-right: 10px;">WareTech</span> <span>STORAGE MANAGEMENT</span>
+                <span id="text" class="title">WareTech</span> 
+                <span id="text"><sub>STORAGE MANAGEMENT</sub></span>
                 <br><br>
-                <P>Smart storage, seamless logistics – delivering trust and step of the way!</P>
+                <P class="login-text">Smart storage, seamless logistics – delivering trust and 
+                    <br>efficiency every step of the way!</P>
                     <div>
                         <img src="/assets/amico.jpg" alt="work">
                     </div>
@@ -17,19 +19,20 @@
         </div>
     
     
-            <div class="col-4">
+            <div class="col-5">
                 <div class="Loginpanel">
                         <div class="icon-container">
                             <img src="/assets/Vector.svg" alt="Login Icon" width="77" height="77" />
                           </div>
-                    <h3>Sign In</h3>
+                          <br>
+                    <h3 id="text">Sign In</h3>
                     <br>
                         <form action="">
-                            <input type="text" placeholder="Username">
+                            <input class="login-input" type="text" placeholder="Username">
+                            <br><br><br>
+                            <input class="login-input" type="password" placeholder="Password">
                             <br><br>
-                            <input type="password" placeholder="Password">
-                            <br><br>
-                            <input type="submit">
+                            <button class="signIn" type="submit">Sign In</button>
                             <br>
                         </form>
                 </div>
