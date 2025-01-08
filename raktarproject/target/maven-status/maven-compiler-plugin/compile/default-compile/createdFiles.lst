@@ -1,0 +1,14 @@
+com\helixlab\raktarproject\controller\UserController.class
+com\helixlab\raktarproject\model\ShelfsXStorage.class
+com\helixlab\raktarproject\model\Storage.class
+com\helixlab\raktarproject\model\UserXStorage.class
+com\helixlab\raktarproject\model\InventorymovementXItems.class
+com\helixlab\raktarproject\model\Inventorymovement.class
+com\helixlab\raktarproject\config\JWT.class
+com\helixlab\raktarproject\model\ItemsXShelfs.class
+com\helixlab\raktarproject\model\InventorymovementXStorage.class
+com\helixlab\raktarproject\model\Users.class
+com\helixlab\raktarproject\controller\ApplicationConfig.class
+com\helixlab\raktarproject\model\Items.class
+com\helixlab\raktarproject\model\Shelfs.class
+com\helixlab\raktarproject\service\UserService.class
