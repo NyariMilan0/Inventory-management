@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Gép: localhost:3306
--- Létrehozás ideje: 2024. Dec 31. 08:51
+-- Létrehozás ideje: 2025. Jan 30. 14:52
 -- Kiszolgáló verziója: 5.7.24
 -- PHP verzió: 8.3.1
 
@@ -36,7 +36,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `addItem` (IN `skuIn` VARCHAR(255) C
     );
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `addPalletWithItems` (IN `skuCodeIn` VARCHAR(255) CHARSET utf8mb4, IN `shelfId` INT(11), IN `heightIn` INT(11))   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `addPalletToShelf` (IN `skuCodeIn` VARCHAR(255) CHARSET utf8mb4, IN `shelfId` INT(11), IN `heightIn` INT(11))   BEGIN
 DECLARE `newPalletId` INT;
 DECLARE `palletName` VARCHAR(255);
 DECLARE `maxCapacity` INT;
@@ -118,6 +118,134 @@ VALUES (storageNameIn, locationIn, 0)$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `assignUserToStorage` (IN `userId` INT, IN `storageId` INT)   INSERT INTO `user_x_storage` (user_id, storage_id)
 VALUES (userId, storageId)$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `completeMovementRequest` (IN `movementRequestIdIn` INT, IN `userIdIn` INT)   BEGIN
+    DECLARE `actionTypeIn` VARCHAR(50);
+    DECLARE `palletIdIn` INT;
+    DECLARE `fromShelfIdIn` INT;
+    DECLARE `toShelfIdIn` INT;
+    DECLARE `storageFromIn` INT;
+    DECLARE `storageToIn` INT;
+    DECLARE `skuIn` VARCHAR(255);
+
+    UPDATE `movement_requests`
+    SET `status` = 'completed'
+    WHERE `id` = movementRequestIdIn;
+
+    SELECT 
+        `actionType`, 
+        `pallet_id`, 
+        `fromShelfId`, 
+        `toShelfId`
+    INTO 
+        actionTypeIn, 
+        palletIdIn, 
+        fromShelfIdIn, 
+        toShelfIdIn
+    FROM `movement_requests`
+    WHERE `id` = movementRequestIdIn;
+
+    SELECT `storage_id` INTO storageFromIn
+    FROM `shelfs_x_storage`
+    WHERE `shelf_id` = fromShelfIdIn
+    LIMIT 1;
+
+    SELECT `storage_id` INTO storageToIn
+    FROM `shelfs_x_storage`
+    WHERE `shelf_id` = toShelfIdIn
+    LIMIT 1;
+
+    SELECT `items`.`sku` INTO skuIn
+    FROM `pallets_x_items`
+    JOIN `items` ON `pallets_x_items`.`item_id` = `items`.`id`
+    WHERE `pallets_x_items`.`pallet_id` = palletIdIn
+    LIMIT 1;
+
+    INSERT INTO `inventorymovement` (
+        `movementDate`, 
+        `actionType`, 
+        `storageFrom`, 
+        `storageTo`, 
+        `fromShelf`, 
+        `toShelf`, 
+        `palletSKU`, 
+        `byUser`
+    )
+    VALUES (
+        NOW(),
+        actionTypeIn,
+        storageFromIn,
+        storageToIn,
+        fromShelfIdIn,
+        toShelfIdIn,
+        skuIn,
+        userIdIn
+    );
+
+    SET @inventoryId = LAST_INSERT_ID();
+    INSERT INTO `inventorymovement_x_pallets` (
+        `inventory_id`, 
+        `pallet_id`, 
+        `action_type`
+    )
+    VALUES (
+        @inventoryId, 
+        palletIdIn, 
+        actionTypeIn
+    );
+
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `createAddMovementRequest` (IN `adminIdIn` INT, IN `palletIdIn` INT, IN `toShelfIdIn` INT, IN `timeLimitIn` DATETIME)   BEGIN
+    DECLARE `movementRequestId` INT;
+
+    INSERT INTO `movement_requests` 
+        (`adminId`, `pallet_id`, `fromShelfId`, `toShelfId`, `actionType`, `timeLimit`)
+    VALUES 
+        (`adminIdIn`, `palletIdIn`, NULL, `toShelfIdIn`, 'add', `timeLimitIn`);
+
+    SET `movementRequestId` = LAST_INSERT_ID();
+
+    INSERT INTO `movement_requests_x_pallets` 
+        (`movement_requests_id`, `pallet_id`)
+    VALUES 
+        (`movementRequestId`, `palletIdIn`);
+
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `createMoveMovementRequest` (IN `adminIdIn` INT, IN `palletIdIn` INT, IN `fromShelfIdIn` INT, IN `toShelfIdIn` INT, IN `timeLimitIn` DATETIME)   BEGIN
+    DECLARE `movementRequestId` INT;
+
+    INSERT INTO `movement_requests` 
+        (`adminId`, `pallet_id`, `fromShelfId`, `toShelfId`, `actionType`, `timeLimit`)
+    VALUES 
+        (`adminIdIn`, `palletIdIn`, `fromShelfIdIn`, `toShelfIdIn`, 'move', `timeLimitIn`);
+
+    SET `movementRequestId` = LAST_INSERT_ID();
+
+    INSERT INTO `movement_requests_x_pallets` 
+        (`movement_requests_id`, `pallet_id`)
+    VALUES 
+        (`movementRequestId`, `palletIdIn`);
+
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `createRemoveMovementRequest` (IN `adminIdIn` INT, IN `palletIdIn` INT, IN `fromShelfIdIn` INT, IN `timeLimitIn` DATETIME)   BEGIN
+    DECLARE `movementRequestId` INT;
+
+    INSERT INTO `movement_requests` 
+        (`adminId`, `pallet_id`, `fromShelfId`, `toShelfId`, `actionType`, `timeLimit`)
+    VALUES 
+        (`adminIdIn`, `palletIdIn`, `fromShelfIdIn`, NULL, 'remove', `timeLimitIn`);
+
+    SET `movementRequestId` = LAST_INSERT_ID();
+
+    INSERT INTO `movement_requests_x_pallets` 
+        (`movement_requests_id`, `pallet_id`)
+    VALUES 
+        (`movementRequestId`, `palletIdIn`);
+
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `deletePallet` (IN `palletId` INT)   BEGIN
 DECLARE shelfId INT;
 
@@ -144,13 +272,11 @@ WHERE `id` = idIn$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `getAdmins` ()   SELECT `users`.*
 FROM `users`
-WHERE `isAdmin` = 1 AND `is_deleted` = 0
-ORDER BY `firstName` ASC, `lastName` ASC$$
+WHERE `users`.`isAdmin` = 1 AND `users`.`is_deleted` IS NULL$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `getAllNonAdmins` ()   SELECT `users`.*
 FROM `users`
-WHERE `isAdmin` = 0 AND `is_deleted` = 0
-ORDER BY `firstName` ASC, `lastName` ASC$$
+WHERE `isAdmin` = 0 AND `is_deleted` IS NULL$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `getAllPallets` ()   BEGIN
 SELECT
@@ -195,8 +321,7 @@ ORDER BY `pallets_x_shelfs`.`shelf_id`$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `getAllUsers` ()   SELECT `users`.*
 FROM `users`
-WHERE `is_deleted` = 0
-ORDER BY `firstName` ASC, `lastName` ASC$$
+WHERE `is_deleted` IS NULL$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `getDeletedUserByName` (IN `firstNameIn` VARCHAR(100) CHARSET utf8mb4, IN `lastNameIn` VARCHAR(100) CHARSET utf8mb4)   SELECT `users`.*
 FROM `users`
@@ -375,60 +500,63 @@ END$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `login` (IN `usernameIN` VARCHAR(100) CHARSET utf8mb4, IN `passwordIN` VARCHAR(100) CHARSET utf8mb4)   SELECT * FROM `users` WHERE `username` = usernameIN AND `password` = passwordIN$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `movePalletBetweenShelfs` (IN `palletIdIn` INT, IN `fromStorageIdIn` INT, IN `fromShelfIdIn` INT, IN `toStorageIdIn` INT, IN `toShelfIdIn` INT, IN `userIdIn` INT)   BEGIN
-DECLARE currentFromCapacity INT;
-DECLARE maxFromCapacity INT;
-DECLARE currentToCapacity INT;
-DECLARE maxToCapacity INT;
-DECLARE palletSKU VARCHAR(255);
+    DECLARE currentFromCapacity INT;
+    DECLARE maxFromCapacity INT;
+    DECLARE currentToCapacity INT;
+    DECLARE maxToCapacity INT;
+    DECLARE palletSKU VARCHAR(255);
 
-START TRANSACTION;
-SELECT `current_capacity`, `max_capacity`
-INTO currentFromCapacity, maxFromCapacity
-FROM `shelfs`
-WHERE `id` = fromShelfIdIn;
+    START TRANSACTION;
 
-SELECT `current_capacity`, `max_capacity`
-INTO currentToCapacity, maxToCapacity
-FROM `shelfs`
-WHERE `id` = toShelfIdIn;
+    SELECT `current_capacity`, `max_capacity`
+    INTO currentFromCapacity, maxFromCapacity
+    FROM `shelfs`
+    WHERE `id` = fromShelfIdIn;
 
-UPDATE `pallets_x_shelfs`
-SET `shelf_id` = toShelfIdIn
-WHERE `pallet_id` = palletIdIn;
+    SELECT `current_capacity`, `max_capacity`
+    INTO currentToCapacity, maxToCapacity
+    FROM `shelfs`
+    WHERE `id` = toShelfIdIn;
 
-SELECT `items`.`sku` 
-INTO palletSKU
-FROM `pallets_x_items`
-JOIN `items` ON `pallets_x_items`.`item_id` = `items`.`id`
-WHERE `pallets_x_items`.`pallet_id` = palletIdIn
-LIMIT 1;
+    UPDATE `pallets_x_shelfs`
+    SET `shelf_id` = toShelfIdIn
+    WHERE `pallet_id` = palletIdIn;
 
-INSERT INTO `inventorymovement` (`movementDate`, `storageFrom`, `storageTo`, `fromShelf`, `toShelf`, `palletSKU`, `byUser`
+    SELECT `items`.`sku` 
+    INTO palletSKU
+    FROM `pallets_x_items`
+    JOIN `items` ON `pallets_x_items`.`item_id` = `items`.`id`
+    WHERE `pallets_x_items`.`pallet_id` = palletIdIn
+    LIMIT 1;
+
+    INSERT INTO `inventorymovement` (
+        `movementDate`, `actionType`, `storageFrom`, `storageTo`, 
+        `fromShelf`, `toShelf`, `palletSKU`, `byUser`
     )
-VALUES (NOW(), fromStorageIdIn, toStorageIdIn, fromShelfIdIn, toShelfIdIn, palletSKU, userIdIn);
+    VALUES (NOW(), "move", fromStorageIdIn, toStorageIdIn, fromShelfIdIn, toShelfIdIn, palletSKU, userIdIn);
 
-SET @inventoryMovementId = LAST_INSERT_ID();
+    SET @inventoryMovementId = LAST_INSERT_ID();
 
-INSERT INTO `inventorymovement_x_pallets` (`inventory_id`, `pallet_id`, `action_type`) 
-VALUES (@inventoryMovementId, palletIdIn, 'move');
+    INSERT INTO `inventorymovement_x_pallets` (`inventory_id`, `pallet_id`, `action_type`) 
+    VALUES (@inventoryMovementId, palletIdIn, 'move');
 
-UPDATE `shelfs`
-SET `current_capacity` = currentFromCapacity + 1,`isFull` = CASE 
-WHEN currentFromCapacity + 1 >= maxFromCapacity 
-THEN 1
-ELSE 0 
-END
+    UPDATE `shelfs`
+    SET `current_capacity` = currentFromCapacity - 1, 
+        `isFull` = CASE 
+            WHEN currentFromCapacity - 1 = 0 THEN 1  -- Ha eléri a 0-t, akkor legyen teljesen üres
+            ELSE 0 
+        END
+    WHERE `id` = fromShelfIdIn;
 
-WHERE `id` = fromShelfIdIn;
-UPDATE `shelfs`
-SET `current_capacity` = currentToCapacity - 1,
-`isFull` = CASE 
-WHEN currentToCapacity - 1 <= 0 THEN 1
-ELSE 0
-END
+    UPDATE `shelfs`
+    SET `current_capacity` = currentToCapacity + 1, 
+        `isFull` = CASE 
+            WHEN currentToCapacity + 1 >= maxToCapacity THEN 1  -- Ha eléri a max kapacitást, akkor legyen tele
+            ELSE 0
+        END
+    WHERE `id` = toShelfIdIn;
 
- WHERE `id` = toShelfIdIn;
- COMMIT;
+    COMMIT;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `registerAdmin` (IN `emailIn` VARCHAR(255) CHARSET utf8mb4, IN `firstNameIn` VARCHAR(255) CHARSET utf8mb4, IN `lastNameIn` VARCHAR(255) CHARSET utf8mb4, IN `userNameIn` VARCHAR(255) CHARSET utf8mb4, IN `pictureIn` TEXT CHARSET utf8mb4, IN `passwordIn` VARCHAR(255) CHARSET utf8mb4)   INSERT INTO `users` (`email`, `firstName`, `lastName`, `userName`, `picture`, `password`, `isAdmin`)
@@ -448,6 +576,7 @@ DELIMITER ;
 CREATE TABLE `inventorymovement` (
   `id` int(11) NOT NULL,
   `movementDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `actionType` varchar(11) DEFAULT NULL,
   `storageFrom` int(11) DEFAULT NULL,
   `storageTo` int(11) DEFAULT NULL,
   `fromShelf` int(11) DEFAULT NULL,
@@ -460,8 +589,12 @@ CREATE TABLE `inventorymovement` (
 -- A tábla adatainak kiíratása `inventorymovement`
 --
 
-INSERT INTO `inventorymovement` (`id`, `movementDate`, `storageFrom`, `storageTo`, `fromShelf`, `toShelf`, `palletSKU`, `byUser`) VALUES
-(2, '2024-12-29 15:21:46', 1, 1, 1, 2, 'SKU002', 1);
+INSERT INTO `inventorymovement` (`id`, `movementDate`, `actionType`, `storageFrom`, `storageTo`, `fromShelf`, `toShelf`, `palletSKU`, `byUser`) VALUES
+(1, '2025-01-30 14:33:32', 'add', NULL, 1, NULL, 1, NULL, 1),
+(2, '2025-01-30 14:35:08', 'add', NULL, 1, NULL, 2, 'SKU001', 1),
+(3, '2025-01-30 14:37:27', 'move', 1, 1, 1, 2, 'SKU001', 5),
+(4, '2025-01-30 14:37:49', 'move', 1, 1, 1, 2, 'SKU001', 5),
+(5, '2025-01-30 14:46:09', 'move', 1, 1, 2, 1, NULL, 2);
 
 -- --------------------------------------------------------
 
@@ -481,7 +614,10 @@ CREATE TABLE `inventorymovement_x_pallets` (
 --
 
 INSERT INTO `inventorymovement_x_pallets` (`id`, `inventory_id`, `pallet_id`, `action_type`) VALUES
-(4, 2, 4, 'move');
+(2, 2, 2, 'add'),
+(3, 3, 2, 'move'),
+(4, 4, 2, 'move'),
+(5, 5, 2, 'move');
 
 -- --------------------------------------------------------
 
@@ -506,27 +642,76 @@ CREATE TABLE `items` (
 --
 
 INSERT INTO `items` (`id`, `sku`, `type`, `name`, `amount`, `price`, `weight`, `size`, `description`) VALUES
-(1, 'SKU001', 'Metal', 'Steel Plate', 50, 500, 200.5, 100.2, 'A flat plate made of steel, used in construction and manufacturing.'),
-(2, 'SKU002', 'Wood', 'Wooden Beam', 75, 150, 150, 120.5, 'A long wooden beam used in carpentry and construction.'),
-(3, 'SKU003', 'Titanium', 'Titanium Rod', 60, 2000, 450, 30, 'A high-strength titanium rod used in aerospace.'),
-(4, 'SKU004', 'Plastic', 'PVC Pipe', 100, 100, 50, 30, 'PVC pipes for plumbing systems.'),
-(5, 'SKU005', 'Wood', 'Oak Plank', 45, 120, 80, 40, 'High-quality oak wood planks for furniture.'),
-(6, 'SKU006', 'Metal', 'Iron Nails', 2000, 20, 1.2, 10, 'Pack of iron nails for construction use.'),
-(7, 'SKU007', 'Plastic', 'Plastic Bags', 150, 50, 5, 15, 'Environmentally friendly plastic bags for various uses.'),
-(8, 'SKU008', 'Titanium', 'Titanium Sheet', 20, 5000, 800, 200, 'High-strength titanium sheet used for industrial applications.'),
-(9, 'SKU009', 'Metal', 'Copper Wire', 300, 350, 250, 150, 'Copper wire for electrical wiring systems.'),
-(10, 'SKU010', 'Plastic', 'Plastic Sheeting', 100, 200, 120, 60, 'Durable plastic sheeting used for construction sites.'),
-(11, 'SKU011', 'Wood', 'Pine Log', 120, 300, 500, 200, 'Pine logs used for woodcrafts and furniture making.'),
-(12, 'SKU012', 'Titanium', 'Titanium Plate', 30, 4000, 1000, 200, 'Large titanium plate used in aerospace technology.'),
-(13, 'SKU013', 'Plastic', 'Nylon Rope', 50, 80, 100, 20, 'Strong nylon rope used in maritime applications.'),
-(14, 'SKU014', 'Wood', 'Cherry Wood Slabs', 25, 350, 150, 45, 'Premium cherry wood slabs for high-end furniture.'),
-(15, 'SKU015', 'Metal', 'Aluminum Sheet', 75, 600, 200, 120, 'Thin aluminum sheets for manufacturing.'),
-(16, 'SKU016', 'Titanium', 'Titanium Wire', 40, 2500, 200, 75, 'High-performance titanium wire used in medical devices.'),
-(17, 'SKU017', 'Plastic', 'ABS Plastic Sheet', 60, 180, 120, 30, 'ABS plastic sheet commonly used in automotive industries.'),
-(18, 'SKU018', 'Metal', 'Brass Rod', 50, 800, 400, 120, 'Brass rods used in machining and manufacturing.'),
-(19, 'SKU019', 'Wood', 'Bamboo Plank', 150, 180, 60, 35, 'Bamboo planks for eco-friendly flooring options.'),
-(20, 'SKU020', 'Titanium', 'Titanium Bolts', 500, 10000, 50, 10, 'Titanium bolts used in engineering and structural work.'),
-(21, 'SKU001245', 'Metal', 'Flange nut', 123, 525, 500, 25, 'A flange nut is a type of nut that has a wide flange at one end, which serves as an integrated washer.');
+(21, 'SKU001', 'Wood', 'Wooden Table', 10, 199.99, 15, 120, 'High-quality oak wood dining table.'),
+(22, 'SKU002', 'Wood', 'Wooden Chair', 25, 79.99, 5.5, 45, 'Comfortable wooden chair with cushioned seat.'),
+(23, 'SKU003', 'Wood', 'Bookshelf', 15, 149.99, 20, 180, 'Large wooden bookshelf with 5 shelves.'),
+(24, 'SKU004', 'Wood', 'Coffee Table', 20, 89.99, 10, 90, 'Stylish wooden coffee table for living rooms.'),
+(25, 'SKU005', 'Wood', 'Wooden Bed Frame', 8, 299.99, 30, 200, 'Durable king-size wooden bed frame.'),
+(26, 'SKU006', 'Metal', 'Metal Cabinet', 12, 249.99, 25, 160, 'Secure metal storage cabinet with lock.'),
+(27, 'SKU007', 'Metal', 'Steel Chair', 30, 59.99, 6, 50, 'Modern steel chair with ergonomic design.'),
+(28, 'SKU008', 'Metal', 'Metal Shelf', 18, 199.99, 18, 150, 'Heavy-duty metal shelf for storage.'),
+(29, 'SKU009', 'Metal', 'Iron Table', 10, 179.99, 20, 110, 'Industrial-style iron dining table.'),
+(30, 'SKU010', 'Metal', 'Metal Bed Frame', 7, 279.99, 28, 190, 'Strong and sturdy metal bed frame.'),
+(31, 'SKU011', 'Plastic', 'Plastic Chair', 40, 29.99, 2.5, 45, 'Lightweight and durable plastic chair.'),
+(32, 'SKU012', 'Plastic', 'Plastic Storage Box', 50, 19.99, 3, 40, 'Transparent plastic storage box with lid.'),
+(33, 'SKU013', 'Plastic', 'Kids Toy Set', 60, 24.99, 1.2, 30, 'Colorful plastic toy set for children.'),
+(34, 'SKU014', 'Plastic', 'Plastic Table', 22, 69.99, 5, 80, 'Easy-to-clean plastic table for outdoor use.'),
+(35, 'SKU015', 'Plastic', 'Water Bottle', 100, 9.99, 0.8, 25, 'Reusable BPA-free plastic water bottle.'),
+(36, 'SKU016', '', 'Aluminum Ladder', 15, 129.99, 10.5, 150, 'Lightweight and durable aluminum ladder.'),
+(37, 'SKU017', '', 'Aluminum Suitcase', 20, 199.99, 8, 70, 'Scratch-resistant aluminum travel suitcase.'),
+(38, 'SKU018', '', 'Aluminum Laptop Stand', 30, 39.99, 1.5, 35, 'Ergonomic aluminum stand for laptops.'),
+(39, 'SKU019', '', 'Aluminum Bicycle', 10, 499.99, 12, 160, 'Lightweight aluminum frame mountain bike.'),
+(40, 'SKU020', '', 'Aluminum Frying Pan', 25, 59.99, 2, 30, 'Non-stick aluminum frying pan for cooking.');
+
+-- --------------------------------------------------------
+
+--
+-- Tábla szerkezet ehhez a táblához `movement_requests`
+--
+
+CREATE TABLE `movement_requests` (
+  `id` int(11) NOT NULL,
+  `adminId` int(11) NOT NULL,
+  `pallet_id` int(11) NOT NULL,
+  `fromShelfId` int(11) DEFAULT NULL,
+  `toShelfId` int(11) DEFAULT NULL,
+  `actionType` varchar(100) NOT NULL,
+  `status` varchar(11) NOT NULL DEFAULT 'pending',
+  `timeLimit` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- A tábla adatainak kiíratása `movement_requests`
+--
+
+INSERT INTO `movement_requests` (`id`, `adminId`, `pallet_id`, `fromShelfId`, `toShelfId`, `actionType`, `status`, `timeLimit`) VALUES
+(2, 2, 2, NULL, 2, 'add', 'completed', '2025-01-31 13:23:44'),
+(3, 3, 3, NULL, 3, 'add', 'pending', '2008-11-11 13:23:44'),
+(4, 4, 4, NULL, 4, 'add', 'pending', '2025-01-31 13:23:44'),
+(5, 1, 2, 1, 2, 'move', 'completed', '2025-01-31 13:23:44');
+
+-- --------------------------------------------------------
+
+--
+-- Tábla szerkezet ehhez a táblához `movement_requests_x_pallets`
+--
+
+CREATE TABLE `movement_requests_x_pallets` (
+  `id` int(11) NOT NULL,
+  `movement_requests_id` int(11) NOT NULL,
+  `pallet_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- A tábla adatainak kiíratása `movement_requests_x_pallets`
+--
+
+INSERT INTO `movement_requests_x_pallets` (`id`, `movement_requests_id`, `pallet_id`) VALUES
+(1, 1, 1),
+(2, 2, 2),
+(3, 3, 3),
+(4, 4, 4),
+(5, 5, 2);
 
 -- --------------------------------------------------------
 
@@ -548,14 +733,7 @@ CREATE TABLE `pallets` (
 --
 
 INSERT INTO `pallets` (`id`, `name`, `created_at`, `height`, `length`, `width`) VALUES
-(4, 'Wooden Beam', '2024-12-29 16:11:01', 80, 120, 80),
-(5, 'Titanium Rod', '2024-12-30 22:27:28', 80, 120, 80),
-(6, 'Titanium Rod', '2024-12-30 22:27:34', 180, 120, 80),
-(7, 'Titanium Rod', '2024-12-30 22:27:40', 180, 120, 80),
-(8, 'Titanium Rod', '2024-12-30 22:27:49', 80, 120, 80),
-(9, 'Titanium Rod', '2024-12-30 22:28:04', 80, 120, 80),
-(10, 'Steel Plate', '2024-12-30 22:28:09', 80, 120, 80),
-(11, 'Titanium Rod', '2024-12-30 22:29:22', 80, 120, 80);
+(4, 'Bookshelf', '2025-01-30 15:50:53', 80, 120, 80);
 
 -- --------------------------------------------------------
 
@@ -573,14 +751,7 @@ CREATE TABLE `pallets_x_items` (
 --
 
 INSERT INTO `pallets_x_items` (`pallet_id`, `item_id`) VALUES
-(4, 2),
-(5, 3),
-(6, 3),
-(7, 3),
-(8, 3),
-(9, 3),
-(10, 1),
-(11, 3);
+(4, 23);
 
 -- --------------------------------------------------------
 
@@ -598,14 +769,7 @@ CREATE TABLE `pallets_x_shelfs` (
 --
 
 INSERT INTO `pallets_x_shelfs` (`pallet_id`, `shelf_id`) VALUES
-(4, 2),
-(5, 2),
-(6, 2),
-(7, 2),
-(8, 2),
-(9, 2),
-(10, 2),
-(11, 2);
+(4, 2);
 
 -- --------------------------------------------------------
 
@@ -631,13 +795,10 @@ CREATE TABLE `shelfs` (
 --
 
 INSERT INTO `shelfs` (`id`, `name`, `locationInStorage`, `max_capacity`, `current_capacity`, `height`, `length`, `width`, `levels`, `isFull`) VALUES
-(1, 'Shelf A', 'Section 1', 24, 24, 400, 720, 80, 4, 1),
-(2, 'Shelf B', 'Section 2', 24, 16, 400, 720, 80, 4, 0),
-(3, 'Shelf C', 'Section 3', 24, 24, 400, 720, 80, 4, 0),
-(4, 'Shelf A', 'Section 1', 24, 24, 400, 720, 80, 4, 0),
-(5, 'Shelf B', 'Section 2', 24, 24, 400, 720, 80, 4, 0),
-(6, 'Shelf C', 'Section 3', 24, 24, 400, 720, 80, 4, 0),
-(7, 'Shelf J', 'Section 5', 24, 24, 400, 720, 80, 4, 0);
+(1, 'Shelf a', 'Isle A', 24, 25, 400, 720, 80, 4, 0),
+(2, 'Shelf B', 'Isle B', 24, 21, 400, 720, 80, 4, 0),
+(3, 'Shelf A', 'Isle A', 24, 24, 400, 720, 80, 4, 0),
+(4, 'Shelf B', 'Isle B', 24, 24, 400, 720, 80, 4, 0);
 
 -- --------------------------------------------------------
 
@@ -657,11 +818,8 @@ CREATE TABLE `shelfs_x_storage` (
 INSERT INTO `shelfs_x_storage` (`shelf_id`, `storage_id`) VALUES
 (1, 1),
 (2, 1),
-(3, 1),
-(4, 2),
-(5, 2),
-(6, 2),
-(7, 1);
+(3, 2),
+(4, 2);
 
 -- --------------------------------------------------------
 
@@ -683,8 +841,8 @@ CREATE TABLE `storage` (
 --
 
 INSERT INTO `storage` (`id`, `name`, `location`, `max_capacity`, `current_capacity`, `isFull`) VALUES
-(1, 'Storage A', 'South Wing', 54, 53, 0),
-(2, 'Storage B', 'Left Wing', 54, 54, 0);
+(1, 'Storage A', 'Left Wing', 54, 52, 0),
+(2, 'Storage B', 'East Wing', 54, 52, 0);
 
 -- --------------------------------------------------------
 
@@ -710,8 +868,26 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `email`, `firstName`, `lastName`, `userName`, `picture`, `password`, `isAdmin`, `is_deleted`, `deletedAt`) VALUES
-(1, 'admin@gmail.com', 'Tóth', 'Bober', 'Johnbober1', 'https://img.com/potpont', 'ASD123@', 0, NULL, NULL),
-(2, 'admi1n@gmail.com', 'Asd', 'asd', 'Postpone123', 'https://img.com/gezameszaros', 'test123', 1, NULL, NULL);
+(1, 'user1@example.com', 'John', 'Doe', 'johndoe', 'profile1.jpg', 'password123', 0, NULL, NULL),
+(2, 'user2@example.com', 'Jane', 'Smith', 'janesmith', 'profile2.jpg', 'password123', 0, NULL, NULL),
+(3, 'user3@example.com', 'Michael', 'Brown', 'michaelbrown', 'profile3.jpg', 'password123', 0, NULL, NULL),
+(4, 'user4@example.com', 'Emily', 'Davis', 'emilydavis', 'profile4.jpg', 'password123', 0, 1, '2025-01-30 14:38:07'),
+(5, 'user5@example.com', 'Chris', 'Wilson', 'chriswilson', 'profile5.jpg', 'password123', 0, NULL, NULL),
+(6, 'user6@example.com', 'Sarah', 'Miller', 'sarahmiller', 'profile6.jpg', 'password123', 0, NULL, NULL),
+(7, 'user7@example.com', 'David', 'Anderson', 'davidanderson', 'profile7.jpg', 'password123', 0, NULL, NULL),
+(8, 'user8@example.com', 'Laura', 'Martinez', 'lauramartinez', 'profile8.jpg', 'password123', 0, NULL, NULL),
+(9, 'user9@example.com', 'James', 'Taylor', 'jamestaylor', 'profile9.jpg', 'password123', 0, NULL, NULL),
+(10, 'user10@example.com', 'Olivia', 'Harris', 'oliviaharris', 'profile10.jpg', 'password123', 0, NULL, NULL),
+(11, 'admin1@example.com', 'Alice', 'Johnson', 'alicejohnson', 'admin1.jpg', 'adminpass123', 1, NULL, NULL),
+(12, 'admin2@example.com', 'Bob', 'Williams', 'bobwilliams', 'admin2.jpg', 'adminpass123', 1, NULL, NULL),
+(13, 'admin3@example.com', 'Charlie', 'Martinez', 'charliemartinez', 'admin3.jpg', 'adminpass123', 1, NULL, NULL),
+(14, 'admin4@example.com', 'Diana', 'Rodriguez', 'dianarodriguez', 'admin4.jpg', 'adminpass123', 1, NULL, NULL),
+(15, 'admin5@example.com', 'Ethan', 'Hernandez', 'ethanhernandez', 'admin5.jpg', 'adminpass123', 1, NULL, NULL),
+(16, 'admin6@example.com', 'Fiona', 'Lopez', 'fionalopez', 'admin6.jpg', 'adminpass123', 1, NULL, NULL),
+(17, 'admin7@example.com', 'George', 'Gonzalez', 'georgegonzalez', 'admin7.jpg', 'adminpass123', 1, NULL, NULL),
+(18, 'admin8@example.com', 'Hannah', 'Wilson', 'hannahwilson', 'admin8.jpg', 'adminpass123', 1, NULL, NULL),
+(19, 'admin9@example.com', 'Ian', 'Anderson', 'iananderson', 'admin9.jpg', 'adminpass123', 1, NULL, NULL),
+(20, 'admin10@example.com', 'Julia', 'Thomas', 'juliathomas', 'admin10.jpg', 'adminpass123', 1, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -723,6 +899,20 @@ CREATE TABLE `user_x_storage` (
   `user_id` int(11) DEFAULT NULL,
   `storage_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- A tábla adatainak kiíratása `user_x_storage`
+--
+
+INSERT INTO `user_x_storage` (`user_id`, `storage_id`) VALUES
+(1, 1),
+(2, 1),
+(3, 1),
+(4, 1),
+(5, 2),
+(6, 2),
+(7, 2),
+(8, 2);
 
 --
 -- Indexek a kiírt táblákhoz
@@ -752,6 +942,20 @@ ALTER TABLE `inventorymovement_x_pallets`
 --
 ALTER TABLE `items`
   ADD PRIMARY KEY (`id`);
+
+--
+-- A tábla indexei `movement_requests`
+--
+ALTER TABLE `movement_requests`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- A tábla indexei `movement_requests_x_pallets`
+--
+ALTER TABLE `movement_requests_x_pallets`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `movement_requests_id` (`movement_requests_id`),
+  ADD KEY `pallet_id` (`pallet_id`);
 
 --
 -- A tábla indexei `pallets`
@@ -813,31 +1017,43 @@ ALTER TABLE `user_x_storage`
 -- AUTO_INCREMENT a táblához `inventorymovement`
 --
 ALTER TABLE `inventorymovement`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT a táblához `inventorymovement_x_pallets`
 --
 ALTER TABLE `inventorymovement_x_pallets`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT a táblához `items`
 --
 ALTER TABLE `items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+
+--
+-- AUTO_INCREMENT a táblához `movement_requests`
+--
+ALTER TABLE `movement_requests`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT a táblához `movement_requests_x_pallets`
+--
+ALTER TABLE `movement_requests_x_pallets`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT a táblához `pallets`
 --
 ALTER TABLE `pallets`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT a táblához `shelfs`
 --
 ALTER TABLE `shelfs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT a táblához `storage`
@@ -849,7 +1065,7 @@ ALTER TABLE `storage`
 -- AUTO_INCREMENT a táblához `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- Megkötések a kiírt táblákhoz
@@ -869,8 +1085,7 @@ ALTER TABLE `inventorymovement`
 -- Megkötések a táblához `inventorymovement_x_pallets`
 --
 ALTER TABLE `inventorymovement_x_pallets`
-  ADD CONSTRAINT `inventorymovement_x_pallets_ibfk_1` FOREIGN KEY (`inventory_id`) REFERENCES `inventorymovement` (`id`),
-  ADD CONSTRAINT `inventorymovement_x_pallets_ibfk_2` FOREIGN KEY (`pallet_id`) REFERENCES `pallets` (`id`);
+  ADD CONSTRAINT `inventorymovement_x_pallets_ibfk_1` FOREIGN KEY (`inventory_id`) REFERENCES `inventorymovement` (`id`);
 
 --
 -- Megkötések a táblához `pallets_x_items`
