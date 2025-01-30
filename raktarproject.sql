@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Gép: localhost:3306
--- Létrehozás ideje: 2025. Jan 30. 15:27
+-- Létrehozás ideje: 2025. Jan 30. 15:36
 -- Kiszolgáló verziója: 5.7.24
 -- PHP verzió: 8.3.1
 
@@ -860,6 +860,7 @@ CREATE TABLE `users` (
   `picture` text,
   `password` varchar(255) DEFAULT NULL,
   `isAdmin` tinyint(1) DEFAULT NULL,
+  `createdAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `is_deleted` tinyint(1) DEFAULT NULL,
   `deletedAt` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -868,27 +869,27 @@ CREATE TABLE `users` (
 -- A tábla adatainak kiíratása `users`
 --
 
-INSERT INTO `users` (`id`, `email`, `firstName`, `lastName`, `userName`, `picture`, `password`, `isAdmin`, `is_deleted`, `deletedAt`) VALUES
-(1, 'user1@example.com', 'John', 'Doe', 'johndoe', 'profile1.jpg', 'password123', 0, NULL, NULL),
-(2, 'user2@example.com', 'Jane', 'Smith', 'janesmith', 'profile2.jpg', 'password123', 0, NULL, NULL),
-(3, 'user3@example.com', 'Michael', 'Brown', 'michaelbrown', 'profile3.jpg', 'password123', 0, NULL, NULL),
-(4, 'user4@example.com', 'Emily', 'Davis', 'emilydavis', 'profile4.jpg', 'password123', 0, 1, '2025-01-30 14:38:07'),
-(5, 'user5@example.com', 'Chris', 'Wilson', 'chriswilson', 'profile5.jpg', 'password123', 0, NULL, NULL),
-(6, 'user6@example.com', 'Sarah', 'Miller', 'sarahmiller', 'profile6.jpg', 'password123', 0, NULL, NULL),
-(7, 'user7@example.com', 'David', 'Anderson', 'davidanderson', 'profile7.jpg', 'password123', 0, NULL, NULL),
-(8, 'user8@example.com', 'Laura', 'Martinez', 'lauramartinez', 'profile8.jpg', 'password123', 0, NULL, NULL),
-(9, 'user9@example.com', 'James', 'Taylor', 'jamestaylor', 'profile9.jpg', 'password123', 0, NULL, NULL),
-(10, 'user10@example.com', 'Olivia', 'Harris', 'oliviaharris', 'profile10.jpg', 'password123', 0, NULL, NULL),
-(11, 'admin1@example.com', 'Alice', 'Johnson', 'alicejohnson', 'admin1.jpg', 'adminpass123', 1, NULL, NULL),
-(12, 'admin2@example.com', 'Bob', 'Williams', 'bobwilliams', 'admin2.jpg', 'adminpass123', 1, NULL, NULL),
-(13, 'admin3@example.com', 'Charlie', 'Martinez', 'charliemartinez', 'admin3.jpg', 'adminpass123', 1, NULL, NULL),
-(14, 'admin4@example.com', 'Diana', 'Rodriguez', 'dianarodriguez', 'admin4.jpg', 'adminpass123', 1, NULL, NULL),
-(15, 'admin5@example.com', 'Ethan', 'Hernandez', 'ethanhernandez', 'admin5.jpg', 'adminpass123', 1, NULL, NULL),
-(16, 'admin6@example.com', 'Fiona', 'Lopez', 'fionalopez', 'admin6.jpg', 'adminpass123', 1, NULL, NULL),
-(17, 'admin7@example.com', 'George', 'Gonzalez', 'georgegonzalez', 'admin7.jpg', 'adminpass123', 1, NULL, NULL),
-(18, 'admin8@example.com', 'Hannah', 'Wilson', 'hannahwilson', 'admin8.jpg', 'adminpass123', 1, NULL, NULL),
-(19, 'admin9@example.com', 'Ian', 'Anderson', 'iananderson', 'admin9.jpg', 'adminpass123', 1, NULL, NULL),
-(20, 'admin10@example.com', 'Julia', 'Thomas', 'juliathomas', 'admin10.jpg', 'adminpass123', 1, NULL, NULL);
+INSERT INTO `users` (`id`, `email`, `firstName`, `lastName`, `userName`, `picture`, `password`, `isAdmin`, `createdAt`, `is_deleted`, `deletedAt`) VALUES
+(1, 'user1@example.com', 'John', 'Doe', 'johndoe', 'profile1.jpg', 'password123', 0, '2025-01-30 16:36:34', NULL, NULL),
+(2, 'user2@example.com', 'Jane', 'Smith', 'janesmith', 'profile2.jpg', 'password123', 0, '2025-01-30 16:36:34', NULL, NULL),
+(3, 'user3@example.com', 'Michael', 'Brown', 'michaelbrown', 'profile3.jpg', 'password123', 0, '2025-01-30 16:36:34', NULL, NULL),
+(4, 'user4@example.com', 'Emily', 'Davis', 'emilydavis', 'profile4.jpg', 'password123', 0, '2025-01-30 16:36:34', 1, '2025-01-30 14:38:07'),
+(5, 'user5@example.com', 'Chris', 'Wilson', 'chriswilson', 'profile5.jpg', 'password123', 0, '2025-01-30 16:36:34', NULL, NULL),
+(6, 'user6@example.com', 'Sarah', 'Miller', 'sarahmiller', 'profile6.jpg', 'password123', 0, '2025-01-30 16:36:34', NULL, NULL),
+(7, 'user7@example.com', 'David', 'Anderson', 'davidanderson', 'profile7.jpg', 'password123', 0, '2025-01-30 16:36:34', NULL, NULL),
+(8, 'user8@example.com', 'Laura', 'Martinez', 'lauramartinez', 'profile8.jpg', 'password123', 0, '2025-01-30 16:36:34', NULL, NULL),
+(9, 'user9@example.com', 'James', 'Taylor', 'jamestaylor', 'profile9.jpg', 'password123', 0, '2025-01-30 16:36:34', NULL, NULL),
+(10, 'user10@example.com', 'Olivia', 'Harris', 'oliviaharris', 'profile10.jpg', 'password123', 0, '2025-01-30 16:36:34', NULL, NULL),
+(11, 'admin1@example.com', 'Alice', 'Johnson', 'alicejohnson', 'admin1.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', NULL, NULL),
+(12, 'admin2@example.com', 'Bob', 'Williams', 'bobwilliams', 'admin2.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', NULL, NULL),
+(13, 'admin3@example.com', 'Charlie', 'Martinez', 'charliemartinez', 'admin3.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', NULL, NULL),
+(14, 'admin4@example.com', 'Diana', 'Rodriguez', 'dianarodriguez', 'admin4.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', NULL, NULL),
+(15, 'admin5@example.com', 'Ethan', 'Hernandez', 'ethanhernandez', 'admin5.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', NULL, NULL),
+(16, 'admin6@example.com', 'Fiona', 'Lopez', 'fionalopez', 'admin6.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', NULL, NULL),
+(17, 'admin7@example.com', 'George', 'Gonzalez', 'georgegonzalez', 'admin7.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', NULL, NULL),
+(18, 'admin8@example.com', 'Hannah', 'Wilson', 'hannahwilson', 'admin8.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', NULL, NULL),
+(19, 'admin9@example.com', 'Ian', 'Anderson', 'iananderson', 'admin9.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', NULL, NULL),
+(20, 'admin10@example.com', 'Julia', 'Thomas', 'juliathomas', 'admin10.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', NULL, NULL);
 
 -- --------------------------------------------------------
 
