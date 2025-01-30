@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Gép: localhost:3306
--- Létrehozás ideje: 2025. Jan 30. 14:52
+-- Létrehozás ideje: 2025. Jan 30. 15:27
 -- Kiszolgáló verziója: 5.7.24
 -- PHP verzió: 8.3.1
 
@@ -20,8 +20,6 @@ SET time_zone = "+00:00";
 --
 -- Adatbázis: `raktarproject`
 --
-CREATE DATABASE IF NOT EXISTS `raktarproject` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
-USE `raktarproject`;
 
 DELIMITER $$
 --
@@ -742,6 +740,7 @@ INSERT INTO `pallets` (`id`, `name`, `created_at`, `height`, `length`, `width`) 
 --
 
 CREATE TABLE `pallets_x_items` (
+  `id` int(11) NOT NULL,
   `pallet_id` int(11) DEFAULT NULL,
   `item_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -750,8 +749,8 @@ CREATE TABLE `pallets_x_items` (
 -- A tábla adatainak kiíratása `pallets_x_items`
 --
 
-INSERT INTO `pallets_x_items` (`pallet_id`, `item_id`) VALUES
-(4, 23);
+INSERT INTO `pallets_x_items` (`id`, `pallet_id`, `item_id`) VALUES
+(1, 4, 23);
 
 -- --------------------------------------------------------
 
@@ -760,6 +759,7 @@ INSERT INTO `pallets_x_items` (`pallet_id`, `item_id`) VALUES
 --
 
 CREATE TABLE `pallets_x_shelfs` (
+  `id` int(11) NOT NULL,
   `pallet_id` int(11) DEFAULT NULL,
   `shelf_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -768,8 +768,8 @@ CREATE TABLE `pallets_x_shelfs` (
 -- A tábla adatainak kiíratása `pallets_x_shelfs`
 --
 
-INSERT INTO `pallets_x_shelfs` (`pallet_id`, `shelf_id`) VALUES
-(4, 2);
+INSERT INTO `pallets_x_shelfs` (`id`, `pallet_id`, `shelf_id`) VALUES
+(1, 4, 2);
 
 -- --------------------------------------------------------
 
@@ -807,6 +807,7 @@ INSERT INTO `shelfs` (`id`, `name`, `locationInStorage`, `max_capacity`, `curren
 --
 
 CREATE TABLE `shelfs_x_storage` (
+  `id` int(11) NOT NULL,
   `shelf_id` int(11) DEFAULT NULL,
   `storage_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -815,11 +816,11 @@ CREATE TABLE `shelfs_x_storage` (
 -- A tábla adatainak kiíratása `shelfs_x_storage`
 --
 
-INSERT INTO `shelfs_x_storage` (`shelf_id`, `storage_id`) VALUES
-(1, 1),
-(2, 1),
-(3, 2),
-(4, 2);
+INSERT INTO `shelfs_x_storage` (`id`, `shelf_id`, `storage_id`) VALUES
+(1, 1, 1),
+(2, 2, 1),
+(3, 3, 2),
+(4, 4, 2);
 
 -- --------------------------------------------------------
 
@@ -896,6 +897,7 @@ INSERT INTO `users` (`id`, `email`, `firstName`, `lastName`, `userName`, `pictur
 --
 
 CREATE TABLE `user_x_storage` (
+  `1` int(11) NOT NULL,
   `user_id` int(11) DEFAULT NULL,
   `storage_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -904,15 +906,15 @@ CREATE TABLE `user_x_storage` (
 -- A tábla adatainak kiíratása `user_x_storage`
 --
 
-INSERT INTO `user_x_storage` (`user_id`, `storage_id`) VALUES
-(1, 1),
-(2, 1),
-(3, 1),
-(4, 1),
-(5, 2),
-(6, 2),
-(7, 2),
-(8, 2);
+INSERT INTO `user_x_storage` (`1`, `user_id`, `storage_id`) VALUES
+(1, 1, 1),
+(2, 2, 1),
+(3, 3, 1),
+(4, 4, 1),
+(5, 5, 2),
+(6, 6, 2),
+(7, 7, 2),
+(8, 8, 2);
 
 --
 -- Indexek a kiírt táblákhoz
@@ -967,6 +969,7 @@ ALTER TABLE `pallets`
 -- A tábla indexei `pallets_x_items`
 --
 ALTER TABLE `pallets_x_items`
+  ADD PRIMARY KEY (`id`),
   ADD KEY `pallet_id` (`pallet_id`),
   ADD KEY `item_id` (`item_id`);
 
@@ -974,6 +977,7 @@ ALTER TABLE `pallets_x_items`
 -- A tábla indexei `pallets_x_shelfs`
 --
 ALTER TABLE `pallets_x_shelfs`
+  ADD PRIMARY KEY (`id`),
   ADD KEY `pallet_id` (`pallet_id`),
   ADD KEY `shelf_id` (`shelf_id`);
 
@@ -987,6 +991,7 @@ ALTER TABLE `shelfs`
 -- A tábla indexei `shelfs_x_storage`
 --
 ALTER TABLE `shelfs_x_storage`
+  ADD PRIMARY KEY (`id`),
   ADD KEY `shelf_id` (`shelf_id`),
   ADD KEY `storage_id` (`storage_id`);
 
@@ -1006,6 +1011,7 @@ ALTER TABLE `users`
 -- A tábla indexei `user_x_storage`
 --
 ALTER TABLE `user_x_storage`
+  ADD PRIMARY KEY (`1`),
   ADD KEY `user_id` (`user_id`),
   ADD KEY `storage_id` (`storage_id`);
 
@@ -1050,9 +1056,27 @@ ALTER TABLE `pallets`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
+-- AUTO_INCREMENT a táblához `pallets_x_items`
+--
+ALTER TABLE `pallets_x_items`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT a táblához `pallets_x_shelfs`
+--
+ALTER TABLE `pallets_x_shelfs`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT a táblához `shelfs`
 --
 ALTER TABLE `shelfs`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT a táblához `shelfs_x_storage`
+--
+ALTER TABLE `shelfs_x_storage`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
@@ -1066,6 +1090,12 @@ ALTER TABLE `storage`
 --
 ALTER TABLE `users`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+
+--
+-- AUTO_INCREMENT a táblához `user_x_storage`
+--
+ALTER TABLE `user_x_storage`
+  MODIFY `1` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- Megkötések a kiírt táblákhoz
