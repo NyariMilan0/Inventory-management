@@ -25,6 +25,25 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "Shelfs.findByIsFull", query = "SELECT s FROM Shelfs s WHERE s.isFull = :isFull")})
 public class Shelfs implements Serializable {
 
+    @Column(name = "max_capacity")
+    private Integer maxCapacity;
+    @Column(name = "current_capacity")
+    private Integer currentCapacity;
+    @Column(name = "height")
+    private Integer height;
+    @Column(name = "length")
+    private Integer length;
+    @Column(name = "width")
+    private Integer width;
+    @Column(name = "levels")
+    private Integer levels;
+    @OneToMany(mappedBy = "shelfId")
+    private Collection<PalletsXShelfs> palletsXShelfsCollection;
+    @OneToMany(mappedBy = "fromShelf")
+    private Collection<Inventorymovement> inventorymovementCollection;
+    @OneToMany(mappedBy = "toShelf")
+    private Collection<Inventorymovement> inventorymovementCollection1;
+
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
@@ -45,8 +64,6 @@ public class Shelfs implements Serializable {
     private Boolean isFull;
     @OneToMany(mappedBy = "shelfId")
     private Collection<ShelfsXStorage> shelfsXStorageCollection;
-    @OneToMany(mappedBy = "shelfId")
-    private Collection<ItemsXShelfs> itemsXShelfsCollection;
 
     public Shelfs() {
     }
@@ -103,13 +120,6 @@ public class Shelfs implements Serializable {
         this.shelfsXStorageCollection = shelfsXStorageCollection;
     }
 
-    public Collection<ItemsXShelfs> getItemsXShelfsCollection() {
-        return itemsXShelfsCollection;
-    }
-
-    public void setItemsXShelfsCollection(Collection<ItemsXShelfs> itemsXShelfsCollection) {
-        this.itemsXShelfsCollection = itemsXShelfsCollection;
-    }
 
     @Override
     public int hashCode() {
@@ -134,6 +144,78 @@ public class Shelfs implements Serializable {
     @Override
     public String toString() {
         return "com.helixlab.raktarproject.model.Shelfs[ id=" + id + " ]";
+    }
+
+    public Integer getMaxCapacity() {
+        return maxCapacity;
+    }
+
+    public void setMaxCapacity(Integer maxCapacity) {
+        this.maxCapacity = maxCapacity;
+    }
+
+    public Integer getCurrentCapacity() {
+        return currentCapacity;
+    }
+
+    public void setCurrentCapacity(Integer currentCapacity) {
+        this.currentCapacity = currentCapacity;
+    }
+
+    public Integer getHeight() {
+        return height;
+    }
+
+    public void setHeight(Integer height) {
+        this.height = height;
+    }
+
+    public Integer getLength() {
+        return length;
+    }
+
+    public void setLength(Integer length) {
+        this.length = length;
+    }
+
+    public Integer getWidth() {
+        return width;
+    }
+
+    public void setWidth(Integer width) {
+        this.width = width;
+    }
+
+    public Integer getLevels() {
+        return levels;
+    }
+
+    public void setLevels(Integer levels) {
+        this.levels = levels;
+    }
+
+    public Collection<PalletsXShelfs> getPalletsXShelfsCollection() {
+        return palletsXShelfsCollection;
+    }
+
+    public void setPalletsXShelfsCollection(Collection<PalletsXShelfs> palletsXShelfsCollection) {
+        this.palletsXShelfsCollection = palletsXShelfsCollection;
+    }
+
+    public Collection<Inventorymovement> getInventorymovementCollection() {
+        return inventorymovementCollection;
+    }
+
+    public void setInventorymovementCollection(Collection<Inventorymovement> inventorymovementCollection) {
+        this.inventorymovementCollection = inventorymovementCollection;
+    }
+
+    public Collection<Inventorymovement> getInventorymovementCollection1() {
+        return inventorymovementCollection1;
+    }
+
+    public void setInventorymovementCollection1(Collection<Inventorymovement> inventorymovementCollection1) {
+        this.inventorymovementCollection1 = inventorymovementCollection1;
     }
 
 }

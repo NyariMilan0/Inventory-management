@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Basic;
@@ -17,6 +18,7 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.ParameterMode;
 import javax.persistence.Persistence;
 import javax.persistence.StoredProcedureQuery;
@@ -41,6 +43,11 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "Users.findByIsDeleted", query = "SELECT u FROM Users u WHERE u.isDeleted = :isDeleted"),
     @NamedQuery(name = "Users.findByDeletedAt", query = "SELECT u FROM Users u WHERE u.deletedAt = :deletedAt")})
 public class Users implements Serializable {
+
+    @OneToMany(mappedBy = "byUser")
+    private Collection<Inventorymovement> inventorymovementCollection;
+    @OneToMany(mappedBy = "userId")
+    private Collection<UserXStorage> userXStorageCollection;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -284,7 +291,7 @@ public Users(Integer id){
                         o[5].toString(), //picture
                         o[6].toString(), //password
                         Boolean.parseBoolean(o[7].toString()), //isadmin
-                        o[8] == null ? null : formatter.parse(o[8].toString()), //creqatedAt
+                        o[8] == null ? null : formatter.parse(o[8].toString()), //createdAt
                         Boolean.parseBoolean(o[9].toString()), //isDeleted
                         o[10] == null ? null : formatter.parse(o[10].toString()) //deletedAt
                 );
@@ -407,6 +414,22 @@ public Users(Integer id){
 
     return userList;
 }
+
+    public Collection<Inventorymovement> getInventorymovementCollection() {
+        return inventorymovementCollection;
+    }
+
+    public void setInventorymovementCollection(Collection<Inventorymovement> inventorymovementCollection) {
+        this.inventorymovementCollection = inventorymovementCollection;
+    }
+
+    public Collection<UserXStorage> getUserXStorageCollection() {
+        return userXStorageCollection;
+    }
+
+    public void setUserXStorageCollection(Collection<UserXStorage> userXStorageCollection) {
+        this.userXStorageCollection = userXStorageCollection;
+    }
     
     
     
