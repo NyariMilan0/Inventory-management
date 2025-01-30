@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Gép: localhost:3306
--- Létrehozás ideje: 2025. Jan 30. 15:59
+-- Létrehozás ideje: 2025. Jan 30. 16:04
 -- Kiszolgáló verziója: 5.7.24
 -- PHP verzió: 8.3.1
 
@@ -20,6 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Adatbázis: `raktarproject`
 --
+CREATE DATABASE IF NOT EXISTS `raktarproject` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE `raktarproject`;
 
 DELIMITER $$
 --
@@ -890,7 +892,8 @@ INSERT INTO `users` (`id`, `email`, `firstName`, `lastName`, `userName`, `pictur
 (17, 'admin7@example.com', 'George', 'Gonzalez', 'georgegonzalez', 'admin7.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', NULL, NULL),
 (18, 'admin8@example.com', 'Hannah', 'Wilson', 'hannahwilson', 'admin8.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', NULL, NULL),
 (19, 'admin9@example.com', 'Ian', 'Anderson', 'iananderson', 'admin9.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', NULL, NULL),
-(20, 'admin10@example.com', 'Julia', 'Thomas', 'juliathomas', 'admin10.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', NULL, NULL);
+(20, 'admin10@example.com', 'Julia', 'Thomas', 'juliathomas', 'admin10.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', NULL, NULL),
+(21, 'asd@asd.com', 'asd', 'asd', 'asd', 'asd', 'asd', 0, '2025-01-30 17:04:06', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1091,7 +1094,7 @@ ALTER TABLE `storage`
 -- AUTO_INCREMENT a táblához `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT a táblához `user_x_storage`
