@@ -195,5 +195,20 @@ public class UserService {
 
         return userList;
     }
+    public Users getUserById(Integer id){
+        return layer.getUserById(id);
+    }
+    
+    
+    public Boolean deletUser(Integer id){
+        Users u = getUserById(id);
+
+        if(u != null){
+            return layer.deleteUser(id);
+        } else{
+            System.err.println("A user nem létezik");
+            return false;
+        }
+    }
 
 }

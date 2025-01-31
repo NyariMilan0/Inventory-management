@@ -414,6 +414,40 @@ public Users(Integer id){
 
     return userList;
 }
+    
+    public Boolean deleteUser(Integer id) {
+        EntityManager em = emf.createEntityManager();
+        Boolean toReturn = false;
+
+        try {
+
+            StoredProcedureQuery spq = em.createStoredProcedureQuery("deleteUser");
+            spq.registerStoredProcedureParameter("idIn", Integer.class, ParameterMode.IN);
+            spq.setParameter("idIn", id);
+
+            spq.execute();
+
+            toReturn = true;
+
+        } catch (Exception e) {
+            System.err.println("Hiba: " + e.getLocalizedMessage());
+            toReturn = false;
+        } finally {
+            em.clear();
+            em.close();
+            return toReturn;
+        }
+
+    }
+    
+    public Users getUserById(Integer id) {
+        try {
+            return new Users(id);
+        } catch (Exception e) {
+            System.err.println("Hiba: " + e.getLocalizedMessage());
+            return null;
+        }
+    }
 
     public Collection<Inventorymovement> getInventorymovementCollection() {
         return inventorymovementCollection;

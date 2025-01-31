@@ -5,11 +5,13 @@ import com.helixlab.raktarproject.model.Users;
 import com.helixlab.raktarproject.service.UserService;
 import java.util.ArrayList;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -40,6 +42,7 @@ public class UserController {
     public void putXml(String content) {
 
     }
+    
 
     @POST
     @Path("login")
@@ -135,6 +138,50 @@ public class UserController {
             responseObj.put("error", e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(responseObj.toString()).type(MediaType.APPLICATION_JSON).build();
         }
+    }
+
+    @GET
+    @Path("getUserById")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getUserById(@QueryParam("id") Integer id) {
+        Users response = layer.getUserById(id);
+        JSONObject userJson = new JSONObject();
+
+        userJson.put("id", response.getId());
+        userJson.put("email", response.getEmail());
+        userJson.put("firstName", response.getFirstName());
+        userJson.put("lastName", response.getLastName());
+        userJson.put("password", response.getPassword());
+        userJson.put("isAdmin", response.getIsAdmin());
+        userJson.put("userName", response.getUserName());  
+        userJson.put("isDeleted", response.getIsDeleted());  
+        userJson.put("createdAt", response.getCreatedAt());
+        userJson.put("deletedAt", response.getDeletedAt());
+        userJson.put("picture", response.getPicture());
+
+        return Response.status(Response.Status.OK).entity(userJson.toString()).type(MediaType.APPLICATION_JSON).build();
+
+    }
+
+    @DELETE
+    @Path("deleteUser")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response deleteUser(@QueryParam("id") Integer id) {
+        Boolean response = layer.deletUser(id);
+        JSONObject toReturn = new JSONObject();
+
+        String result = "";
+
+        if (response == false) {
+            result = "fail";
+        } else {
+            result = "success";
+        }
+
+        toReturn.put("result", result);
+
+        return Response.status(Response.Status.OK).entity(toReturn.toString()).type(MediaType.APPLICATION_JSON).build();
+
     }
 
 }
