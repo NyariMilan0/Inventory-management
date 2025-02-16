@@ -4,8 +4,13 @@
     height: 100vh;
   }
    */
-
-
+   @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap');
+.roboto-condensed {
+    font-family: "Roboto Condensed", serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+  }
 #container {
     background-image: url('/assets/login.jpg');;
     width: 100vw;
@@ -13,6 +18,8 @@
     background-size:cover;
     background-position:center;
     overflow: hidden;
+
+    
     
 } 
 
@@ -31,7 +38,7 @@
 }
  .Loginpanel{
    /* padding-top: 250px;  */
-  width: 40%; 
+  width: auto;
 
   text-align: center;
  }
@@ -43,6 +50,7 @@
 
 .col-5{
     padding-top: 350px;
+    padding-right: 100px
 }
 
 .col-7{
@@ -74,13 +82,12 @@
     border: none;
     border-radius: 10px;
     /* box-shadow: 2px 10px 20px #888888; */
-    box-shadow: 5px 7px 15px #888888   ;
+    box-shadow: 1px 2px 3px #888888   ;
 }
 
 .title{
-    margin-right: 10px;
+    margin-right: 30px;
     font-size:40px;
-    font-weight: bolder;
     color:#1D3557;
     height: 63px;
     width: 221px;
@@ -97,4 +104,42 @@ sub{
 
 #text{
     color: #1D3557;
+}
+
+.icon-container{
+
+}
+
+.signIn{
+    
+}
+
+.login-text{
+    font-size: 25px;
+}
+
+.amico{
+    height: 70%;
+    width: 70%;
+}
+
+
+@media (max-width: 1050px) {
+    .amico {
+      display: none;
+    }
+  }
+  
+  @media (max-width: 960px) {
+   .logincontainer, .textcontainer{
+    width: 100%;
+    height: auto;
+    padding: 0px;
+   }
+  }
+
+  @media (max-width: 960px) {
+    .textcontainer{
+     justify-items: center;
+    }
 }
