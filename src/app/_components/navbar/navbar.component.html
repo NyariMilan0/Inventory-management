@@ -1,29 +1,33 @@
-<div class="sidebar-container">
-    <div class="sidebar" 
-         [class.expanded]="isExpanded" 
-         (mouseenter)="isExpanded = true" 
-         (mouseleave)="isExpanded = false">
+<div class="sidebar-container roboto-condensed">
+  <div class="sidebar" 
+       [class.expanded]="isExpanded" 
+       (mouseenter)="isExpanded = true" 
+       (mouseleave)="isExpanded = false">
 
-      <a class="menuMain">
-        <img class="navbarCompanyLogo" src="/assets/Vector.svg" alt="">
-        <span class="navbarLogoText">WareTech</span>
+    <a class="menuMain">
+      <img class="navbarCompanyLogo" src="/assets/CompanyLogo.svg" alt="">
+      <span class="navbarLogoText">WareTech</span>
+    </a>
+    
+    <hr class="navbarSeparatorLine">
+    <div class="menu-items">
+      <p>main</p>
+      <a class="menu-item">
+        <img class="navbarIcons" src="/assets/DiagramIcon.svg" alt="">
+        <span class="menu-text ">Storage</span>
       </a>
-      
-      <hr class="navbarSeparatorLine">
-      <div class="menu-items">
-        <p>main</p>
-        <a class="menu-item">
-          <img class="navbarIcons" src="/assets/DiagramIcon.svg" alt="">
-          <span class="menu-text">Overview</span>
-        </a>
-        <a class="menu-item">
-          <i class="bi bi-box-arrow-right">a</i>
-          <span class="menu-text">Kijelentkezés</span>
-        </a>
-      </div>
-    </div>
-  
-    <div class="main-content">
-
+      <a class="menu-item">
+        <img class="navbarIcons" src="/assets/PalletIcon.svg" alt="">
+        <span class="menu-text">Pallet Management</span>
+      </a>
+      <a class="menu-item">
+        <img class="navbarIcons" src="/assets/Items.svg" alt="">
+        <span class="menu-text">Items</span>
+      </a>
+      <a class="menu-item">
+        <img class="navbarIcons" src="/assets/ItemManagementIcon.svg" alt="">
+        <span class="menu-text">Manage Items</span>
+      </a>
     </div>
   </div>
+</div>

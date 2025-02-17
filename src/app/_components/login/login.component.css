@@ -91,8 +91,8 @@ sub{
     color: #1D3557;
 }
 
-.icon-container{
-
+.icon-container img{
+    margin-bottom: 15px;
 }
 
 
@@ -139,8 +139,8 @@ sub{
   }
   
   @media (max-width: 960px) {
-   .logincontainer, .textcontainer{
-    width: 100%;
+   .loginContainer, .textcontainer{
+    width: 100% !important;
     height: auto;
     padding: 0px;
    }
