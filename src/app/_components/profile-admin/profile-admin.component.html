@@ -1,0 +1,93 @@
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#profileModal">
+    Profil megnyitása
+  </button>
+  
+  <div class="modal fade" id="profileModal">
+    <div class="modal-dialog modal-dialog-centered modal-lg custom-modal-dialog">
+      <div class="modal-content shadow custom-modal-content">
+          <div class="popup-header">
+              <div class="row">
+                  <div class="col-10">
+                      <h5 class="modal-title">Profile Information</h5>
+                  </div>
+                  <div class="closeButtonContainer col-2"><button class="closeButton" >&times;</button></div>
+
+              </div>
+            </div>
+          
+          <div class="modal-body custom-modal-body">
+              <div class="belsobox">
+              <div class="d-flex align-items-start mb-4">
+                    
+                        <div class="col-6" style="padding-left:30px;">
+                            <img
+                              src="https://www.w3schools.com/howto/img_avatar.png"
+                              alt="Profile Picture"
+                              class="profileImg"
+                            >
+                        </div>
+                        <div class="col-6" style="padding:100px 0px 0px 10px;">
+                            <p class="mb-1"><span id="userName" class="fw-bold">john_doe</span></p>
+                        </div>
+                    
+                </div>
+            <div class="middleDiv">
+              <p class="mb-1">First Name: <span id="firstName">John</span></p>
+              <p class="mb-1">Last Name: <span id="lastName">Doe</span></p>
+              <p class="mb-1">Role: <span id="role">Administrator</span></p>
+            </div>
+              <div class="informations row">
+                  <div class="col-4">
+                      <div class="mb-3 ">
+                        <!-- <label for="oldPassword" class="form-label">Old password</label> -->
+                        <input
+                          type="password"
+                          class="form-control"
+                          id="oldPassword"
+                          placeholder="Enter old password"
+                        >
+                      </div>
+                      <div class="mb-3 ">
+                        <!-- <label for="newPassword" class="form-label">New password</label> -->
+                        <input
+                          type="password"
+                          class="form-control"
+                          id="newPassword"
+                          placeholder="Enter new password"
+                        >
+                      </div>
+                      <div class="mb-3 ">
+                        <!-- <label for="newPasswordAgain" class="form-label">New password again</label> -->
+                        <input
+                          type="password"
+                          class="form-control"
+                          id="newPasswordAgain"
+                          placeholder="Re-enter new password"
+                        >
+                      </div>
+                      <div class="mb-4 profileButtons ">
+                        <button class="btn btn-primary" type="button">Update password</button>
+                      </div>
+                  </div>
+                  <div class="col-4">
+                      <div class="mb-3 ">
+                        <!-- <label for="newUsername" class="form-label">New username</label> -->
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="newUsername"
+                          placeholder="Enter new username"
+                        >
+                      </div>
+                      <div class="mb-4 profileButtons">
+                        <button class="btn btn-secondary"type="button">Edit username</button>
+                      </div>
+                  </div>
+                  <div class=" buttonDiv col-4"><button class="btn btn-danger signOutButton" type="button">Sign out</button></div>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+  
