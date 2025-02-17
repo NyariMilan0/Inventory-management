@@ -1,46 +1,37 @@
 <div id="container" class="roboto-condensed ">
-    <!-- <img src="/src/assets/Desktop - 21.png" alt="" class="bg"> -->
-<div class="row">
-    
+    <div class="row">
         <div class="col-7 textcontainer">
             <div class="content">
-                
-                    <span style="margin-right: 10px;" class="icon-container"><img src="/assets/Vector.svg" alt="Login Icon" width="56" height="56" /></span>
-               
-                <span id="text" class="title">WareTech</span> 
+                <span style="margin-right: 10px;" class="icon-container"><img src="/assets/Vector.svg" alt="Login Icon" width="56" height="56" /></span>
+                <h1 id="text" class="title">WareTech</h1> 
                 <span id="text"><sub>STORAGE MANAGEMENT</sub></span>
                 <br><br>
-                <P class="login-text">Smart storage, seamless logistics – delivering trust and 
-                    efficiency every step of the way!</P>
+                <P class="login-text">Smart storage, seamless logistics – delivering trust and efficiency every step of the way!</P>
                     <div>
                         <img class="amico" src="/assets/amico.jpg" alt="work">
                     </div>
             </div>
         </div>
-    
-    
-            <div class="col-5 logincontainer">
+
+        <div class="col-5 loginContainer">
                 <div class="Loginpanel">
-                        <div class="icon-container">
-                            <img class="login-icon" src="/assets/Vector.svg" alt="Login Icon" width="77" height="77" />
-                          <br><br>
-                            <h3 id="text">Sign In</h3>
-                        </div>
+                    <div class="icon-container">
+                        <img class="login-icon" src="/assets/Vector.svg" alt="Login Icon" width="77" height="77" />
+                        <br><br>
+                        <h3 id="text">Sign In</h3>
+                    </div>
                         <br>
-                    
-                            <div>
-                                <form action="">
-                                    <input class="login-input" type="text" placeholder="Username">
-                                    <br><br><br>
-                                    <input class="login-input" type="password" placeholder="Password">
-                                    <br><br>
-                                </form>
-                            </div>
-                        <button class="signIn" type="submit">Sign In</button>
-                                <br>
+                        <div [class]="messageClass">{{ message }}</div>
+                        <br>
+                        <form (ngSubmit)="onSubmit()" novalidate>
+                            <input class="login-input" type="text" [(ngModel)]="username" name="username" placeholder="Username" required>
+                            <br><br><br>
+                            <input class="login-input" type="password" [(ngModel)]="password" name="password" placeholder="Password" required>
+                            <br><br>
+                            <button class="signIn" type="submit">Sign In</button>
+                            <br>
+                        </form>
                 </div>
-            </div>
-</div>
-       
-       
+        </div>
+    </div>
 </div>

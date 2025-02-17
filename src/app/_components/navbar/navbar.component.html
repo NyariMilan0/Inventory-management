@@ -1,1 +1,29 @@
-<p>navbar works!</p>
+<div class="sidebar-container">
+    <div class="sidebar" 
+         [class.expanded]="isExpanded" 
+         (mouseenter)="isExpanded = true" 
+         (mouseleave)="isExpanded = false">
+
+      <a class="menuMain">
+        <img class="navbarCompanyLogo" src="/assets/Vector.svg" alt="">
+        <span class="navbarLogoText">WareTech</span>
+      </a>
+      
+      <hr class="navbarSeparatorLine">
+      <div class="menu-items">
+        <p>main</p>
+        <a class="menu-item">
+          <img class="navbarIcons" src="/assets/DiagramIcon.svg" alt="">
+          <span class="menu-text">Overview</span>
+        </a>
+        <a class="menu-item">
+          <i class="bi bi-box-arrow-right">a</i>
+          <span class="menu-text">Kijelentkezés</span>
+        </a>
+      </div>
+    </div>
+  
+    <div class="main-content">
+
+    </div>
+  </div>

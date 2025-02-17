@@ -1,0 +1,134 @@
+.sidebar-container {
+    display: flex;
+    min-height: 100vh;
+  }
+  
+  .sidebar {
+    width: 100px;
+    height: 100vh;
+    background: #457B9D;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    position: fixed;
+    z-index: 1000;
+    border-top-right-radius: 17px;
+    border-bottom-right-radius: 17px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .sidebar.expanded {
+    width: 250px;
+    align-items: flex-start;
+  }
+
+  .menuMain {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px 0px 5px 18px;
+    width: 100%;
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  .navbarIcons {
+    
+  }
+  
+  .navbarCompanyLogo {
+    width: 35px;
+    height: 35px;
+    min-width: 35px;
+    margin-left: 15px;
+    margin-top: 15px;
+    margin-bottom: 0px;
+  }
+  
+  .menu-items p {
+    margin-left: 17px;
+    color: white;
+    padding-bottom: 0px;
+    margin-top: 10px;
+    margin-bottom: 0px;
+    font-size: 14px;
+    font-weight: lighter;
+    text-transform: uppercase;
+    user-select: none;
+  }
+
+  .navbarLogoText {
+    color: #1D3557;
+    font-size: 28px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    user-select: none;
+    text-decoration: none;
+    margin-top: 10px;
+    margin-left: 10px;
+    text-decoration: dotted;
+  }
+  
+  .sidebar.expanded .navbarLogoText {
+    opacity: 1;
+  }
+
+  .menu-items {
+    width: 100%;
+    padding: 0 15px;
+  }
+  
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    color: #1D3557;
+    text-decoration: none;
+    padding: 15px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    width: calc(100% - 30px);
+    margin: 5px 0;
+  }
+  
+  .menu-item:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+  
+  .bi {
+    font-size: 1.8rem;
+    min-width: 35px;
+    text-align: center;
+  }
+  
+  .menu-text {
+    font-size: 16px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  
+  .sidebar.expanded .menu-text {
+    opacity: 1;
+  }
+  
+  .navbarSeparatorLine {
+    border: 0;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.9);
+    margin: 15px auto;
+    width: 100%;
+  }
+  
+  .main-content {
+    margin-left: 100px;
+    transition: margin 0.3s ease;
+    padding: 20px;
+    flex-grow: 1;
+  }
+  
+  .sidebar.expanded ~ .main-content {
+    margin-left: 250px;
+  }

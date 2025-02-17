@@ -1,1 +1,10 @@
-<p>storage-management works!</p>
+<app-navbar></app-navbar>
+<h1>Dashboard</h1>
+<div id="profile">
+  <h2>Profil</h2>
+  <p>Username: {{ userName }}</p>
+  <p>Name: {{ firstName }} {{ lastName }}</p>
+  <p>Email: {{ email }}</p>
+</div>
+<button (click)="logout()">Kijelentkezés</button>
+<p>{{ message }}</p>

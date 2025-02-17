@@ -1,16 +1,11 @@
-/* #container {
-    background-image
-    width: 100vw;
-    height: 100vh;
-  }
-   */
-   @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap');
 .roboto-condensed {
     font-family: "Roboto Condensed", serif;
     font-optical-sizing: auto;
     font-weight: 400;
     font-style: normal;
   }
+
 #container {
     background-image: url('/assets/login.jpg');;
     width: 100vw;
@@ -18,28 +13,16 @@
     background-size:cover;
     background-position:center;
     overflow: hidden;
-
+    user-select: none;
     
     
 } 
-
-/* img.bg {
-    min-height: 100%;
-    min-width: 1024px;
-    width: 100%;
-    height: auto;
-    position: fixed;
-    top: 0;
-    left: 0;
-} */
 
 .row{
     height: 100vh;
 }
  .Loginpanel{
-   /* padding-top: 250px;  */
-  width: auto;
-
+  width: fit-content;
   text-align: center;
  }
 
@@ -49,7 +32,7 @@
  } 
 
 .col-5{
-    padding-top: 350px;
+    padding-top: 300px;
     padding-right: 100px
 }
 
@@ -76,6 +59,7 @@
 }
 
 .login-input{
+    padding-left: 10px;
     align-items: center;
     width: 372px;
     height: 52px;
@@ -86,13 +70,14 @@
 }
 
 .title{
-    margin-right: 30px;
+    margin-right: 10px;
     font-size:40px;
     color:#1D3557;
     height: 63px;
     width: 221px;
-    padding-top: 50 px;
-
+    display: inline-block;
+    margin-bottom: 0px;
+    
 }
 
 sub{
@@ -110,17 +95,40 @@ sub{
 
 }
 
-.signIn{
-    
-}
+
 
 .login-text{
     font-size: 25px;
+    color: #1D3557;
 }
 
 .amico{
     height: 70%;
     width: 70%;
+}
+
+.success { 
+    color: green;
+    width: auto;
+    border-radius: 5px;
+    border: 1px solid green;
+    background-color: white;
+    border-left: 5px solid green;
+    padding: 5px 0px 5px 0px; 
+}
+.error {
+    color: red;
+    width: auto;
+    border-radius: 5px;
+    border: 1px solid red;
+    background-color: white;
+    border-left: 5px solid red;
+    padding: 5px 0px 5px 0px;
+ }
+
+.loginContainer {
+    user-select: none;
+    justify-items: center;
 }
 
 
