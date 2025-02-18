@@ -7,6 +7,10 @@ import { ProfileAdminComponent } from './_components/profile-admin/profile-admin
 import { ProfileUserComponent } from './_components/profile-user/profile-user.component';
 
 export const routes: Routes = [
+  { path: 'storage', component: StorageManagementComponent },
+  // { path: 'pallet-management', component: PalletManagementComponent },
+  // { path: 'items', component: ItemsComponent },
+  // { path: 'manage-items', component: ManageItemsComponent },
     { path: 'login', component: LoginComponent },
     {path: 'navbar', component: NavbarComponent},
     {path: 'profileAdmin', component: ProfileAdminComponent},

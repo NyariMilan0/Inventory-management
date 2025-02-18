@@ -14,8 +14,6 @@
     background-position:center;
     overflow: hidden;
     user-select: none;
-    
-    
 } 
 
 .row{
@@ -107,6 +105,7 @@ sub{
     width: 70%;
 }
 
+/* -------------------------------------- Login errors and successes --------------------------------------*/
 .success { 
     color: green;
     width: auto;
@@ -118,6 +117,7 @@ sub{
 }
 .error {
     color: red;
+    padding: 0px;
     width: auto;
     border-radius: 5px;
     border: 1px solid red;
@@ -126,6 +126,23 @@ sub{
     padding: 5px 0px 5px 0px;
  }
 
+ .inputSuccess {
+    border: 1px green solid;
+ }
+
+ .inputError {
+    border: 1px red solid
+ }
+ .errorPasswordText {
+    color: red;
+ }
+
+ .errorUsernameText {
+    color: red;
+ }
+
+
+ /* ---------------------------------------------------------------------------------------*/
 .loginContainer {
     user-select: none;
     justify-items: center;

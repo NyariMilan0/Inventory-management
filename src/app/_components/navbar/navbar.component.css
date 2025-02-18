@@ -140,3 +140,6 @@
 .sidebar.expanded ~ .main-content {
   margin-left: 250px;
 }
+app-navbar {
+  width: 100px;
+}
