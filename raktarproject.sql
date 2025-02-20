@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Gép: localhost:3306
--- Létrehozás ideje: 2025. Jan 30. 21:40
+-- Létrehozás ideje: 2025. Feb 20. 08:30
 -- Kiszolgáló verziója: 5.7.24
 -- PHP verzió: 8.3.1
 
@@ -321,7 +321,13 @@ ORDER BY `pallets_x_shelfs`.`shelf_id`$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `getAllUsers` ()   SELECT `users`.*
 FROM `users`
-WHERE `is_deleted` IS NULL$$
+WHERE `is_deleted` = 0$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getCapacityByShelfUsage` ()   SELECT SUM(`shelfs`.`current_capacity`) AS `currentFreeSpaces`, SUM(`shelfs`.`max_capacity`) AS `maxCapacity`
+FROM `shelfs`$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getCapacityForStorageUsage` ()   SELECT SUM(`storage`.`current_capacity`) AS `freeSpaces`, SUM(`storage`.`max_capacity`) AS `maxUsableSpace`
+FROM `storage`$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `getDeletedUserByName` (IN `firstNameIn` VARCHAR(100) CHARSET utf8mb4, IN `lastNameIn` VARCHAR(100) CHARSET utf8mb4)   SELECT `users`.*
 FROM `users`
@@ -567,11 +573,115 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `movePalletBetweenShelfs` (IN `palle
     COMMIT;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `movePalletBetweenShelfsNew` (IN `palletIdIn` INT, IN `fromShelfIdIn` INT, IN `toShelfIdIn` INT, IN `userIdIn` INT)   BEGIN
+    DECLARE currentFromCapacity INT;
+    DECLARE maxFromCapacity INT;
+    DECLARE currentToCapacity INT;
+    DECLARE maxToCapacity INT;
+    DECLARE palletSKU VARCHAR(255);
+    DECLARE storageFromIn INT;
+    DECLARE storageToIn INT;
+
+    START TRANSACTION;
+
+    -- Tárolók lekérdezése a polcok alapján
+    SELECT `storage_id` INTO storageFromIn FROM `shelfs_x_storage` WHERE `shelf_id` = fromShelfIdIn LIMIT 1;
+    SELECT `storage_id` INTO storageToIn FROM `shelfs_x_storage` WHERE `shelf_id` = toShelfIdIn LIMIT 1;
+
+    -- Forrás polc kapacitás adatok
+    SELECT `current_capacity`, `max_capacity`
+    INTO currentFromCapacity, maxFromCapacity
+    FROM `shelfs`
+    WHERE `id` = fromShelfIdIn;
+
+    -- Cél polc kapacitás adatok
+    SELECT `current_capacity`, `max_capacity`
+    INTO currentToCapacity, maxToCapacity
+    FROM `shelfs`
+    WHERE `id` = toShelfIdIn;
+
+    -- Raklap áthelyezése a célpolcra
+    UPDATE `pallets_x_shelfs`
+    SET `shelf_id` = toShelfIdIn
+    WHERE `pallet_id` = palletIdIn;
+
+    -- Raklap SKU lekérése
+    SELECT `items`.`sku` INTO palletSKU
+    FROM `pallets_x_items`
+    JOIN `items` ON `pallets_x_items`.`item_id` = `items`.`id`
+    WHERE `pallets_x_items`.`pallet_id` = palletIdIn
+    LIMIT 1;
+
+    -- Készletmozgás rögzítése
+    INSERT INTO `inventorymovement` (
+        `movementDate`, `actionType`, `storageFrom`, `storageTo`, 
+        `fromShelf`, `toShelf`, `palletSKU`, `byUser`
+    ) VALUES (
+        NOW(), 'move', storageFromIn, storageToIn, 
+        fromShelfIdIn, toShelfIdIn, palletSKU, userIdIn
+    );
+
+    SET @inventoryMovementId = LAST_INSERT_ID();
+
+    -- Kapcsolat létrehozása a készletmozgás és a raklap között
+    INSERT INTO `inventorymovement_x_pallets` 
+        (`inventory_id`, `pallet_id`, `action_type`) 
+    VALUES 
+        (@inventoryMovementId, palletIdIn, 'move');
+
+    -- Forrás polc kapacitás frissítése (palett eltávolítása)
+    UPDATE `shelfs`
+    SET 
+        `current_capacity` = currentFromCapacity + 1,
+        `isFull` = CASE 
+            WHEN (currentFromCapacity + 1) > 0 THEN 0  -- Ha van hely, nem teli
+            ELSE 1  -- Egyébként teli
+        END
+    WHERE `id` = fromShelfIdIn;
+
+    -- Cél polc kapacitás frissítése (palett hozzáadása)
+    UPDATE `shelfs`
+    SET 
+        `current_capacity` = currentToCapacity - 1,
+        `isFull` = CASE 
+            WHEN (currentToCapacity - 1) <= 0 THEN 1  -- Ha nincs hely, teli
+            ELSE 0  -- Egyébként nem teli
+        END
+    WHERE `id` = toShelfIdIn;
+
+    COMMIT;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `passwordChangeByUserId` (IN `idIn` INT(11), IN `newPassword` VARCHAR(100) CHARSET utf8mb4)   UPDATE `users`
+SET `users`.`password` = newPassword
+WHERE `users`.`id` = idIn$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `registerAdmin` (IN `emailIn` VARCHAR(255) CHARSET utf8mb4, IN `firstNameIn` VARCHAR(255) CHARSET utf8mb4, IN `lastNameIn` VARCHAR(255) CHARSET utf8mb4, IN `userNameIn` VARCHAR(255) CHARSET utf8mb4, IN `pictureIn` TEXT CHARSET utf8mb4, IN `passwordIn` VARCHAR(255) CHARSET utf8mb4)   INSERT INTO `users` (`email`, `firstName`, `lastName`, `userName`, `picture`, `password`, `isAdmin`)
 VALUES (emailIn, firstNameIn, lastNameIn, userNameIn, pictureIn, passwordIn, 1)$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `registerUser` (IN `emailIn` VARCHAR(255) CHARSET utf8mb4, IN `firstNameIn` VARCHAR(255) CHARSET utf8mb4, IN `lastNameIn` VARCHAR(255) CHARSET utf8mb4, IN `userNameIn` VARCHAR(255) CHARSET utf8mb4, IN `pictureIn` TEXT CHARSET utf8mb4, IN `passwordIn` VARCHAR(255) CHARSET utf8mb4)   INSERT INTO `users` (`email`, `firstName`, `lastName`, `userName`, `picture`, `password`, `isAdmin`)
 VALUES (emailIn, firstNameIn, lastNameIn, userNameIn, pictureIn, passwordIn, 0)$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `updateItem` (IN `itemIdIn` INT(11), IN `skuIn` VARCHAR(100), IN `typeIn` VARCHAR(100), IN `nameIn` VARCHAR(100), IN `amountIn` INT(100), IN `priceIn` DECIMAL(65), IN `weightIn` DECIMAL(65), IN `sizeIn` DECIMAL(65), IN `descriptionIn` TEXT)   UPDATE `items`
+SET `items`.`sku` = skuIn, `items`.`type` = typeIn ,
+`items`.`name` = nameIn, `items`.`amount` = amountIn, `items`.`price`= priceIn , `items`.`weight` = weightIn , `items`.`size` = sizeIn, `items`.`description` = descriptionIn
+WHERE `items`.`id` = itemIdIn$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `updateMovementRequest` (IN `idIn` INT(11), IN `adminIdIn` INT(11), IN `pallet_idIn` INT(11), IN `fromShelfIdIn` INT(11), IN `toShelfIdIn` INT(11), IN `actionTypeIn` VARCHAR(100), IN `statusIn` VARCHAR(11), IN `timeLimitIn` DATETIME)   UPDATE `movement_requests`
+SET `movement_requests`.`adminId` = adminIdIn,
+`movement_requests`.`pallet_id` = pallet_idIn,
+`movement_requests`.`fromShelfId` = fromShelfIdIn, `movement_requests`.`toShelfId` = toShelfIdIn,
+`movement_requests`.`actionType` = actionTypeIn,
+`movement_requests`.`status` = statusIn,
+`movement_requests`.`timeLimit` = timeLimitIn
+WHERE `movement_requests`.`id` = idIn$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usernameChangeByUserId` (IN `idIn` INT(11), IN `usernameIn` VARCHAR(100) CHARSET utf8mb4)   BEGIN
+
+UPDATE `users`
+SET `users`.`userName` = usernameIn
+WHERE `users`.`id` = idIn;
+END$$
 
 DELIMITER ;
 
@@ -604,7 +714,8 @@ INSERT INTO `inventorymovement` (`id`, `movementDate`, `actionType`, `storageFro
 (4, '2025-01-30 14:37:49', 'move', 1, 1, 1, 2, 'SKU001', 5),
 (5, '2025-01-30 14:46:09', 'move', 1, 1, 2, 1, NULL, 2),
 (6, '2025-01-30 16:11:49', 'move', 1, 1, 1, 1, NULL, 1),
-(7, '2025-01-30 21:13:16', 'move', 1, 1, 1, 2, 'SKU001', 2);
+(7, '2025-01-30 21:13:16', 'move', 1, 1, 1, 2, 'SKU001', 2),
+(8, '2025-02-06 09:11:27', 'move', 1, 1, 1, 2, 'SKU001', 1);
 
 -- --------------------------------------------------------
 
@@ -629,7 +740,8 @@ INSERT INTO `inventorymovement_x_pallets` (`id`, `inventory_id`, `pallet_id`, `a
 (4, 4, 2, 'move'),
 (5, 5, 2, 'move'),
 (6, 6, 1, 'move'),
-(7, 7, 5, 'move');
+(7, 7, 5, 'move'),
+(8, 8, 6, 'move');
 
 -- --------------------------------------------------------
 
@@ -654,7 +766,7 @@ CREATE TABLE `items` (
 --
 
 INSERT INTO `items` (`id`, `sku`, `type`, `name`, `amount`, `price`, `weight`, `size`, `description`) VALUES
-(21, 'SKU001', 'Wood', 'Wooden Table', 10, 199.99, 15, 120, 'High-quality oak wood dining table.'),
+(21, 'asd', 'Wood', 'asd', 1, 1, 1, 1, 'asd'),
 (22, 'SKU002', 'Wood', 'Wooden Chair', 25, 79.99, 5.5, 45, 'Comfortable wooden chair with cushioned seat.'),
 (23, 'SKU003', 'Wood', 'Bookshelf', 15, 149.99, 20, 180, 'Large wooden bookshelf with 5 shelves.'),
 (24, 'SKU004', 'Wood', 'Coffee Table', 20, 89.99, 10, 90, 'Stylish wooden coffee table for living rooms.'),
@@ -697,7 +809,7 @@ CREATE TABLE `movement_requests` (
 --
 
 INSERT INTO `movement_requests` (`id`, `adminId`, `pallet_id`, `fromShelfId`, `toShelfId`, `actionType`, `status`, `timeLimit`) VALUES
-(2, 2, 2, NULL, 2, 'add', 'completed', '2025-01-31 13:23:44'),
+(2, 3, 3, 3, 3, 'move', 'pending', '2008-11-11 13:23:44'),
 (3, 3, 3, NULL, 3, 'add', 'pending', '2008-11-11 13:23:44'),
 (4, 4, 4, NULL, 4, 'add', 'pending', '2025-01-31 13:23:44'),
 (5, 1, 2, 1, 2, 'move', 'completed', '2025-01-31 13:23:44');
@@ -745,7 +857,8 @@ CREATE TABLE `pallets` (
 --
 
 INSERT INTO `pallets` (`id`, `name`, `created_at`, `height`, `length`, `width`) VALUES
-(5, 'Wooden Table', '2025-01-30 22:08:11', 80, 120, 80);
+(5, 'Wooden Table', '2025-01-30 22:08:11', 80, 120, 80),
+(6, 'Wooden Table', '2025-02-06 10:11:00', 80, 120, 80);
 
 -- --------------------------------------------------------
 
@@ -764,7 +877,8 @@ CREATE TABLE `pallets_x_items` (
 --
 
 INSERT INTO `pallets_x_items` (`id`, `pallet_id`, `item_id`) VALUES
-(2, 5, 21);
+(2, 5, 21),
+(3, 6, 21);
 
 -- --------------------------------------------------------
 
@@ -783,7 +897,8 @@ CREATE TABLE `pallets_x_shelfs` (
 --
 
 INSERT INTO `pallets_x_shelfs` (`id`, `pallet_id`, `shelf_id`) VALUES
-(2, 5, 2);
+(2, 5, 2),
+(3, 6, 2);
 
 -- --------------------------------------------------------
 
@@ -810,7 +925,7 @@ CREATE TABLE `shelfs` (
 
 INSERT INTO `shelfs` (`id`, `name`, `locationInStorage`, `max_capacity`, `current_capacity`, `height`, `length`, `width`, `levels`, `isFull`) VALUES
 (1, 'Shelf a', 'Isle A', 24, 24, 400, 720, 80, 4, 0),
-(2, 'Shelf B', 'Isle B', 24, 23, 400, 720, 80, 4, 0),
+(2, 'Shelf B', 'Isle B', 24, 22, 400, 720, 80, 4, 0),
 (3, 'Shelf A', 'Isle A', 24, 24, 400, 720, 80, 4, 0),
 (4, 'Shelf B', 'Isle B', 24, 24, 400, 720, 80, 4, 0);
 
@@ -884,27 +999,31 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `email`, `firstName`, `lastName`, `userName`, `picture`, `password`, `isAdmin`, `createdAt`, `is_deleted`, `deletedAt`) VALUES
-(1, 'user1@example.com', 'John', 'Doe', 'johndoe', 'profile1.jpg', 'password123', 0, '2025-01-30 16:36:34', 0, NULL),
-(2, 'user2@example.com', 'Jane', 'Smith', 'janesmith', 'profile2.jpg', 'password123', 0, '2025-01-30 16:36:34', 0, NULL),
-(3, 'user3@example.com', 'Michael', 'Brown', 'michaelbrown', 'profile3.jpg', 'password123', 0, '2025-01-30 16:36:34', 0, NULL),
-(4, 'user4@example.com', 'Emily', 'Davis', 'emilydavis', 'profile4.jpg', 'password123', 1, '2025-01-30 16:36:34', 1, '2025-01-30 14:38:07'),
-(5, 'user5@example.com', 'Chris', 'Wilson', 'chriswilson', 'profile5.jpg', 'password123', 0, '2025-01-30 16:36:34', 1, '2025-01-30 20:56:34'),
-(6, 'user6@example.com', 'Sarah', 'Miller', 'sarahmiller', 'profile6.jpg', 'password123', 0, '2025-01-30 16:36:34', 0, NULL),
-(7, 'user7@example.com', 'David', 'Anderson', 'davidanderson', 'profile7.jpg', 'password123', 0, '2025-01-30 16:36:34', 0, NULL),
-(8, 'user8@example.com', 'Laura', 'Martinez', 'lauramartinez', 'profile8.jpg', 'password123', 0, '2025-01-30 16:36:34', 0, NULL),
-(9, 'user9@example.com', 'James', 'Taylor', 'jamestaylor', 'profile9.jpg', 'password123', 0, '2025-01-30 16:36:34', 0, NULL),
-(10, 'user10@example.com', 'Olivia', 'Harris', 'oliviaharris', 'profile10.jpg', 'password123', 0, '2025-01-30 16:36:34', 0, NULL),
-(11, 'admin1@example.com', 'Alice', 'Johnson', 'alicejohnson', 'admin1.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
-(12, 'admin2@example.com', 'Bob', 'Williams', 'bobwilliams', 'admin2.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
-(13, 'admin3@example.com', 'Charlie', 'Martinez', 'charliemartinez', 'admin3.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
-(14, 'admin4@example.com', 'Diana', 'Rodriguez', 'dianarodriguez', 'admin4.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
-(15, 'admin5@example.com', 'Ethan', 'Hernandez', 'ethanhernandez', 'admin5.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
-(16, 'admin6@example.com', 'Fiona', 'Lopez', 'fionalopez', 'admin6.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
-(17, 'admin7@example.com', 'George', 'Gonzalez', 'georgegonzalez', 'admin7.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
-(18, 'admin8@example.com', 'Hannah', 'Wilson', 'hannahwilson', 'admin8.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
-(19, 'admin9@example.com', 'Ian', 'Anderson', 'iananderson', 'admin9.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
-(20, 'admin10@example.com', 'Julia', 'Thomas', 'juliathomas', 'admin10.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
-(21, 'asd@asd.com', 'asd', 'asd', 'asd', 'asd', 'asd', 0, '2025-01-30 17:04:06', 0, NULL);
+(1, 'user1@example.com', 'John', 'Doe', 'smityjhonny', 'profile1.jpg', 'asd', 0, '2025-01-30 16:36:34', 1, '2025-01-31 10:56:52'),
+(2, 'user2@example.com', 'Jane', 'Smith', 'smityjhonny', 'profile2.jpg', 'password123', 0, '2025-01-30 16:36:34', 0, NULL),
+(3, 'user3@example.com', 'Michael', 'Brown', 'smityjhonny', 'profile3.jpg', 'password123', 0, '2025-01-30 16:36:34', 0, NULL),
+(4, 'user4@example.com', 'Emily', 'Davis', 'smityjhonny', 'profile4.jpg', 'password123', 1, '2025-01-30 16:36:34', 1, '2025-01-30 14:38:07'),
+(5, 'user5@example.com', 'Chris', 'Wilson', 'smityjhonny', 'profile5.jpg', 'password123', 0, '2025-01-30 16:36:34', 1, '2025-01-30 20:56:34'),
+(6, 'user6@example.com', 'Sarah', 'Miller', 'smityjhonny', 'profile6.jpg', 'password123', 0, '2025-01-30 16:36:34', 0, NULL),
+(7, 'user7@example.com', 'David', 'Anderson', 'smityjhonny', 'profile7.jpg', 'password123', 0, '2025-01-30 16:36:34', 0, NULL),
+(8, 'user8@example.com', 'Laura', 'Martinez', 'smityjhonny', 'profile8.jpg', 'password123', 0, '2025-01-30 16:36:34', 0, NULL),
+(9, 'user9@example.com', 'James', 'Taylor', 'smityjhonny', 'profile9.jpg', 'password123', 0, '2025-01-30 16:36:34', 0, NULL),
+(10, 'user10@example.com', 'Olivia', 'Harris', 'smityjhonny', 'profile10.jpg', 'password123', 0, '2025-01-30 16:36:34', 0, NULL),
+(11, 'admin1@example.com', 'Alice', 'Johnson', 'smityjhonny', 'admin1.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
+(12, 'admin2@example.com', 'Bob', 'Williams', 'smityjhonny', 'admin2.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
+(13, 'admin3@example.com', 'Charlie', 'Martinez', 'smityjhonny', 'admin3.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
+(14, 'admin4@example.com', 'Diana', 'Rodriguez', 'smityjhonny', 'admin4.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
+(15, 'admin5@example.com', 'Ethan', 'Hernandez', 'smityjhonny', 'admin5.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
+(16, 'admin6@example.com', 'Fiona', 'Lopez', 'smityjhonny', 'admin6.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
+(17, 'admin7@example.com', 'George', 'Gonzalez', 'smityjhonny', 'admin7.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
+(18, 'admin8@example.com', 'Hannah', 'Wilson', 'smityjhonny', 'admin8.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
+(19, 'admin9@example.com', 'Ian', 'Anderson', 'smityjhonny', 'admin9.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
+(20, 'admin10@example.com', 'Julia', 'Thomas', 'smityjhonny', 'admin10.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
+(21, 'asd@asd.com', 'asd', 'asd', 'asd', 'asd', 'asd', 1, '2025-01-30 17:04:06', 0, NULL),
+(22, 'testtest@gmail.com', 'Jónás', 'Kiszacskos', 'smityjhonny', 'csicskaszatyor1445', 'Asdasd123@', 0, '2025-01-30 22:52:27', 0, NULL),
+(23, 'adminadmin@gmail.com', 'Josephinio', 'Murányi', 'smityjhonny', 'répaszeletelo', 'Asdasdasd123@', 0, '2025-01-30 22:55:12', 0, NULL),
+(24, 'testemail@gmail.com', 'Testes', 'Kismargo', 'smityjhonny', 'Testesikismargit', 'A@assword3211', 0, '2025-01-31 11:50:47', 0, NULL),
+(25, 'testadminaa@gmail.com', 'adminka', 'kalocsai', 'smityjhonny', 'kalocsaiadminka', 'Admin@12ij5', 0, '2025-01-31 11:53:15', 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -1039,13 +1158,13 @@ ALTER TABLE `user_x_storage`
 -- AUTO_INCREMENT a táblához `inventorymovement`
 --
 ALTER TABLE `inventorymovement`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT a táblához `inventorymovement_x_pallets`
 --
 ALTER TABLE `inventorymovement_x_pallets`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT a táblához `items`
@@ -1069,19 +1188,19 @@ ALTER TABLE `movement_requests_x_pallets`
 -- AUTO_INCREMENT a táblához `pallets`
 --
 ALTER TABLE `pallets`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT a táblához `pallets_x_items`
 --
 ALTER TABLE `pallets_x_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT a táblához `pallets_x_shelfs`
 --
 ALTER TABLE `pallets_x_shelfs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT a táblához `shelfs`
@@ -1105,7 +1224,7 @@ ALTER TABLE `storage`
 -- AUTO_INCREMENT a táblához `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT a táblához `user_x_storage`
