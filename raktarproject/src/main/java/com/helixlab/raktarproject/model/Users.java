@@ -27,7 +27,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.Size;
 
-
 @Entity
 @Table(name = "users")
 @NamedQueries({
@@ -85,19 +84,18 @@ public class Users implements Serializable {
     @Column(name = "deletedAt")
     @Temporal(TemporalType.TIMESTAMP)
     private Date deletedAt;
-    
-    static EntityManagerFactory emf = Persistence.createEntityManagerFactory("com.helixLab_raktarproject_war_1.0-SNAPSHOTPU");
 
+    static EntityManagerFactory emf = Persistence.createEntityManagerFactory("com.helixLab_raktarproject_war_1.0-SNAPSHOTPU");
 
     public Users() {
     }
 
-public Users(Integer id){
+    public Users(Integer id) {
         EntityManager em = emf.createEntityManager();
-        
+
         try {
             Users u = em.find(Users.class, id);
-            
+
             this.id = u.getId();
             this.email = u.getEmail();
             this.firstName = u.getFirstName();
@@ -108,7 +106,7 @@ public Users(Integer id){
             this.isDeleted = u.getIsDeleted();
             this.deletedAt = u.getDeletedAt();
             this.createdAt = u.getCreatedAt();
-            this.picture = u.getPicture();  
+            this.picture = u.getPicture();
         } catch (Exception ex) {
             System.err.println("Hiba: " + ex.getLocalizedMessage());
         } finally {
@@ -117,7 +115,7 @@ public Users(Integer id){
         }
     }
 
-    public Users(Integer id, String email, String firstName, String lastName, String userName, String picture, String password, boolean  isAdmin,Date createdAt, boolean isDeleted, Date deletedAt){
+    public Users(Integer id, String email, String firstName, String lastName, String userName, String picture, String password, boolean isAdmin, Date createdAt, boolean isDeleted, Date deletedAt) {
         this.id = id;
         this.email = email;
         this.firstName = firstName;
@@ -147,13 +145,11 @@ public Users(Integer id){
         this.password = password;
         this.isAdmin = isAdmin;
     }
-    
-    
 
     public Integer getId() {
         return id;
     }
-    
+
     public void setId(Integer id) {
         this.id = id;
     }
@@ -262,7 +258,7 @@ public Users(Integer id){
     public String toString() {
         return "com.helixlab.raktarproject.model.Users[ id=" + id + " ]";
     }
-    
+
     public Users login(String userName, String password) {
         EntityManager em = emf.createEntityManager();
 
@@ -308,7 +304,7 @@ public Users(Integer id){
             em.close();
         }
     }
-    
+
     public Boolean registerUser(Users u) {
         EntityManager em = emf.createEntityManager();
 
@@ -339,7 +335,7 @@ public Users(Integer id){
             em.close();
         }
     }
-    
+
     public Boolean registerAdmin(Users u) {
         EntityManager em = emf.createEntityManager();
 
@@ -370,22 +366,22 @@ public Users(Integer id){
             em.close();
         }
     }
-    
-    public static Boolean isUserExists(String email){
+
+    public static Boolean isUserExists(String email) {
         EntityManager em = emf.createEntityManager();
-        
+
         try {
             StoredProcedureQuery spq = em.createStoredProcedureQuery("isUserExist");
 
             spq.registerStoredProcedureParameter("emailIN", String.class, ParameterMode.IN);
             spq.registerStoredProcedureParameter("resultOUT", Boolean.class, ParameterMode.OUT);
-            
+
             spq.setParameter("emailIN", email);
-            
+
             spq.execute();
-            
+
             Boolean result = Boolean.valueOf(spq.getOutputParameterValue("resultOUT").toString());
-            
+
             return result;
         } catch (Exception e) {
             System.err.println("Hiba: " + e.getLocalizedMessage());
@@ -395,26 +391,26 @@ public Users(Integer id){
             em.close();
         }
     }
-    
+
     public static ArrayList<Users> getAllUsers() {
-    EntityManager em = emf.createEntityManager();
-    ArrayList<Users> userList = new ArrayList<>();
+        EntityManager em = emf.createEntityManager();
+        ArrayList<Users> userList = new ArrayList<>();
 
-    try {
-        StoredProcedureQuery spq = em.createStoredProcedureQuery("getAllUsers", Users.class);
-        spq.execute();
-        userList = new ArrayList<>(spq.getResultList());
+        try {
+            StoredProcedureQuery spq = em.createStoredProcedureQuery("getAllUsers", Users.class);
+            spq.execute();
+            userList = new ArrayList<>(spq.getResultList());
 
-    } catch (Exception e) {
-        System.err.println("Error: " + e.getLocalizedMessage());
-    } finally {
-        em.clear();
-        em.close();
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getLocalizedMessage());
+        } finally {
+            em.clear();
+            em.close();
+        }
+
+        return userList;
     }
 
-    return userList;
-}
-    
     public Boolean deleteUser(Integer id) {
         EntityManager em = emf.createEntityManager();
         Boolean toReturn = false;
@@ -439,7 +435,7 @@ public Users(Integer id){
         }
 
     }
-    
+
     public Users getUserById(Integer id) {
         try {
             return new Users(id);
@@ -464,9 +460,75 @@ public Users(Integer id){
     public void setUserXStorageCollection(Collection<UserXStorage> userXStorageCollection) {
         this.userXStorageCollection = userXStorageCollection;
     }
-    
-    
-    
-    
+
+    public Boolean passwordChangeByUserId(Integer userId, String oldPassword, String newPassword) {
+        EntityManager em = emf.createEntityManager();
+
+        try {
+            // Ellenőrizzük, hogy a régi jelszó helyes-e
+            if (!this.password.equals(oldPassword)) {
+                throw new IllegalArgumentException("A régi jelszó helytelen!");
+            }
+
+            // Ellenőrizzük, hogy a userId megegyezik-e az aktuális felhasználóéval
+            if (!this.id.equals(userId)) {
+                throw new IllegalArgumentException("Csak a saját jelszavadat módosíthatod!");
+            }
+
+            // Tárolt eljárás meghívása
+            StoredProcedureQuery spq = em.createStoredProcedureQuery("passwordChangeByUserId");
+            spq.registerStoredProcedureParameter("userId", Integer.class, ParameterMode.IN);
+            spq.registerStoredProcedureParameter("newPassword", String.class, ParameterMode.IN);
+
+            spq.setParameter("userId", userId);
+            spq.setParameter("newPassword", newPassword);
+
+            spq.execute();
+
+            // Frissítjük az objektum jelszavát
+            this.password = newPassword;
+
+            return true;
+        } catch (Exception e) {
+            System.err.println("Hiba a jelszóváltoztatás során: " + e.getLocalizedMessage());
+            return false;
+        } finally {
+            em.clear();
+            em.close();
+        }
+
+    }
+
+    public Boolean usernameChangeByUserId(Integer userId, String newUsername) {
+        EntityManager em = emf.createEntityManager();
+
+        try {
+            // Ellenőrizzük, hogy a userId megegyezik-e az aktuális felhasználóéval
+            if (!this.id.equals(userId)) {
+                throw new IllegalArgumentException("Csak a saját felhasználónevedet módosíthatod!");
+            }
+
+            // Tárolt eljárás meghívása
+            StoredProcedureQuery spq = em.createStoredProcedureQuery("usernameChangeByUserId");
+            spq.registerStoredProcedureParameter("idIn", Integer.class, ParameterMode.IN);
+            spq.registerStoredProcedureParameter("usernameIn", String.class, ParameterMode.IN);
+
+            spq.setParameter("idIn", userId);
+            spq.setParameter("usernameIn", newUsername);
+
+            spq.execute();
+
+            // Frissítjük az objektum felhasználónevét
+            this.userName = newUsername;
+
+            return true;
+        } catch (Exception e) {
+            System.err.println("Hiba a felhasználónév változtatása során: " + e.getLocalizedMessage());
+            return false;
+        } finally {
+            em.clear();
+            em.close();
+        }
+    }
 
 }

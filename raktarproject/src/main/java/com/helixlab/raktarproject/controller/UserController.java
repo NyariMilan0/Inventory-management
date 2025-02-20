@@ -42,7 +42,6 @@ public class UserController {
     public void putXml(String content) {
 
     }
-    
 
     @POST
     @Path("login")
@@ -153,8 +152,8 @@ public class UserController {
         userJson.put("lastName", response.getLastName());
         userJson.put("password", response.getPassword());
         userJson.put("isAdmin", response.getIsAdmin());
-        userJson.put("userName", response.getUserName());  
-        userJson.put("isDeleted", response.getIsDeleted());  
+        userJson.put("userName", response.getUserName());
+        userJson.put("isDeleted", response.getIsDeleted());
         userJson.put("createdAt", response.getCreatedAt());
         userJson.put("deletedAt", response.getDeletedAt());
         userJson.put("picture", response.getPicture());
@@ -182,6 +181,33 @@ public class UserController {
 
         return Response.status(Response.Status.OK).entity(toReturn.toString()).type(MediaType.APPLICATION_JSON).build();
 
+    }
+
+    @PUT
+    @Path("passwordChangeByUserId")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response passwordChangeByUserId(String bodyString) {
+        JSONObject body = new JSONObject(bodyString);
+
+        Integer userId = body.getInt("userId");
+        String oldPassword = body.getString("oldPassword");
+        String newPassword = body.getString("newPassword");
+
+        JSONObject obj = layer.passwordChangeByUserId(userId, oldPassword, newPassword);
+        return Response.status(obj.getInt("statusCode")).entity(obj.toString()).type(MediaType.APPLICATION_JSON).build();
+    }
+
+    @PUT
+    @Path("usernameChangeByUserId")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response usernameChangeByUserId(String bodyString) {
+        JSONObject body = new JSONObject(bodyString);
+
+        Integer userId = body.getInt("userId");
+        String newUsername = body.getString("newUsername");
+
+        JSONObject obj = layer.usernameChangeByUserId(userId, newUsername);
+        return Response.status(obj.getInt("statusCode")).entity(obj.toString()).type(MediaType.APPLICATION_JSON).build();
     }
 
 }

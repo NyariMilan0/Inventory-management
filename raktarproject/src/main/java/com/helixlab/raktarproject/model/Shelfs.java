@@ -1,19 +1,22 @@
 package com.helixlab.raktarproject.model;
 
+import static com.helixlab.raktarproject.model.Users.emf;
 import java.io.Serializable;
 import java.util.Collection;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.Persistence;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
 
 @Entity
 @Table(name = "shelfs")
@@ -65,11 +68,47 @@ public class Shelfs implements Serializable {
     @OneToMany(mappedBy = "shelfId")
     private Collection<ShelfsXStorage> shelfsXStorageCollection;
 
+    static EntityManagerFactory emf = Persistence.createEntityManagerFactory("com.helixLab_raktarproject_war_1.0-SNAPSHOTPU");
+
     public Shelfs() {
     }
 
     public Shelfs(Integer id) {
+        EntityManager em = emf.createEntityManager();
+
+        try {
+            Shelfs s = em.find(Shelfs.class, id);
+
+            this.id = s.getId();
+            this.name = s.getName();
+            this.locationInStorage = s.getLocationInStorage();
+            this.maxCapacity = s.getMaxCapacity();
+            this.currentCapacity = s.getCurrentCapacity();
+            this.height = s.getHeight();
+            this.length = s.getLength();
+            this.width = s.getWidth();
+            this.levels = s.getLevels();
+            this.isFull = s.getIsFull();
+
+        } catch (Exception ex) {
+            System.err.println("Hiba: " + ex.getLocalizedMessage());
+        } finally {
+            em.clear();
+            em.close();
+        }
+    }
+
+    public Shelfs(Integer id, String name, String locationInStorage, Integer maxCapacity, Integer currentCapacity, Integer height, Integer length, Integer width, Integer levels, boolean isFull) {
         this.id = id;
+        this.name = name;
+        this.locationInStorage = locationInStorage;
+        this.maxCapacity = maxCapacity;
+        this.currentCapacity = currentCapacity;
+        this.height = height;
+        this.length = length;
+        this.width = width;
+        this.levels = levels;
+        this.isFull = isFull;
     }
 
     public Integer getId() {
@@ -119,7 +158,6 @@ public class Shelfs implements Serializable {
     public void setShelfsXStorageCollection(Collection<ShelfsXStorage> shelfsXStorageCollection) {
         this.shelfsXStorageCollection = shelfsXStorageCollection;
     }
-
 
     @Override
     public int hashCode() {
@@ -217,5 +255,14 @@ public class Shelfs implements Serializable {
     public void setInventorymovementCollection1(Collection<Inventorymovement> inventorymovementCollection1) {
         this.inventorymovementCollection1 = inventorymovementCollection1;
     }
+    
+ 
+    
+    
+    
+    
+    
+    
+    
 
 }
