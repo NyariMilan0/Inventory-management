@@ -1,8 +1,16 @@
 .sidebar-container {
-  display: flex;
-  min-height: 100vh;
-  user-select: none;
-  width: fit-content;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  visibility: visible; /* Changed from hidden to visible */
+  opacity: 1; /* Changed from 0 to 1 */
+  transition: opacity 0.5s linear;
+}
+
+.sidebar-container.visible {
+  visibility: visible;
+  opacity: 1;
 }
 
 .sidebar {
@@ -18,10 +26,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  position: fixed;
   left: 0;
   top: 0;
-  z-index: 1000;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   
 }
 
@@ -131,15 +138,13 @@
 }
 
 .main-content {
-  margin-left: 100px;
-  transition: margin 0.3s ease;
-  padding: 20px;
-  flex-grow: 1;
+  margin-left: 100px; /* Match the width of the sidebar when not expanded */
+  transition: margin-left 0.3s ease; /* Smooth transition when expanding */
 }
 
 .sidebar.expanded ~ .main-content {
   margin-left: 250px;
 }
 app-navbar {
-  width: 100px;
+  width: auto; /* Let it grow naturally with content */
 }

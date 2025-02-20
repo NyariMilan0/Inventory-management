@@ -12,29 +12,33 @@
                     </div>
             </div>
         </div>
-
-        <div class="col-5 loginContainer">
-                <div class="Loginpanel">
-                    <div class="icon-container">
-                        <img class="login-icon" src="/assets/CompanyLogo.svg" alt="Login Icon" width="77" height="77" />
-                        <br><br>
-                        <h3 id="text">Sign In</h3>
-                    </div>
-                        <br>
+                <div class="col-5 loginContainer">
+                    <div class="Loginpanel">
+                        <div class="icon-container">
+                            <img class="login-icon" src="/assets/CompanyLogo.svg" alt="Login Icon" width="77" height="77" />
+                            <br><br>
+                            <h3 id="text">Sign In</h3>
+                        </div>
                         <br>
                         <div [class]="messageClass">{{ message }}</div>
                         <br>
-                        <form (ngSubmit)="onSubmit()" novalidate>
-                            <input [class]="inputClass" class="login-input" type="text" [(ngModel)]="username" name="username" placeholder="Username" required>
-                            <div [class]="errorUsernameText">{{ emptyUsername }}</div>
+                        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+                            <input [class.invalid]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched" class="login-input" type="text" formControlName="username" placeholder="Username" required>
                             <br>
-                            <input [class]="inputClass" class="login-input" type="password" [(ngModel)]="password" name="password" placeholder="Password" required>
-                            <div [class]="errorPasswordText">{{ emptyPassword }}</div>
+                            @if(loginForm.get('username')?.invalid && loginForm.get('username')?.touched){
+                                <span class="errorText">Username is required</span>
+                            }
+                            <br>
+                            <input style="margin-top: 10px;" [class.invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="login-input" [type]="showPassword ? 'text' : 'password'" formControlName="password" placeholder="Password" required>
+                            <br>
+                            @if(loginForm.get('password')?.invalid && loginForm.get('password')?.touched){
+                                <span class="errorText">Password is required</span>
+                            }
                             <br><br>
-                            <button class="signIn" type="submit">Sign In</button>
+                            <button class="signIn" type="submit" [disabled]="isLoading">Sign In</button>
                             <br>
                         </form>
+                    </div>
                 </div>
+            </div>
         </div>
-    </div>
-</div>

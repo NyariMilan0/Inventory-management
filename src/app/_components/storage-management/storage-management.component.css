@@ -12,3 +12,142 @@
     padding: 0.5rem 1rem;
     cursor: pointer;
   }
+  
+  .main-content {
+    margin-left: 100px; /* Match the width of the sidebar when not expanded */
+    transition: margin-left 0.3s ease; /* Smooth transition when expanding */
+  }
+  .dashboard-container {
+    padding: 20px;
+  }
+  
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  header input {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  
+  .main-content {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .warehouse-section {
+    flex: 2;
+    margin-right: 20px;
+  }
+  
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .slot {
+    width: 50px;
+    height: 50px;
+    border: 1px solid #ccc;
+  }
+  
+  .slot.used {
+    background-color: #34495e;
+  }
+  
+  .usage-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .progress-bar {
+    width: 100%;
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    overflow: hidden;
+    margin: 10px 0;
+  }
+  
+  .progress {
+    height: 20px;
+    background-color: #3498db;
+    text-align: center;
+    color: white;
+    line-height: 20px;
+  }
+  
+  .progress.red {
+    background-color: red;
+  }
+  
+  .storage-capacity {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .circular-progress {
+    position: relative;
+    width: 150px;
+    height: 150px;
+  }
+  
+  .circular-progress svg {
+    width: 100%;
+    height: 100%;
+  }
+  
+  .circular-progress .bg {
+    fill: none;
+    stroke: #e0e0e0;
+    stroke-width: 3;
+  }
+  
+  .circular-progress .progress {
+    fill: none;
+    stroke: #3498db;
+    stroke-width: 3;
+    stroke-linecap: round;
+    transform: rotate(-90deg);
+    transform-origin: center;
+  }
+  
+  .percentage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    color: #34495e;
+  }
+  
+  .low-stock-items {
+    width: 100%;
+    margin-top: 20px;
+  }
+  
+  .item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    margin-bottom: 10px;
+  }
+  
+  .item-info, .category-info {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .low-stock {
+    color: red;
+  }

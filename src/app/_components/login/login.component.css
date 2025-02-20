@@ -126,22 +126,16 @@ sub{
     padding: 5px 0px 5px 0px;
  }
 
- .inputSuccess {
-    border: 1px green solid;
- }
-
- .inputError {
-    border: 1px red solid
- }
- .errorPasswordText {
+.errorText {
     color: red;
- }
-
- .errorUsernameText {
-    color: red;
- }
-
-
+}
+.login-input.invalid {
+    border: 1px solid red;
+  }
+  
+  .login-input.ng-valid {
+    border: 1px solid green;
+  }
  /* ---------------------------------------------------------------------------------------*/
 .loginContainer {
     user-select: none;

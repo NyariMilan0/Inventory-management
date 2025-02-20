@@ -1,10 +1,59 @@
 <app-navbar></app-navbar>
-<h1>Dashboard</h1>
-<div id="profile">
-  <h2>Profil</h2>
-  <p>Username: {{ userName }}</p>
-  <p>Name: {{ firstName }} {{ lastName }}</p>
-  <p>Email: {{ email }}</p>
+<div class="main-content">
+  <div class="dashboard-container">
+    <header>
+      <h1>Warehouse Management</h1>
+      <input type="text" placeholder="Search">
+    </header>
+    <div class="main-content">
+      <div class="warehouse-section">
+        <h2>Section 01</h2>
+        <div class="grid">
+          <!-- Example of filled and empty slots -->
+          <div class="slot" *NgFor="let slot of section01Slots" [class]="{'used': slot.used}"></div>
+        </div>
+        <div class="usage-stats">
+          <span>25 Free place</span>
+          <span>15 Used place</span>
+          <div class="progress-bar">
+            <div class="progress" [style.width]="section01Usage + '%'">{{ section01Usage }}%</div>
+          </div>
+        </div>
+        <!-- Repeat similar structure for other sections -->
+        <div class="section" *NgFor="let section of sections">
+          <h2>Section {{ section.id }}</h2>
+          <p>{{ section.date }}</p>
+          <div class="progress-bar">
+            <div class="progress" [style.width]="section.usage + '%'" [class]="{'red': section.usage > 80}">{{ section.usage }}%</div>
+          </div>
+        </div>
+      </div>
+      <div class="storage-capacity">
+        <h2>Warehouse Storage Capacity</h2>
+        <div class="circular-progress">
+          <svg viewBox="0 0 36 36">
+            <path class="bg" d="M18 2.0845
+            a 15.9155 15.9155 0 0 1 0 31.831
+            a 15.9155 15.9155 0 0 1 0 -31.831"/>
+            <path class="progress" [attr.stroke-dasharray]="warehouseCapacityPercentage + ', 100'" d="M18 2.0845
+            a 15.9155 15.9155 0 0 1 0 31.831
+            a 15.9155 15.9155 0 0 1 0 -31.831"/>
+          </svg>
+          <div class="percentage">{{ warehouseCapacityPercentage }}%</div>
+        </div>
+        <div class="low-stock-items">
+          <div class="item" *NgFor="let item of lowStockItems">
+            <div class="item-info">
+              <span>Item</span>
+              <span>{{ item.name }}</span>
+            </div>
+            <div class="category-info">
+              <span>Category {{ item.category }}</span>
+              <span class="low-stock">Low in stock {{ item.stock }}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-<button (click)="logout()">Kijelentkezés</button>
-<p>{{ message }}</p>

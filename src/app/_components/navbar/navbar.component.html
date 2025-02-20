@@ -1,42 +1,38 @@
-<div class="sidebar-container roboto-condensed">
-  <div class="sidebar" 
-       [class.expanded]="isExpanded" 
-       (mouseenter)="isExpanded = true" 
-       (mouseleave)="isExpanded = false">
-
+<div class="sidebar-container roboto-condensed" [class.visible]="isVisible">
+  <div class="sidebar" [class.expanded]="isExpanded">
     <a class="menuMain">
-      <img class="navbarCompanyLogo" src="/assets/CompanyLogo.svg" alt="">
+      <img class="navbarCompanyLogo" src="/assets/CompanyLogo.svg" alt="Company Logo">
       <span class="navbarLogoText">WareTech</span>
     </a>
-    
     <hr class="navbarSeparatorLine">
     <div class="menu-items">
-      <p>main</p>
+      <p>Main</p>
 
-      <div>
-        <a routerLink="/storage" class="menu-item">
-          <img class="navbarIcons" src="/assets/DiagramIcon.svg" alt="">
-          <span class="menu-text">Storage</span>
-        </a>
-      </div>
+      <a routerLink="/storage" class="menu-item">
+        <img class="navbarIcons" src="/assets/DiagramIcon.svg" alt="Storage">
+        <span class="menu-text">Storage</span>
+      </a>
+
       <a routerLink="/pallet-management" class="menu-item">
-        <img class="navbarIcons" src="/assets/PalletIcon.svg" alt="">
+        <img class="navbarIcons" src="/assets/PalletIcon.svg" alt="Pallet Management">
         <span class="menu-text">Pallet Management</span>
       </a>
-      <a routerLink="/items" class="menu-item">
-        <img class="navbarIcons" src="/assets/Items.svg" alt="">
+
+      <a routerLink="/pallet-management" class="menu-item">
+        <img class="navbarIcons" src="/assets/Items.svg" alt="Pallet Management">
         <span class="menu-text">Items</span>
       </a>
-      <a routerLink="/manage-items" class="menu-item">
-        <img class="navbarIcons" src="/assets/ItemManagementIcon.svg" alt="">
-        <span class="menu-text">Manage Items</span>
+      <a routerLink="/" class="menu-item">
+        <img class="navbarIcons" src="/assets/ItemManagementIcon.svg" alt="Pallet Management">
+        <span class="menu-text">Item management</span>
       </a>
-      <hr class="navbarSeparatorLine">
-      <a routerLink="/profileUser" class="menu-item">
-        <img class="navbarIcons" src="/assets/profileIcon.svg" alt="">
-        <span class="menu-text">Profile</span>
-      </a>
-    </div>
 
+      <a routerLink="/profileUser" class="menu-item">
+        <img class="navbarIcons" src="/assets/profileIcon.svg" alt="Profile User">
+        <span class="menu-text">Profile User</span>
+      </a>
+
+
+    </div>
   </div>
 </div>
