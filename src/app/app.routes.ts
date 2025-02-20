@@ -5,10 +5,12 @@ import { authGuard } from './auth.guard';
 import { NavbarComponent } from './_components/navbar/navbar.component';
 import { ProfileAdminComponent } from './_components/profile-admin/profile-admin.component';
 import { NgModule } from '@angular/core';
+import { RegisterComponent } from './_components/register/register.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'storage', component: StorageManagementComponent,canActivate: [authGuard] },
+  { path: 'register', component: RegisterComponent,canActivate: [authGuard] },
   // { path: 'pallet-management', component: PalletManagementComponent },
   // { path: 'items', component: ItemsComponent },
   // { path: 'manage-items', component: ManageItemsComponent },

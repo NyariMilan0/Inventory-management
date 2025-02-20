@@ -20,7 +20,7 @@
                             <h3 id="text">Sign In</h3>
                         </div>
                         <br>
-                        <div [class]="messageClass">{{ message }}</div>
+                        <div [class]="messageClass"><i class="fas fa-exclamation-circle"></i>{{ message }}</div>
                         <br>
                         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
                             <input [class.invalid]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched" class="login-input" type="text" formControlName="username" placeholder="Username" required>

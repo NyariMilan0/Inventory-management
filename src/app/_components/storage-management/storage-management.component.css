@@ -14,14 +14,13 @@
   }
   
   .main-content {
-    margin-left: 100px; /* Match the width of the sidebar when not expanded */
-    transition: margin-left 0.3s ease; /* Smooth transition when expanding */
+    margin-left: 100px;
   }
   .dashboard-container {
     padding: 20px;
   }
   
-  header {
+  /* header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -150,4 +149,4 @@
   
   .low-stock {
     color: red;
-  }
+  } */

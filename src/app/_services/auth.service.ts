@@ -13,6 +13,7 @@ export class AuthService {
     return this.http.post<any>(this.apiUrl, { userName: username, password }).pipe(
       tap(res => {
         localStorage.setItem('jwtToken', res.result.jwt);
+        localStorage.setItem('id', res.result.id);
         localStorage.setItem('userName', res.result.userName);
         localStorage.setItem('firstName', res.result.firstName);
         localStorage.setItem('lastName', res.result.lastName);

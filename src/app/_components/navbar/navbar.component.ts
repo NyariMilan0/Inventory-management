@@ -23,7 +23,7 @@ export class NavbarComponent {
 
   menuItems = [
     { path: '/storage', icon: 'DiagramIcon.svg', text: 'Storage' },
-    { path: '/profileUser', icon: 'profileIcon.svg', text: 'Profile User' },
+    { path: '/profileAdmin', icon: 'profileIcon.svg', text: 'User Profile' },
     { path: '/pallet-management', icon: 'PalletIcon.svg', text: 'Pallet Management' },
   ];
 }

@@ -1,5 +1,16 @@
 <app-navbar></app-navbar>
 <div class="main-content">
+  <h1>Dashboard</h1>
+  <div id="profile">
+    <h2>Profil</h2>
+    <p>Username: {{ userName }}</p>
+    <p>Name: {{ firstName }} {{ lastName }}</p>
+    <p>Email: {{ email }}</p>
+  </div>
+  <button (click)="logout()">Kijelentkezés</button>
+  <p>{{ message }}</p>
+</div>
+<!-- <div class="main-content">
   <div class="dashboard-container">
     <header>
       <h1>Warehouse Management</h1>
@@ -8,9 +19,9 @@
     <div class="main-content">
       <div class="warehouse-section">
         <h2>Section 01</h2>
-        <div class="grid">
+        <div class="grid"> -->
           <!-- Example of filled and empty slots -->
-          <div class="slot" *NgFor="let slot of section01Slots" [class]="{'used': slot.used}"></div>
+          <!-- <div class="slot" *NgFor="let slot of section01Slots" [class]="{'used': slot.used}"></div>
         </div>
         <div class="usage-stats">
           <span>25 Free place</span>
@@ -18,9 +29,9 @@
           <div class="progress-bar">
             <div class="progress" [style.width]="section01Usage + '%'">{{ section01Usage }}%</div>
           </div>
-        </div>
+        </div> -->
         <!-- Repeat similar structure for other sections -->
-        <div class="section" *NgFor="let section of sections">
+        <!-- <div class="section" *NgFor="let section of sections">
           <h2>Section {{ section.id }}</h2>
           <p>{{ section.date }}</p>
           <div class="progress-bar">
@@ -54,6 +65,6 @@
           </div>
         </div>
       </div>
-    </div>
-  </div>
-</div>
+    </div>  -->
+  <!-- </div>
+</div> -->

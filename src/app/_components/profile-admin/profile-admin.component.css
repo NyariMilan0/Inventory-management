@@ -95,8 +95,36 @@ align-items: flex-end;
     padding-top: 50px;
 }
 
+.custom-input.invalid {
+    border-color: red;
+}
 
+.error-text {
+    color: red;
+    font-size: 12px;
+    margin-top: 5px;
+    display: block;
+}
 
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-bottom: 10px;
+    padding: 5px;
+    border: 1px solid red;
+    border-radius: 4px;
+}
+.success-message {
+    color: green;
+    font-size: 14px;
+    margin-bottom: 10px;
+    padding: 5px;
+    border: 1px solid green;
+    border-radius: 4px;
+}
+.success-message i, .error-message i {
+    margin-right: 5px;
+}
 input{
     align-items: center;
     width: 98%;
@@ -110,6 +138,9 @@ input{
     background-color: #A8DADC;
 }
 
+input:focus {
+    background-color: #F1FAEE;
+}
 .profileButtons{
     text-align: center;
 }
@@ -119,7 +150,7 @@ input{
     -webkit-box-shadow: -4px -4px 4px 0px rgba(0,0,0,0.25) inset;
     -moz-box-shadow: -4px -4px 4px 0px rgba(0,0,0,0.25) inset;
     border: 1px rgba(0,0,0,0.25) solid;
-    border-radius: 5px;
+    border-radius: 10px;
     padding: 5px 20px 5px 20px;
     background-color: #F1FAEE;
     font-weight: 500;
@@ -130,4 +161,8 @@ input{
 
 p{
     font-weight: 500;
+}
+
+button {
+    border-radius: 10px;
 }
