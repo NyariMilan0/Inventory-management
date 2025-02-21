@@ -6,13 +6,14 @@ import { NavbarComponent } from './_components/navbar/navbar.component';
 import { ProfileAdminComponent } from './_components/profile-admin/profile-admin.component';
 import { NgModule } from '@angular/core';
 import { RegisterComponent } from './_components/register/register.component';
+import { ItemListComponent } from './_components/item-list/item-list.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'storage', component: StorageManagementComponent,canActivate: [authGuard] },
   { path: 'register', component: RegisterComponent,canActivate: [authGuard] },
   // { path: 'pallet-management', component: PalletManagementComponent },
-  // { path: 'items', component: ItemsComponent },
+  { path: 'items', component: ItemListComponent },
   // { path: 'manage-items', component: ManageItemsComponent },
     {path: 'navbar', component: NavbarComponent,canActivate: [authGuard]},
     {path: 'profileAdmin', component: ProfileAdminComponent},

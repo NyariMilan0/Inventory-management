@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 
 @Component({
   standalone: true,
-  selector: 'app-warehouse-dashboard',
+  selector: 'app-warehouse-storage',
   templateUrl: './storage-management.component.html',
   styleUrls: ['./storage-management.component.css'],
   imports: [NavbarComponent]
@@ -31,12 +31,6 @@ export class StorageManagementComponent {
   }
 
   logout() {
- // Lekérdezés, hogy ott van-e még
-console.log(localStorage.getItem("jwtToken")); // Kiírja a tokent, ha még ott van
-
-// Ha meg akarod tartani, nem kell semmit tenni
-// Ha törölni akarod:
-localStorage.removeItem("jwtToken");
     this.auth.logout();
     this.message = 'Logout successful';
     setTimeout(() => this.router.navigate(['/login']), 1500);

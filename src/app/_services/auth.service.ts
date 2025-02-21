@@ -24,7 +24,7 @@ export class AuthService {
   }
 
   logout() {
-    localStorage.clear();
+    // localStorage.clear();
   }
 
   private handleError(error: HttpErrorResponse) {

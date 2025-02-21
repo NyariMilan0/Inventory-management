@@ -49,7 +49,7 @@ export class ProfileAdminComponent implements OnInit {
       newPassword: ['', [
         Validators.required,
         Validators.minLength(6),
-        this.passwordComplexityValidator() // Custom validator for complexity
+        this.passwordComplexityValidator()
       ]],
       newPasswordAgain: ['', Validators.required]
     }, { validators: this.passwordMatchValidator });
@@ -63,13 +63,12 @@ export class ProfileAdminComponent implements OnInit {
     this.updateUserInfo();
   }
 
-  // Custom validator for password complexity
   passwordComplexityValidator(): ValidatorFn {
     return (control: AbstractControl): { [key: string]: any } | null => {
       const value = control.value || '';
       const hasLowercase = /[a-z]/.test(value);
       const hasUppercase = /[A-Z]/.test(value);
-      const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(value); // Adjust special characters as needed
+      const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(value);
 
       if (!hasLowercase || !hasUppercase || !hasSpecial) {
         return { complexity: true };

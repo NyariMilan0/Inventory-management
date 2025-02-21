@@ -1,12 +1,10 @@
-/* Main Content */
 .main-content {
     transition: margin-left 0.3s ease;
     min-height: 100vh;
     background: linear-gradient(135deg, #F1FAEE 0%, #F1FAEE 50%, #A8DADC 100%); /* Softer gradient, less vibrant */
     padding-top: 25px;
   }
-  
-  /* Register Section */
+
   .register-section {
     background: #FFFFFF;
     border-radius: 12px;
@@ -18,16 +16,14 @@
   .register-section:hover {
     transform: translateY(-3px);
   }
-  
-  /* Headings */
+
   h3 {
     color: #457B9D;
     font-weight: 600;
     font-size: 24px;
     letter-spacing: 0.5px;
   }
-  
-  /* Avatar */
+
   .avatar {
     width: 100px;
     height: 100px;
@@ -37,7 +33,7 @@
     border: 3px solid #457B9D;
   }
   
-  /* Form Labels */
+
   .form-label {
     color: #457B9D;
     font-weight: 500;
@@ -45,7 +41,7 @@
     margin-bottom: 5px;
   }
   
-  /* Custom Input */
+
   .custom-input {
     background-color: #F1FAEE;
     border: 1px solid #A8DADC;
@@ -62,13 +58,12 @@
     box-shadow: 0 0 8px rgba(69, 123, 157, 0.3);
   }
   
-  /* Invalid Input */
   .custom-input.invalid {
     border-color: #ff4444;
     background-color: #ffe6e6;
   }
   
-  /* Error Text */
+ 
   .error-text {
     color: #ff4444;
     font-size: 12px;
@@ -77,15 +72,15 @@
     font-weight: 400;
   }
   
-  /* Success/Error Messages */
+ 
   .success-message {
-    color: #457B9D; /* Changed to teal blue for consistency */
+    color: #457B9D; 
     font-size: 14px;
     margin-bottom: 15px;
     padding: 8px 12px;
     border: 1px solid #457B9D;
     border-radius: 6px;
-    background-color: rgba(69, 123, 157, 0.1); /* Light teal background */
+    background-color: rgba(69, 123, 157, 0.1);
   }
   
   .error-message {
@@ -102,44 +97,43 @@
     margin-right: 8px;
   }
   
-  /* Button */
+
   .btn-success {
-    background: #A8DADC; /* Soft cyan as default */
+    background: #A8DADC; 
     border: none;
     font-size: 16px;
     padding: 12px 20px;
     border-radius: 6px;
-    color: #457B9D; /* Teal text for contrast */
+    color: #457B9D; 
     font-weight: 500;
     transition: all 0.3s ease;
   }
   
   .btn-success:hover {
-    background: #457B9D; /* Teal blue on hover */
-    color: #F1FAEE; /* Creamy white text */
+    background: #457B9D; 
+    color: #F1FAEE; 
     transform: translateY(-2px);
   }
   
-  /* Active state when form is valid */
+
   .btn-success:not(:disabled) {
-    background: #457B9D; /* Teal blue when active (form valid) */
-    color: #F1FAEE; /* Creamy white text */
+    background: #457B9D; 
+    color: #F1FAEE; 
   }
   
-  /* Disabled state */
+ 
   .btn-success:disabled {
-    background: #A8DADC; /* Soft cyan */
+    background: #A8DADC; 
     opacity: 0.7;
     color: #457B9D;
     cursor: not-allowed;
   }
   
-  /* Container Adjustments */
+
   .container {
     padding: 0 15px;
   }
   
-  /* Responsive Design */
   @media (max-width: 768px) {
     .main-content {
       padding: 15px;

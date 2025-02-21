@@ -10,7 +10,6 @@ import { RouterModule } from '@angular/router';
 })
 export class NavbarComponent {
   isExpanded = false;
-  // Make sidebar visible by default
   isVisible = true;
 
   @HostListener('mouseenter') onMouseEnter() {
