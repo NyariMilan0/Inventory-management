@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Gép: localhost:3306
--- Létrehozás ideje: 2025. Feb 20. 08:30
+-- Létrehozás ideje: 2025. Feb 22. 11:38
 -- Kiszolgáló verziója: 5.7.24
 -- PHP verzió: 8.3.1
 
@@ -246,7 +246,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `createRemoveMovementRequest` (IN `a
 
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `deletePallet` (IN `palletId` INT)   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `deletePalletById` (IN `palletId` INT)   BEGIN
 DECLARE shelfId INT;
 
 SELECT `shelf_id`
@@ -264,6 +264,34 @@ UPDATE `shelfs`
 SET `current_capacity` = `current_capacity` + 1
 WHERE `shelfs`.`id` = shelfId;
 
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `deleteShelfFromStorage` (IN `shelfIdIn` INT, IN `storageIdIn` INT)   BEGIN
+    DECLARE `storageCurrentCapacity` INT;
+
+
+    DELETE FROM `shelfs_x_storage`
+    WHERE `shelf_id` = `shelfIdIn` AND `storage_id` = `storageIdIn`;
+
+
+    DELETE FROM `shelfs`
+    WHERE `id` = `shelfIdIn`;
+
+
+    SELECT `current_capacity`
+    INTO `storageCurrentCapacity`
+    FROM `storage`
+    WHERE `id` = `storageIdIn`;
+
+    UPDATE `storage`
+    SET `current_capacity` = `storageCurrentCapacity` + 1
+    WHERE `id` = `storageIdIn`;
+
+    IF `storageCurrentCapacity` + 1 > 0 THEN
+        UPDATE `storage`
+        SET `isFull` = 0
+        WHERE `id` = `storageIdIn`;
+    END IF;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `deleteUser` (IN `idIn` INT(11))   UPDATE `users`
@@ -339,7 +367,11 @@ FROM `users`
 WHERE `is_deleted` = 1
 ORDER BY `firstName` ASC, `lastName` ASC$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `getItemList` ()   SELECT `items`.`name`, `items`.`sku`, `items`.`amount`
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getFullShelfs` ()   SELECT `shelfs`.*
+FROM `shelfs`
+WHERE `shelfs`.`isFull` = 1$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getItemList` ()   SELECT `items`.*
 FROM `items`
 WHERE `items`.`amount` IS NOT NULL$$
 
@@ -454,6 +486,21 @@ JOIN `shelfs` ON `pallets_x_shelfs`.`shelf_id` = `shelfs`.`id`
 JOIN `shelfs_x_storage` ON `shelfs`.`id` = `shelfs_x_storage`.`shelf_id`
 
 WHERE `shelfs_x_storage`.`storage_id` = storageIdIn;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getPalletsWithShelfs` ()   BEGIN
+    SELECT 
+        `pallets`.`id` AS `pallet_id`,
+        `pallets`.`name` AS `pallet_name`,
+        `shelfs`.`id` AS `shelf_id`,
+        `shelfs`.`name` AS `shelf_name`,
+        `shelfs`.`locationInStorage` AS `shelf_location`
+    FROM 
+        `pallets`
+    JOIN 
+        `pallets_x_shelfs` ON `pallets`.`id` = `pallets_x_shelfs`.`pallet_id`
+    JOIN 
+        `shelfs` ON `pallets_x_shelfs`.`shelf_id` = `shelfs`.`id`;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `getShelfsByStorageId` (IN `storageId` INT)   BEGIN
@@ -683,6 +730,20 @@ SET `users`.`userName` = usernameIn
 WHERE `users`.`id` = idIn;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `userUpdate` (IN `idIn` INT(11), IN `emailIn` VARCHAR(255), IN `firstNameIn` VARCHAR(255), IN `lastNameIn` VARCHAR(255), IN `userNameIn` VARCHAR(255), IN `pictureIn` TEXT, IN `passwordIn` VARCHAR(255), IN `isAdminIn` TINYINT(1))   BEGIN
+    UPDATE `users`
+    SET 
+        `email` = `emailIn`,
+        `firstName` = `firstNameIn`,
+        `lastName` = `lastNameIn`,
+        `userName` = `userNameIn`,
+        `picture` = `pictureIn`,
+        `password` = `passwordIn`,
+        `isAdmin` = `isAdminIn`
+    WHERE 
+        `id` = `idIn`;
+END$$
+
 DELIMITER ;
 
 -- --------------------------------------------------------
@@ -858,7 +919,29 @@ CREATE TABLE `pallets` (
 
 INSERT INTO `pallets` (`id`, `name`, `created_at`, `height`, `length`, `width`) VALUES
 (5, 'Wooden Table', '2025-01-30 22:08:11', 80, 120, 80),
-(6, 'Wooden Table', '2025-02-06 10:11:00', 80, 120, 80);
+(6, 'Wooden Table', '2025-02-06 10:11:00', 80, 120, 80),
+(7, 'Plastic Storage Box', '2025-02-21 09:27:47', 80, 120, 80),
+(8, 'Plastic Chair', '2025-02-21 09:27:47', 80, 120, 80),
+(9, 'Metal Bed Frame', '2025-02-21 09:27:47', 80, 120, 80),
+(10, 'Iron Table', '2025-02-21 09:27:47', 80, 120, 80),
+(11, 'Plastic Storage Box', '2025-02-21 09:27:47', 80, 120, 80),
+(12, 'Plastic Chair', '2025-02-21 09:27:47', 80, 120, 80),
+(13, 'Metal Bed Frame', '2025-02-21 09:27:47', 80, 120, 80),
+(14, 'Iron Table', '2025-02-21 09:27:47', 80, 120, 80),
+(15, 'Plastic Storage Box', '2025-02-21 09:27:47', 80, 120, 80),
+(16, 'Plastic Chair', '2025-02-21 09:27:47', 80, 120, 80),
+(17, 'Metal Bed Frame', '2025-02-21 09:27:47', 80, 120, 80),
+(18, 'Iron Table', '2025-02-21 09:27:47', 80, 120, 80),
+(19, 'Plastic Storage Box', '2025-02-21 09:27:47', 80, 120, 80),
+(20, 'Plastic Chair', '2025-02-21 09:27:47', 80, 120, 80),
+(21, 'Metal Bed Frame', '2025-02-21 09:27:47', 80, 120, 80),
+(22, 'Iron Table', '2025-02-21 09:27:47', 80, 120, 80),
+(23, 'Plastic Storage Box', '2025-02-21 09:27:47', 80, 120, 80),
+(24, 'Plastic Chair', '2025-02-21 09:27:47', 80, 120, 80),
+(25, 'Metal Bed Frame', '2025-02-21 09:27:47', 80, 120, 80),
+(26, 'Iron Table', '2025-02-21 09:27:47', 80, 120, 80),
+(27, 'Plastic Storage Box', '2025-02-21 09:27:47', 80, 120, 80),
+(28, 'Plastic Storage Box', '2025-02-21 09:28:00', 80, 120, 80);
 
 -- --------------------------------------------------------
 
@@ -878,7 +961,29 @@ CREATE TABLE `pallets_x_items` (
 
 INSERT INTO `pallets_x_items` (`id`, `pallet_id`, `item_id`) VALUES
 (2, 5, 21),
-(3, 6, 21);
+(3, 6, 21),
+(4, 7, 32),
+(5, 8, 31),
+(6, 9, 30),
+(7, 10, 29),
+(8, 11, 32),
+(9, 12, 31),
+(10, 13, 30),
+(11, 14, 29),
+(12, 15, 32),
+(13, 16, 31),
+(14, 17, 30),
+(15, 18, 29),
+(16, 19, 32),
+(17, 20, 31),
+(18, 21, 30),
+(19, 22, 29),
+(20, 23, 32),
+(21, 24, 31),
+(22, 25, 30),
+(23, 26, 29),
+(24, 27, 32),
+(25, 28, 32);
 
 -- --------------------------------------------------------
 
@@ -898,7 +1003,29 @@ CREATE TABLE `pallets_x_shelfs` (
 
 INSERT INTO `pallets_x_shelfs` (`id`, `pallet_id`, `shelf_id`) VALUES
 (2, 5, 2),
-(3, 6, 2);
+(3, 6, 2),
+(4, 7, 2),
+(5, 8, 2),
+(6, 9, 2),
+(7, 10, 2),
+(8, 11, 2),
+(9, 12, 2),
+(10, 13, 2),
+(11, 14, 2),
+(12, 15, 2),
+(13, 16, 2),
+(14, 17, 2),
+(15, 18, 2),
+(16, 19, 2),
+(17, 20, 2),
+(18, 21, 2),
+(19, 22, 2),
+(20, 23, 2),
+(21, 24, 2),
+(22, 25, 2),
+(23, 26, 2),
+(24, 27, 2),
+(25, 28, 2);
 
 -- --------------------------------------------------------
 
@@ -925,7 +1052,7 @@ CREATE TABLE `shelfs` (
 
 INSERT INTO `shelfs` (`id`, `name`, `locationInStorage`, `max_capacity`, `current_capacity`, `height`, `length`, `width`, `levels`, `isFull`) VALUES
 (1, 'Shelf a', 'Isle A', 24, 24, 400, 720, 80, 4, 0),
-(2, 'Shelf B', 'Isle B', 24, 22, 400, 720, 80, 4, 0),
+(2, 'Shelf B', 'Isle B', 24, 0, 400, 720, 80, 4, 1),
 (3, 'Shelf A', 'Isle A', 24, 24, 400, 720, 80, 4, 0),
 (4, 'Shelf B', 'Isle B', 24, 24, 400, 720, 80, 4, 0);
 
@@ -999,31 +1126,47 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `email`, `firstName`, `lastName`, `userName`, `picture`, `password`, `isAdmin`, `createdAt`, `is_deleted`, `deletedAt`) VALUES
-(1, 'user1@example.com', 'John', 'Doe', 'smityjhonny', 'profile1.jpg', 'asd', 0, '2025-01-30 16:36:34', 1, '2025-01-31 10:56:52'),
-(2, 'user2@example.com', 'Jane', 'Smith', 'smityjhonny', 'profile2.jpg', 'password123', 0, '2025-01-30 16:36:34', 0, NULL),
-(3, 'user3@example.com', 'Michael', 'Brown', 'smityjhonny', 'profile3.jpg', 'password123', 0, '2025-01-30 16:36:34', 0, NULL),
-(4, 'user4@example.com', 'Emily', 'Davis', 'smityjhonny', 'profile4.jpg', 'password123', 1, '2025-01-30 16:36:34', 1, '2025-01-30 14:38:07'),
-(5, 'user5@example.com', 'Chris', 'Wilson', 'smityjhonny', 'profile5.jpg', 'password123', 0, '2025-01-30 16:36:34', 1, '2025-01-30 20:56:34'),
-(6, 'user6@example.com', 'Sarah', 'Miller', 'smityjhonny', 'profile6.jpg', 'password123', 0, '2025-01-30 16:36:34', 0, NULL),
-(7, 'user7@example.com', 'David', 'Anderson', 'smityjhonny', 'profile7.jpg', 'password123', 0, '2025-01-30 16:36:34', 0, NULL),
-(8, 'user8@example.com', 'Laura', 'Martinez', 'smityjhonny', 'profile8.jpg', 'password123', 0, '2025-01-30 16:36:34', 0, NULL),
-(9, 'user9@example.com', 'James', 'Taylor', 'smityjhonny', 'profile9.jpg', 'password123', 0, '2025-01-30 16:36:34', 0, NULL),
-(10, 'user10@example.com', 'Olivia', 'Harris', 'smityjhonny', 'profile10.jpg', 'password123', 0, '2025-01-30 16:36:34', 0, NULL),
-(11, 'admin1@example.com', 'Alice', 'Johnson', 'smityjhonny', 'admin1.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
-(12, 'admin2@example.com', 'Bob', 'Williams', 'smityjhonny', 'admin2.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
-(13, 'admin3@example.com', 'Charlie', 'Martinez', 'smityjhonny', 'admin3.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
-(14, 'admin4@example.com', 'Diana', 'Rodriguez', 'smityjhonny', 'admin4.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
-(15, 'admin5@example.com', 'Ethan', 'Hernandez', 'smityjhonny', 'admin5.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
-(16, 'admin6@example.com', 'Fiona', 'Lopez', 'smityjhonny', 'admin6.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
-(17, 'admin7@example.com', 'George', 'Gonzalez', 'smityjhonny', 'admin7.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
-(18, 'admin8@example.com', 'Hannah', 'Wilson', 'smityjhonny', 'admin8.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
-(19, 'admin9@example.com', 'Ian', 'Anderson', 'smityjhonny', 'admin9.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
-(20, 'admin10@example.com', 'Julia', 'Thomas', 'smityjhonny', 'admin10.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
+(1, 'user1@example.com', 'John', 'Doe', 'ujFelhasznalonev', 'profile1.jpg', 'ujASDas@1dasd', 0, '2025-01-30 16:36:34', 1, '2025-01-31 10:56:52'),
+(2, 'user2@example.com', 'Jane', 'Smith', 'smityjhonny2', 'profile2.jpg', 'password123', 0, '2025-01-30 16:36:34', 0, NULL),
+(3, 'user3@example.com', 'Michael', 'Brown', 'smityjhonny3', 'profile3.jpg', 'password123', 0, '2025-01-30 16:36:34', 0, NULL),
+(4, 'user4@example.com', 'Emily', 'Davis', 'smityjhonny4', 'profile4.jpg', 'password123', 1, '2025-01-30 16:36:34', 1, '2025-01-30 14:38:07'),
+(5, 'user5@example.com', 'Chris', 'Wilson', 'smityjhonny5', 'profile5.jpg', 'password123', 0, '2025-01-30 16:36:34', 1, '2025-01-30 20:56:34'),
+(6, 'user6@example.com', 'Sarah', 'Miller', 'smityjhonny6', 'profile6.jpg', 'password123', 0, '2025-01-30 16:36:34', 0, NULL),
+(7, 'user7@example.com', 'David', 'Anderson', 'smityjhonny7', 'profile7.jpg', 'password123', 0, '2025-01-30 16:36:34', 0, NULL),
+(8, 'user8@example.com', 'Laura', 'Martinez', 'smityjhonny8', 'profile8.jpg', 'password123', 0, '2025-01-30 16:36:34', 0, NULL),
+(9, 'user9@example.com', 'James', 'Taylor', 'smityjhonny9', 'profile9.jpg', 'password123', 0, '2025-01-30 16:36:34', 0, NULL),
+(10, 'user10@example.com', 'Olivia', 'Harris', 'smityjhonny10', 'profile10.jpg', 'password123', 0, '2025-01-30 16:36:34', 0, NULL),
+(11, 'admin1@example.com', 'Alice', 'Johnson', 'smityjhonny11', 'admin1.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
+(12, 'admin2@example.com', 'Bob', 'Williams', 'smityjhonny12', 'admin2.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
+(13, 'admin3@example.com', 'Charlie', 'Martinez', 'smityjhonny13', 'admin3.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
+(14, 'admin4@example.com', 'Diana', 'Rodriguez', 'smityjhonny14', 'admin4.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
+(15, 'admin5@example.com', 'Ethan', 'Hernandez', 'smityjhonny15', 'admin5.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
+(16, 'admin6@example.com', 'Fiona', 'Lopez', 'smityjhonny16', 'admin6.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
+(17, 'admin7@example.com', 'George', 'Gonzalez', 'smityjhonny17', 'admin7.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
+(18, 'admin8@example.com', 'Hannah', 'Wilson', 'smityjhonny18', 'admin8.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
+(19, 'admin9@example.com', 'Ian', 'Anderson', 'smityjhonny19', 'admin9.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
+(20, 'admin10@example.com', 'Julia', 'Thomas', 'smityjhonny20', 'admin10.jpg', 'adminpass123', 1, '2025-01-30 16:36:34', 0, NULL),
 (21, 'asd@asd.com', 'asd', 'asd', 'asd', 'asd', 'asd', 1, '2025-01-30 17:04:06', 0, NULL),
-(22, 'testtest@gmail.com', 'Jónás', 'Kiszacskos', 'smityjhonny', 'csicskaszatyor1445', 'Asdasd123@', 0, '2025-01-30 22:52:27', 0, NULL),
-(23, 'adminadmin@gmail.com', 'Josephinio', 'Murányi', 'smityjhonny', 'répaszeletelo', 'Asdasdasd123@', 0, '2025-01-30 22:55:12', 0, NULL),
-(24, 'testemail@gmail.com', 'Testes', 'Kismargo', 'smityjhonny', 'Testesikismargit', 'A@assword3211', 0, '2025-01-31 11:50:47', 0, NULL),
-(25, 'testadminaa@gmail.com', 'adminka', 'kalocsai', 'smityjhonny', 'kalocsaiadminka', 'Admin@12ij5', 0, '2025-01-31 11:53:15', 0, NULL);
+(22, 'testtest@gmail.com', 'Jónás', 'Kiszacskos', 'smityjhonny22', 'csicskaszatyor1445', 'Asdasd123@', 0, '2025-01-30 22:52:27', 0, NULL),
+(23, 'adminadmin@gmail.com', 'Josephinio', 'Murányi', 'smityjhonny23', 'répaszeletelo', 'Asdasdasd123@', 0, '2025-01-30 22:55:12', 0, NULL),
+(24, 'testemail@gmail.com', 'Testes', 'Kismargo', 'smityjhonny24', 'Testesikismargit', 'A@assword3211', 0, '2025-01-31 11:50:47', 0, NULL),
+(25, 'testadminaa@gmail.com', 'adminka', 'kalocsai', 'smityjhonny25', 'kalocsaiadminka', 'Admin@12ij5', 0, '2025-01-31 11:53:15', 0, NULL),
+(26, 'testemadil@gmail.com', 'Testes', 'Kismargo', 'https//:margitka', 'Testesikismargit', 'A@assword3211', 0, '2025-02-20 18:56:55', 0, NULL),
+(27, 'fisimasi@gmail.com', 'Firstnameeee', 'Lastnameeee', 'https://www.w3schools.com/howto/img_avatar.png', 'CSiruszfiam', 'ASDasd@123', 0, '2025-02-20 18:58:56', 0, NULL),
+(28, 'Admintest@gmail.com', 'Admintest', 'Admintest', 'https://www.w3schools.com/howto/img_avatar.png', 'Admintest', 'Admintest123@@', 0, '2025-02-20 18:59:53', 0, NULL),
+(29, 'testadminaaa@gmail.com', 'adminka', 'kalocsai', 'https//:adminka', 'kalocsaiadminka', 'Admin@12ij5', 0, '2025-02-20 19:00:16', 0, NULL),
+(30, 'asasasasasn@gmail.com', 'asd', 'asd', 'GASGSAAGSSAGSAGASGSAGASGGSA', 'asd', 'ASD123@', 1, '2025-02-20 19:00:53', 0, NULL),
+(31, 'tesasgaa@gmail.com', 'adminka', 'kalocsai', 'https//:adminka', 'kalocsaiadminka', 'Admin@12ij5', 0, '2025-02-20 19:04:20', 0, NULL),
+(32, 'agsgaags@gmail.com', 'adminka', 'kalocsai', 'https//:adminka', 'kalocsaiadminka', 'Admin@12ij5', 0, '2025-02-20 19:07:57', 0, NULL),
+(33, 'gecags@gmail.com', 'adminka', 'kalocsai', 'https//:adminka', 'kalocsaiadminka', 'Admin@12ij5', 0, '2025-02-20 19:12:42', 0, NULL),
+(34, 'gfaszg@gmail.com', 'adminka', 'kalocsai', 'https//:adminka', 'kalocsaiadminka', 'Admin@12ij5', 0, '2025-02-20 19:20:10', 0, NULL),
+(35, 'fisimasnnkhhggi@gmail.com', 'asdsdf', 'asdsdf', 'https://www.w3schools.com/howto/img_avatar.png', 'asdn', 'Faszom@123asd', 0, '2025-02-20 19:45:00', 0, NULL),
+(36, 'asgasg@gmail.com', 'agsasggasgsaasg', 'gaagsgsasg', 'https://www.w3schools.com/howto/img_avatar.png', 'CSiruszfiam', 'ASDasd123@@@', 0, '2025-02-21 10:08:00', 0, NULL),
+(38, 'asghfgasg@gmail.com', 'agsgasasggasgsaasg', 'gaagsgsasg', 'CSiruszfiam', 'https://www.w3schools.com/howto/img_avatar.png', 'ASDasd123@@@', 0, '2025-02-21 10:25:16', 0, NULL),
+(39, 'ahdhddhhdsgasg@gmail.com', 'agsasggasgsaasg', 'gaagsgsasg', 'CSiruszfiam', 'https://www.w3schools.com/howto/img_avatar.png', 'ASDasd123@@@', 0, '2025-02-21 10:27:00', 0, NULL),
+(40, 'admiasasafsasfn@gmail.com', 'aasdasgfas', 'gasgasg', 'asgasgasgsa', 'https://img.com/pasd', 'asdasdaSAs@@~234125', 1, '2025-02-21 10:36:27', 0, NULL),
+(41, 'gfahfdszg@gmail.com', 'adminka', 'kalocsai', 'https//:adminka', 'kalocsaiadminka', 'Admin@12ij5', 0, '2025-02-21 10:36:47', 0, NULL),
+(42, 'teshdftemasdil@gmail.com', 'Testes', 'Kismargo', 'https//:margitka', 'Testesikismargit', 'A@assword3211', 0, '2025-02-21 10:37:11', 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -1078,7 +1221,8 @@ ALTER TABLE `inventorymovement_x_pallets`
 -- A tábla indexei `items`
 --
 ALTER TABLE `items`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `sku` (`sku`);
 
 --
 -- A tábla indexei `movement_requests`
@@ -1140,7 +1284,8 @@ ALTER TABLE `storage`
 -- A tábla indexei `users`
 --
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email` (`email`);
 
 --
 -- A tábla indexei `user_x_storage`
@@ -1188,19 +1333,19 @@ ALTER TABLE `movement_requests_x_pallets`
 -- AUTO_INCREMENT a táblához `pallets`
 --
 ALTER TABLE `pallets`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT a táblához `pallets_x_items`
 --
 ALTER TABLE `pallets_x_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT a táblához `pallets_x_shelfs`
 --
 ALTER TABLE `pallets_x_shelfs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT a táblához `shelfs`
@@ -1224,7 +1369,7 @@ ALTER TABLE `storage`
 -- AUTO_INCREMENT a táblához `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- AUTO_INCREMENT a táblához `user_x_storage`
