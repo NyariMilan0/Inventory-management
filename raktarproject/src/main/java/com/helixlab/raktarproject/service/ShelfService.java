@@ -13,10 +13,9 @@ import java.util.ArrayList;
  * @author nidid
  */
 public class ShelfService {
-    
+
     private Shelfs layer = new Shelfs();
-    
-    
+
     public ShelfCapacitySummaryDTO getCapacityByShelfUsage() {
         ShelfCapacitySummaryDTO summary = null;
 
@@ -28,7 +27,28 @@ public class ShelfService {
 
         return summary;
     }
-    
-    
-    
+
+    public Shelfs getShelfsById(Integer id) {
+        return layer.getShelfsById(id);
+    }
+
+    public Boolean deleteShelfFromStorage(Integer id) {
+        Shelfs s = getShelfsById(id);
+
+        if (s != null) {
+            return layer.deleteShelfFromStorage(id);
+        } else {
+            System.err.println("The Shelf doesn't exist");
+            return false;
+        }
+    }
+
+    public void addShelfToStorage(String shelfName, String locationIn, Integer storageId) {
+        try {
+            Shelfs.addShelfToStorage(shelfName, locationIn, storageId);
+        } catch (Exception e) {
+            throw new RuntimeException("Service layer error: " + e.getMessage(), e);
+        }
+    }
+
 }

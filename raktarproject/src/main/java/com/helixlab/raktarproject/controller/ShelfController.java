@@ -2,12 +2,17 @@ package com.helixlab.raktarproject.controller;
 
 import com.helixlab.raktarproject.model.ShelfCapacitySummaryDTO;
 import com.helixlab.raktarproject.model.Shelfs;
+import com.helixlab.raktarproject.model.Users;
 import com.helixlab.raktarproject.service.ShelfService;
 import java.util.ArrayList;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -66,6 +71,90 @@ public class ShelfController {
             responseObj.put("statusCode", 500);
             responseObj.put("message", "Failed to retrieve shelf capacity summary");
             responseObj.put("error", e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(responseObj.toString())
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+    }
+
+    @GET
+    @Path("getShelfsById")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getShelfsById(@QueryParam("id") Integer id) {
+        Shelfs response = layer.getShelfsById(id);
+        JSONObject shelfJson = new JSONObject();
+
+        shelfJson.put("id", response.getId());
+        shelfJson.put("name", response.getName());
+        shelfJson.put("locationInStorage", response.getLocationInStorage());
+        shelfJson.put("maxCapacity", response.getMaxCapacity());
+        shelfJson.put("currentCapacity", response.getCurrentCapacity());
+        shelfJson.put("height", response.getHeight());
+        shelfJson.put("length", response.getLength());
+        shelfJson.put("width", response.getWidth());
+        shelfJson.put("levels", response.getLevels());
+        shelfJson.put("isFull", response.getIsFull());
+
+        return Response.status(Response.Status.OK).entity(shelfJson.toString()).type(MediaType.APPLICATION_JSON).build();
+
+    }
+
+    @DELETE
+    @Path("deleteShelfFromStorage")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response deleteShelfFromStorage(@QueryParam("id") Integer id) {
+        Boolean response = layer.deleteShelfFromStorage(id);
+        JSONObject toReturn = new JSONObject();
+
+        String result = "";
+
+        if (response == false) {
+            result = "fail";
+        } else {
+            result = "success";
+        }
+
+        toReturn.put("result", result);
+
+        return Response.status(Response.Status.OK).entity(toReturn.toString()).type(MediaType.APPLICATION_JSON).build();
+
+    }
+    
+    @POST
+    @Path("addShelfToStorage")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response addShelfToStorage(String jsonInput) {
+        JSONObject responseObj = new JSONObject();
+
+        try {
+            // Bemeneti JSON feldolgozása
+            JSONObject input = new JSONObject(jsonInput);
+            Integer storageId = input.getInt("storageId");
+            String shelfName = input.getString("shelfName");
+            String locationIn = input.getString("locationIn");
+
+            // Service réteg meghívása
+            layer.addShelfToStorage(shelfName, locationIn, storageId);
+
+            // Sikeres válasz
+            responseObj.put("statusCode", 201); // Created
+            responseObj.put("message", "Shelf successfully added to storage");
+            responseObj.put("storageId", storageId);
+            responseObj.put("shelfName", shelfName);
+
+            return Response.status(Response.Status.CREATED)
+                           .entity(responseObj.toString())
+                           .type(MediaType.APPLICATION_JSON)
+                           .build();
+
+        } catch (Exception e) {
+            // Hiba esetén válasz
+            responseObj.put("statusCode", 500);
+            responseObj.put("message", "Failed to add shelf to storage");
+            responseObj.put("error", e.getMessage());
+
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                            .entity(responseObj.toString())
                            .type(MediaType.APPLICATION_JSON)
