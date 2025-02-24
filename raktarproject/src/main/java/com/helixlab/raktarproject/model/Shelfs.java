@@ -15,6 +15,7 @@ import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.ParameterMode;
 import javax.persistence.Persistence;
 import javax.persistence.StoredProcedureQuery;
 import javax.persistence.Table;
@@ -59,10 +60,11 @@ public class Shelfs implements Serializable {
     @Size(max = 255)
     @Column(name = "name")
     private String name;
-    @Lob
-    @Size(max = 65535)
-    @Column(name = "capacity")
-    private String capacity;
+    //erre hibát adott a wildfly
+    //@Lob
+    //@Size(max = 65535)
+    //@Column(name = "capacity")
+    //private String capacity;
     @Size(max = 255)
     @Column(name = "locationInStorage")
     private String locationInStorage;
@@ -101,11 +103,23 @@ public class Shelfs implements Serializable {
         }
     }
     
-    public Shelfs(Integer currentCapacity, Integer maxCapacity){
+    public Shelfs(Integer id, String name, String locationInStorage, Integer maxCapacity, Integer currentCapacity, Integer height, Integer length, Integer width, Integer levels, boolean  isFull){
+        this.id = id;
+        this.name = name;
+        this.locationInStorage = locationInStorage;
+        this.maxCapacity = maxCapacity;
+        this.currentCapacity = currentCapacity;
+        this.height = height;
+        this.length = length;
+        this.width = width;
+        this.levels = levels;
+        this.isFull = isFull;
+    }
+
+    public Shelfs(Integer currentCapacity, Integer maxCapacity) {
         this.currentCapacity = currentCapacity;
         this.maxCapacity = maxCapacity;
     }
-    
 
     public Integer getId() {
         return id;
@@ -123,13 +137,13 @@ public class Shelfs implements Serializable {
         this.name = name;
     }
 
-    public String getCapacity() {
-        return capacity;
-    }
+    //public String getCapacity() {
+    //    return capacity;
+    //}
 
-    public void setCapacity(String capacity) {
-        this.capacity = capacity;
-    }
+    //public void setCapacity(String capacity) {
+    //    this.capacity = capacity;
+    //}
 
     public String getLocationInStorage() {
         return locationInStorage;
@@ -227,7 +241,7 @@ public class Shelfs implements Serializable {
     public void setLevels(Integer levels) {
         this.levels = levels;
     }
-    
+
     public static ShelfCapacitySummaryDTO getCapacityByShelfUsage() {
         EntityManager em = emf.createEntityManager();
         ShelfCapacitySummaryDTO summary = null;
@@ -240,8 +254,8 @@ public class Shelfs implements Serializable {
             if (!results.isEmpty()) {
                 Object[] result = results.get(0);
                 summary = new ShelfCapacitySummaryDTO(
-                    result[0] != null ? ((Number) result[0]).intValue() : 0, // currentFreeSpaces
-                    result[1] != null ? ((Number) result[1]).intValue() : 0  // maxCapacity
+                        result[0] != null ? ((Number) result[0]).intValue() : 0, // currentFreeSpaces
+                        result[1] != null ? ((Number) result[1]).intValue() : 0 // maxCapacity
                 );
             }
         } catch (Exception e) {
@@ -253,7 +267,68 @@ public class Shelfs implements Serializable {
 
         return summary;
     }
-    
+
+    public Shelfs getShelfsById(Integer id) {
+        try {
+            return new Shelfs(id);
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getLocalizedMessage());
+            return null;
+        }
+    }
+
+    public Boolean deleteShelfFromStorage(Integer id) {
+        EntityManager em = emf.createEntityManager();
+        Boolean toReturn = false;
+
+        try {
+            StoredProcedureQuery spq = em.createStoredProcedureQuery("deleteShelfFromStorage");
+            spq.registerStoredProcedureParameter("shelfIdIn", Integer.class, ParameterMode.IN);
+            spq.setParameter("shelfIdIn", id);
+
+            spq.execute();
+
+            toReturn = true;
+
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getLocalizedMessage());
+            toReturn = false;
+        } finally {
+            em.clear();
+            em.close();
+            return toReturn;
+        }
+    }
+
+    public static void addShelfToStorage(String shelfName, String locationIn, Integer storageId) {
+        EntityManager em = emf.createEntityManager();
+
+        try {
+            em.getTransaction().begin();
+
+            StoredProcedureQuery spq = em.createStoredProcedureQuery("addShelfToStorage");
+            spq.registerStoredProcedureParameter("storageIdIn", Integer.class, javax.persistence.ParameterMode.IN);
+            spq.registerStoredProcedureParameter("shelfNameIn", String.class, javax.persistence.ParameterMode.IN);
+            spq.registerStoredProcedureParameter("locationIn", String.class, javax.persistence.ParameterMode.IN);
+
+            spq.setParameter("storageIdIn", storageId);
+            spq.setParameter("shelfNameIn", shelfName);
+            spq.setParameter("locationIn", locationIn);
+
+            spq.execute();
+
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            System.err.println("Error adding shelf to storage: " + e.getLocalizedMessage());
+            throw new RuntimeException("Failed to add shelf to storage", e);
+        } finally {
+            em.clear();
+            em.close();
+        }
+    }
 
     public Collection<PalletsXShelfs> getPalletsXShelfsCollection() {
         return palletsXShelfsCollection;
@@ -278,14 +353,5 @@ public class Shelfs implements Serializable {
     public void setInventorymovementCollection1(Collection<Inventorymovement> inventorymovementCollection1) {
         this.inventorymovementCollection1 = inventorymovementCollection1;
     }
-    
- 
-    
-    
-    
-    
-    
-    
-    
 
 }

@@ -206,7 +206,7 @@ public class UserService {
         if (u != null) {
             return layer.deleteUser(id);
         } else {
-            System.err.println("A user nem létezik");
+            System.err.println("The user doesn't exist");
             return false;
         }
     }
@@ -302,5 +302,7 @@ public class UserService {
         toReturn.put("statusCode", statusCode);
         return toReturn;
     }
+    
+    
 
 }

@@ -440,7 +440,7 @@ public class Users implements Serializable {
         try {
             return new Users(id);
         } catch (Exception e) {
-            System.err.println("Hiba: " + e.getLocalizedMessage());
+            System.err.println("Error: " + e.getLocalizedMessage());
             return null;
         }
     }
