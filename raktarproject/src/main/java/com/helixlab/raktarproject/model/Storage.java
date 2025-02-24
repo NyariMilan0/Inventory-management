@@ -25,6 +25,15 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "Storage.findByIsFull", query = "SELECT s FROM Storage s WHERE s.isFull = :isFull")})
 public class Storage implements Serializable {
 
+    @Column(name = "max_capacity")
+    private Integer maxCapacity;
+    @Column(name = "current_capacity")
+    private Integer currentCapacity;
+    @OneToMany(mappedBy = "storageFrom")
+    private Collection<Inventorymovement> inventorymovementCollection;
+    @OneToMany(mappedBy = "storageTo")
+    private Collection<Inventorymovement> inventorymovementCollection1;
+
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
@@ -43,10 +52,6 @@ public class Storage implements Serializable {
     private String location;
     @Column(name = "isFull")
     private Boolean isFull;
-    @OneToMany(mappedBy = "fromStorageid")
-    private Collection<InventorymovementXStorage> inventorymovementXStorageCollection;
-    @OneToMany(mappedBy = "toStorageid")
-    private Collection<InventorymovementXStorage> inventorymovementXStorageCollection1;
     @OneToMany(mappedBy = "storageId")
     private Collection<ShelfsXStorage> shelfsXStorageCollection;
     @OneToMany(mappedBy = "storageId")
@@ -99,22 +104,6 @@ public class Storage implements Serializable {
         this.isFull = isFull;
     }
 
-    public Collection<InventorymovementXStorage> getInventorymovementXStorageCollection() {
-        return inventorymovementXStorageCollection;
-    }
-
-    public void setInventorymovementXStorageCollection(Collection<InventorymovementXStorage> inventorymovementXStorageCollection) {
-        this.inventorymovementXStorageCollection = inventorymovementXStorageCollection;
-    }
-
-    public Collection<InventorymovementXStorage> getInventorymovementXStorageCollection1() {
-        return inventorymovementXStorageCollection1;
-    }
-
-    public void setInventorymovementXStorageCollection1(Collection<InventorymovementXStorage> inventorymovementXStorageCollection1) {
-        this.inventorymovementXStorageCollection1 = inventorymovementXStorageCollection1;
-    }
-
     public Collection<ShelfsXStorage> getShelfsXStorageCollection() {
         return shelfsXStorageCollection;
     }
@@ -154,6 +143,38 @@ public class Storage implements Serializable {
     @Override
     public String toString() {
         return "com.helixlab.raktarproject.model.Storage[ id=" + id + " ]";
+    }
+
+    public Integer getMaxCapacity() {
+        return maxCapacity;
+    }
+
+    public void setMaxCapacity(Integer maxCapacity) {
+        this.maxCapacity = maxCapacity;
+    }
+
+    public Integer getCurrentCapacity() {
+        return currentCapacity;
+    }
+
+    public void setCurrentCapacity(Integer currentCapacity) {
+        this.currentCapacity = currentCapacity;
+    }
+
+    public Collection<Inventorymovement> getInventorymovementCollection() {
+        return inventorymovementCollection;
+    }
+
+    public void setInventorymovementCollection(Collection<Inventorymovement> inventorymovementCollection) {
+        this.inventorymovementCollection = inventorymovementCollection;
+    }
+
+    public Collection<Inventorymovement> getInventorymovementCollection1() {
+        return inventorymovementCollection1;
+    }
+
+    public void setInventorymovementCollection1(Collection<Inventorymovement> inventorymovementCollection1) {
+        this.inventorymovementCollection1 = inventorymovementCollection1;
     }
 
 }

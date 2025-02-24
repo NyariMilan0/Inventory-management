@@ -7,6 +7,8 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -14,6 +16,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 
 @Entity
@@ -24,6 +27,30 @@ import javax.validation.constraints.NotNull;
     @NamedQuery(name = "Inventorymovement.findByMovementDate", query = "SELECT i FROM Inventorymovement i WHERE i.movementDate = :movementDate"),
     @NamedQuery(name = "Inventorymovement.findByAmount", query = "SELECT i FROM Inventorymovement i WHERE i.amount = :amount")})
 public class Inventorymovement implements Serializable {
+
+    @Size(max = 11)
+    @Column(name = "actionType")
+    private String actionType;
+    @Size(max = 50)
+    @Column(name = "palletSKU")
+    private String palletSKU;
+    @OneToMany(mappedBy = "inventoryId")
+    private Collection<InventorymovementXPallets> inventorymovementXPalletsCollection;
+    @JoinColumn(name = "storageFrom", referencedColumnName = "id")
+    @ManyToOne
+    private Storage storageFrom;
+    @JoinColumn(name = "storageTo", referencedColumnName = "id")
+    @ManyToOne
+    private Storage storageTo;
+    @JoinColumn(name = "fromShelf", referencedColumnName = "id")
+    @ManyToOne
+    private Shelfs fromShelf;
+    @JoinColumn(name = "toShelf", referencedColumnName = "id")
+    @ManyToOne
+    private Shelfs toShelf;
+    @JoinColumn(name = "byUser", referencedColumnName = "id")
+    @ManyToOne
+    private Users byUser;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -38,10 +65,6 @@ public class Inventorymovement implements Serializable {
     private Date movementDate;
     @Column(name = "amount")
     private Integer amount;
-    @OneToMany(mappedBy = "inventoryId")
-    private Collection<InventorymovementXStorage> inventorymovementXStorageCollection;
-    @OneToMany(mappedBy = "inventoryId")
-    private Collection<InventorymovementXItems> inventorymovementXItemsCollection;
 
     public Inventorymovement() {
     }
@@ -79,22 +102,6 @@ public class Inventorymovement implements Serializable {
         this.amount = amount;
     }
 
-    public Collection<InventorymovementXStorage> getInventorymovementXStorageCollection() {
-        return inventorymovementXStorageCollection;
-    }
-
-    public void setInventorymovementXStorageCollection(Collection<InventorymovementXStorage> inventorymovementXStorageCollection) {
-        this.inventorymovementXStorageCollection = inventorymovementXStorageCollection;
-    }
-
-    public Collection<InventorymovementXItems> getInventorymovementXItemsCollection() {
-        return inventorymovementXItemsCollection;
-    }
-
-    public void setInventorymovementXItemsCollection(Collection<InventorymovementXItems> inventorymovementXItemsCollection) {
-        this.inventorymovementXItemsCollection = inventorymovementXItemsCollection;
-    }
-
     @Override
     public int hashCode() {
         int hash = 0;
@@ -118,6 +125,70 @@ public class Inventorymovement implements Serializable {
     @Override
     public String toString() {
         return "com.helixlab.raktarproject.model.Inventorymovement[ id=" + id + " ]";
+    }
+
+    public String getActionType() {
+        return actionType;
+    }
+
+    public void setActionType(String actionType) {
+        this.actionType = actionType;
+    }
+
+    public String getPalletSKU() {
+        return palletSKU;
+    }
+
+    public void setPalletSKU(String palletSKU) {
+        this.palletSKU = palletSKU;
+    }
+
+    public Collection<InventorymovementXPallets> getInventorymovementXPalletsCollection() {
+        return inventorymovementXPalletsCollection;
+    }
+
+    public void setInventorymovementXPalletsCollection(Collection<InventorymovementXPallets> inventorymovementXPalletsCollection) {
+        this.inventorymovementXPalletsCollection = inventorymovementXPalletsCollection;
+    }
+
+    public Storage getStorageFrom() {
+        return storageFrom;
+    }
+
+    public void setStorageFrom(Storage storageFrom) {
+        this.storageFrom = storageFrom;
+    }
+
+    public Storage getStorageTo() {
+        return storageTo;
+    }
+
+    public void setStorageTo(Storage storageTo) {
+        this.storageTo = storageTo;
+    }
+
+    public Shelfs getFromShelf() {
+        return fromShelf;
+    }
+
+    public void setFromShelf(Shelfs fromShelf) {
+        this.fromShelf = fromShelf;
+    }
+
+    public Shelfs getToShelf() {
+        return toShelf;
+    }
+
+    public void setToShelf(Shelfs toShelf) {
+        this.toShelf = toShelf;
+    }
+
+    public Users getByUser() {
+        return byUser;
+    }
+
+    public void setByUser(Users byUser) {
+        this.byUser = byUser;
     }
 
 }

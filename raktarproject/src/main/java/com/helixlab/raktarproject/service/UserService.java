@@ -54,20 +54,20 @@ public class UserService {
                 statusCode = 400; // Bad Request
             } else {
                 Users modelResult = layer.login(userName, password);
-                    JSONObject test = new JSONObject();
+                JSONObject test = new JSONObject();
                 try {
-                        test.put("minden", layer.getId());
-                        test.put("id", modelResult.getId());
-                        test.put("email", modelResult.getEmail());
-                        test.put("firstName", modelResult.getFirstName());
-                        test.put("jwt", JWT.createJWT(modelResult));
-                    } catch (Exception e) {
-                        status = "jwtGenerationError";
-                        statusCode = 500;
-                        e.printStackTrace();
-                    }
+                    test.put("minden", layer.getId());
+                    test.put("id", modelResult.getId());
+                    test.put("email", modelResult.getEmail());
+                    test.put("firstName", modelResult.getFirstName());
+                    test.put("jwt", JWT.createJWT(modelResult));
+                } catch (Exception e) {
+                    status = "jwtGenerationError";
+                    statusCode = 500;
+                    e.printStackTrace();
+                }
 
-                    toReturn.put("result", test);
+                toReturn.put("result", test);
 
                 if (modelResult == null) {
                     status = "userNotFound";
@@ -164,8 +164,8 @@ public class UserService {
                     status = "UserAlreadyExists";
                     statusCode = 417;
                 } else {
-                    boolean registerUser = layer.registerUser(u);
-                    if (registerUser == false) {
+                    boolean registerAdmin = layer.registerAdmin(u);
+                    if (registerAdmin == false) {
                         status = "fail";
                         statusCode = 417;
                     }
@@ -194,6 +194,113 @@ public class UserService {
         }
 
         return userList;
+    }
+
+    public Users getUserById(Integer id) {
+        return layer.getUserById(id);
+    }
+
+    public Boolean deletUser(Integer id) {
+        Users u = getUserById(id);
+
+        if (u != null) {
+            return layer.deleteUser(id);
+        } else {
+            System.err.println("A user nem létezik");
+            return false;
+        }
+    }
+
+    public JSONObject passwordChangeByUserId(Integer userId, String oldPassword, String newPassword) {
+        JSONObject toReturn = new JSONObject();
+        String status = "success";
+        int statusCode = 200;
+
+        try {
+            // Felhasználó lekérése az ID alapján
+            Users user = getUserById(userId);
+
+            if (user == null) {
+                status = "userNotFound";
+                statusCode = 404; // Not Found
+            } else if (user.getId() == null) {
+                status = "userInvalid";
+                statusCode = 417; // Expectation Failed
+            } else {
+                // Ellenőrizzük, hogy az új jelszó érvényes-e
+                if (!isValidPassword(newPassword)) {
+                    status = "invalidNewPassword";
+                    statusCode = 417; // Expectation Failed
+                } else {
+                    // Jelszóváltoztatás meghívása a Users osztályban
+                    Boolean result = user.passwordChangeByUserId(userId, oldPassword, newPassword);
+
+                    if (!result) {
+                        status = "passwordChangeFailed";
+                        statusCode = 417; // Expectation Failed
+                    } else {
+                        JSONObject resultJson = new JSONObject();
+                        resultJson.put("id", user.getId());
+                        resultJson.put("email", user.getEmail());
+                        resultJson.put("firstName", user.getFirstName());
+                        resultJson.put("lastName", user.getLastName());
+                        resultJson.put("userName", user.getUserName());
+                        toReturn.put("result", resultJson);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            status = "modelException";
+            statusCode = 500; // Internal Server Error
+            System.err.println("Hiba a jelszóváltoztatás során: " + e.getMessage());
+        }
+
+        toReturn.put("status", status);
+        toReturn.put("statusCode", statusCode);
+        return toReturn;
+    }
+
+    public JSONObject usernameChangeByUserId(Integer userId, String newUsername) {
+        JSONObject toReturn = new JSONObject();
+        String status = "success";
+        int statusCode = 200;
+
+        try {
+            // Felhasználó lekérése az ID alapján
+            Users user = getUserById(userId);
+
+            if (user == null) {
+                status = "userNotFound";
+                statusCode = 404; // Not Found
+            } else if (user.getId() == null) {
+                status = "userInvalid";
+                statusCode = 417; // Expectation Failed
+            } else {
+                // Felhasználónév változtatás meghívása a Users osztályban
+                Boolean result = user.usernameChangeByUserId(userId, newUsername);
+
+                if (!result) {
+                    status = "usernameChangeFailed";
+                    statusCode = 417; // Expectation Failed
+                } else {
+                    JSONObject resultJson = new JSONObject();
+                    resultJson.put("id", user.getId());
+                    resultJson.put("email", user.getEmail());
+                    resultJson.put("firstName", user.getFirstName());
+                    resultJson.put("lastName", user.getLastName());
+                    resultJson.put("userName", user.getUserName());
+                    toReturn.put("result", resultJson);
+                }
+            }
+        } catch (Exception e) {
+            status = "modelException";
+            statusCode = 500; // Internal Server Error
+            System.err.println("Hiba a felhasználónév változtatása során: " + e.getMessage());
+        }
+
+        toReturn.put("status", status);
+        toReturn.put("statusCode", statusCode);
+        return toReturn;
     }
 
 }

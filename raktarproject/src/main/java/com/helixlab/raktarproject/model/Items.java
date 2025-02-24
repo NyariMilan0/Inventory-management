@@ -34,6 +34,16 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "Items.findBySize", query = "SELECT i FROM Items i WHERE i.size = :size")})
 public class Items implements Serializable {
 
+    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    @Column(name = "price")
+    private Double price;
+    @Column(name = "weight")
+    private Double weight;
+    @Column(name = "size")
+    private Double size;
+    @OneToMany(mappedBy = "itemId")
+    private Collection<PalletsXItems> palletsXItemsCollection;
+
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
@@ -51,9 +61,6 @@ public class Items implements Serializable {
     private String name;
     @Column(name = "amount")
     private Integer amount;
-    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
-    @Column(name = "price")
-    private Float price;
     @Size(max = 11)
     @Column(name = "itemState")
     private String itemState;
@@ -62,18 +69,10 @@ public class Items implements Serializable {
     @Column(name = "transactionTimestamp")
     @Temporal(TemporalType.TIMESTAMP)
     private Date transactionTimestamp;
-    @Column(name = "weight")
-    private Float weight;
-    @Column(name = "size")
-    private Float size;
     @Lob
     @Size(max = 65535)
     @Column(name = "description")
     private String description;
-    @OneToMany(mappedBy = "itemId")
-    private Collection<InventorymovementXItems> inventorymovementXItemsCollection;
-    @OneToMany(mappedBy = "itemId")
-    private Collection<ItemsXShelfs> itemsXShelfsCollection;
 
     public Items() {
     }
@@ -127,13 +126,6 @@ public class Items implements Serializable {
         this.amount = amount;
     }
 
-    public Float getPrice() {
-        return price;
-    }
-
-    public void setPrice(Float price) {
-        this.price = price;
-    }
 
     public String getItemState() {
         return itemState;
@@ -151,21 +143,6 @@ public class Items implements Serializable {
         this.transactionTimestamp = transactionTimestamp;
     }
 
-    public Float getWeight() {
-        return weight;
-    }
-
-    public void setWeight(Float weight) {
-        this.weight = weight;
-    }
-
-    public Float getSize() {
-        return size;
-    }
-
-    public void setSize(Float size) {
-        this.size = size;
-    }
 
     public String getDescription() {
         return description;
@@ -174,23 +151,6 @@ public class Items implements Serializable {
     public void setDescription(String description) {
         this.description = description;
     }
-
-    public Collection<InventorymovementXItems> getInventorymovementXItemsCollection() {
-        return inventorymovementXItemsCollection;
-    }
-
-    public void setInventorymovementXItemsCollection(Collection<InventorymovementXItems> inventorymovementXItemsCollection) {
-        this.inventorymovementXItemsCollection = inventorymovementXItemsCollection;
-    }
-
-    public Collection<ItemsXShelfs> getItemsXShelfsCollection() {
-        return itemsXShelfsCollection;
-    }
-
-    public void setItemsXShelfsCollection(Collection<ItemsXShelfs> itemsXShelfsCollection) {
-        this.itemsXShelfsCollection = itemsXShelfsCollection;
-    }
-
     @Override
     public int hashCode() {
         int hash = 0;
@@ -214,6 +174,38 @@ public class Items implements Serializable {
     @Override
     public String toString() {
         return "com.helixlab.raktarproject.model.Items[ id=" + id + " ]";
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
+    public Double getWeight() {
+        return weight;
+    }
+
+    public void setWeight(Double weight) {
+        this.weight = weight;
+    }
+
+    public Double getSize() {
+        return size;
+    }
+
+    public void setSize(Double size) {
+        this.size = size;
+    }
+
+    public Collection<PalletsXItems> getPalletsXItemsCollection() {
+        return palletsXItemsCollection;
+    }
+
+    public void setPalletsXItemsCollection(Collection<PalletsXItems> palletsXItemsCollection) {
+        this.palletsXItemsCollection = palletsXItemsCollection;
     }
 
 }

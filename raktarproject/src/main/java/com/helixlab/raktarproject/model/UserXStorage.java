@@ -4,6 +4,8 @@ import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -19,6 +21,12 @@ import javax.validation.constraints.NotNull;
     @NamedQuery(name = "UserXStorage.findAll", query = "SELECT u FROM UserXStorage u"),
     @NamedQuery(name = "UserXStorage.findById", query = "SELECT u FROM UserXStorage u WHERE u.id = :id")})
 public class UserXStorage implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "1")
+    private Integer a;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -87,6 +95,14 @@ public class UserXStorage implements Serializable {
     @Override
     public String toString() {
         return "com.helixlab.raktarproject.model.UserXStorage[ id=" + id + " ]";
+    }
+
+    public Integer getA() {
+        return a;
+    }
+
+    public void setA(Integer a) {
+        this.a = a;
     }
 
 }
