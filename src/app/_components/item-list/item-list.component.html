@@ -1,103 +1,102 @@
-<app-navbar></app-navbar>
-<div class="container-fluid p-4" style="background-color: #f0f7f4;">
-    <div class="row justify-content-center">
-      <div class="col-12 col-md-10 col-lg-8">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <div class="d-flex align-items-center">
-            <div class="dropdown">
-              <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="max-width: 200px;">
-                Open
-              </button>
-              <div class="dropdown-menu p-3" aria-labelledby="filterDropdown" style="border-radius: 10px; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); width: 200px;">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="metal" (change)="toggleCategory('Metal')">
-                  <label class="form-check-label" for="metal">Metal</label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="wood" (change)="toggleCategory('Wood')">
-                  <label class="form-check-label" for="wood">Wood</label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="plastic" (change)="toggleCategory('Plastic')">
-                  <label class="form-check-label" for="plastic">Plastic</label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="titanium" (change)="toggleCategory('Titanium')">
-                  <label class="form-check-label" for="titanium">Titanium</label>
+<div class="d-flex">
+  <div class="sidebar" style="width: 100px; background-color: #e0e7e4; min-height: 100vh;"></div>
+  <div class="main-content flex-grow-1">
+    <app-navbar></app-navbar>
+    <div class="container-fluid p-4" style="background-color: #f0f7f4;">
+      <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex align-items-center gap-2">
+              <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle open-button" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                  Open
+                </button>
+                <div class="dropdown-menu p-3" aria-labelledby="filterDropdown" style="border-radius: 10px; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); width: 200px;">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="metal" (change)="toggleCategory('Metal')">
+                    <label class="form-check-label" for="metal">Metal</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="wood" (change)="toggleCategory('Wood')">
+                    <label class="form-check-label" for="wood">Wood</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="plastic" (change)="toggleCategory('Plastic')">
+                    <label class="form-check-label" for="plastic">Plastic</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="titanium" (change)="toggleCategory('Titanium')">
+                    <label class="form-check-label" for="titanium">Titanium</label>
+                  </div>
                 </div>
               </div>
+              <button class="btn btn-outline-secondary weight-button" (click)="sortByWeight()">
+                <i class="fa-solid fa-weight-hanging"></i>Weight
+                <i class="fas fa-arrow-down arrow-icon" [ngClass]="{'rotate-up': isWeightAscending}"></i>
+              </button>
+              <button class="btn btn-outline-secondary abc-button" (click)="sortByName()">
+                <span class="abc-text" [ngClass]="{'abc-descending': !isNameAscending, 'abc-ascending': isNameAscending}">ABC</span>
+                <i class="fas fa-arrow-down arrow-icon" [ngClass]="{'rotate-up': isNameAscending}"></i>
+              </button>
             </div>
-            <button class="btn btn-outline-secondary me-2" (click)="sortByWeight()">
-              Weight <i class="bi" [ngClass]="{'bi-arrow-up': isWeightAscending, 'bi-arrow-down': !isWeightAscending}"></i>
-            </button>
-            <button class="btn btn-outline-secondary" (click)="sortByName()">
-              ABC <i class="bi" [ngClass]="{'bi-arrow-down': isNameAscending, 'bi-arrow-up': !isNameAscending}"></i>
-            </button>
+            <div class="d-flex gap-2">
+            </div>
           </div>
-          <div>
-            <button class="btn btn-outline-secondary me-2">
-              <i class="bi bi-lock"></i>
-            </button>
-            <button class="btn btn-outline-secondary">
-              <i class="bi bi-arrow-bar-up"></i>
-            </button>
-          </div>
-        </div>
-        <h2 class="text-center mb-4">Item List</h2>
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-          <div class="col" *ngFor="let item of items">
-            <div class="card shadow-sm h-100" style="border-radius: 10px;">
-              <div class="card-body d-flex align-items-center justify-content-between p-3">
-                <div class="d-flex align-items-center">
-                  <div class="item-square bg-info bg-opacity-25 me-3" style="border-radius: 5px; height: 100px; width: 100px; display: flex; align-items: center; justify-content: center;">
-                    Item
+          <h2 class="text-center mb-4">Item List</h2>
+          <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            <div class="col" *ngFor="let item of items">
+              <div class="card shadow-sm h-100 larger-card">
+                <div class="card-body d-flex flex-column p-3">
+                  <div class="d-flex align-items-center gap-3">
+                    <div class="item-square bg-info bg-opacity-25 me-3">
+                      Item
+                    </div>
+                    <div>
+                      <h5 class="card-title mb-1">{{ item.name }}</h5>
+                      <p class="card-text mb-1">
+                        <strong>Weight:</strong> {{ item.weight }} kg<br>
+                        <strong>Category:</strong> {{ item.material }}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h5 class="card-title mb-1" style="color: #2c5282;">{{ item.name }}</h5>
-                    <p class="card-text mb-1" style="color: #2c5282;">
-                      <strong>Weight:</strong> {{ item.weight }} kg<br>
-                      <strong>Category:</strong> {{ item.material }}
-                    </p>
-                  </div>
+                  <button class="btn btn-info details-button" (click)="openModal(item)">Details</button>
                 </div>
-                <button class="btn btn-info" style="border-radius: 20px;" (click)="openModal(item)">Details</button>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  
-    <!-- Bootstrap Modal for Item Details -->
-    <div #itemModal class="modal fade" id="itemModal" tabindex="-1" aria-labelledby="itemModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="itemModalLabel">Item Details</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-              <div class="col-md-4 text-center">
-                <img [src]="selectedItem.imageUrl || 'assets/images/placeholder.png'" class="img-fluid" alt="{{ selectedItem.name }}" style="max-height: 200px; object-fit: cover;" *ngIf="selectedItem">
-                <p class="text-muted mt-2" *ngIf="!selectedItem">No image available</p>
-              </div>
-              <div class="col-md-8">
-                <h4>{{ selectedItem?.name || 'No name available' }}</h4>
-                <p><strong>SKU:</strong> {{ selectedItem?.sku || 'No SKU available' }}</p>
-                <p><strong>Material:</strong> {{ selectedItem?.material || 'No material available' }}</p>
-                <p><strong>Quantity:</strong> {{ selectedItem?.quantity || 0 }}</p>
-                <p><strong>Price:</strong> ${{ selectedItem?.price || 0 }}</p>
-                <p><strong>Weight:</strong> {{ selectedItem?.weight || 0 }} kg</p>
-                <p><strong>Dimensions:</strong> {{ selectedItem?.dimensions || 0 }} cm</p>
-                <p><strong>Description:</strong> {{ selectedItem?.description || 'No description available' }}</p>
+      <div #itemModal class="modal fade" id="itemModal" tabindex="-1" aria-labelledby="itemModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="itemModalLabel">Item Details</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-md-4 text-center">
+                  <img [src]="selectedItem.imageUrl || 'assets/images/placeholder.png'" class="img-fluid" alt="{{ selectedItem.name }}" style="max-height: 200px; object-fit: cover;" *ngIf="selectedItem">
+                  <p class="text-muted mt-2" *ngIf="!selectedItem">No image available</p>
+                </div>
+                <div class="col-md-8">
+                  <h4>{{ selectedItem?.name || 'No name available' }}</h4>
+                  <p><strong>SKU:</strong> {{ selectedItem?.sku || 'No SKU available' }}</p>
+                  <p><strong>Material:</strong> {{ selectedItem?.material || 'No material available' }}</p>
+                  <p><strong>Quantity:</strong> {{ selectedItem?.quantity || 0 }}</p>
+                  <p><strong>Price:</strong> ${{ selectedItem?.price || 0 }}</p>
+                  <p><strong>Weight:</strong> {{ selectedItem?.weight || 0 }} kg</p>
+                  <p><strong>Dimensions:</strong> {{ selectedItem?.dimensions || 0 }} cm</p>
+                  <p><strong>Description:</strong> {{ selectedItem?.description || 'No description available' }}</p>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+</div>

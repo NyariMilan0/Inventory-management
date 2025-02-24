@@ -1,4 +1,3 @@
-// src/app/_components/item-list/item-list.component.ts
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavbarComponent } from '../navbar/navbar.component';
@@ -13,7 +12,7 @@ export interface Item {
   weight: number;
   dimensions: number;
   description: string;
-  imageUrl?: string; // Optional property for image URL
+  imageUrl?: string; 
 }
 
 @Component({
@@ -24,19 +23,18 @@ export interface Item {
   styleUrls: ['./item-list.component.css']
 })
 export class ItemListComponent implements OnInit {
-  originalItems: Item[] = []; // Store the original list of items
-  items: Item[] = []; // The filtered/displayed list of items
-  selectedItem: Item | null = null; // Track the selected item for the modal
-  selectedCategories: string[] = []; // Track selected categories for filtering
-  isWeightAscending: boolean = true; // Track weight sort direction
-  isNameAscending: boolean = true; // Track name sort direction
+  originalItems: Item[] = [];
+  items: Item[] = [];
+  selectedItem: Item | null = null; 
+  selectedCategories: string[] = [];
+  isWeightAscending: boolean = true; 
+  isNameAscending: boolean = true;
 
-  @ViewChild('itemModal', { static: false }) modalElement!: ElementRef; // Reference to the item modal
+  @ViewChild('itemModal', { static: false }) modalElement!: ElementRef;
 
   constructor() {}
 
   ngOnInit(): void {
-    // Initialize items with the original list
     this.originalItems = [
       { id: 21, sku: 'asd', material: 'Wood', name: 'asd', quantity: 1, price: 1, weight: 1, dimensions: 1, description: 'asd', imageUrl: 'assets/images/placeholder.png' },
       { id: 22, sku: 'SKU002', material: 'Wood', name: 'Wooden Chair', quantity: 25, price: 79.99, weight: 5.5, dimensions: 45, description: 'Comfortable wooden chair with cushioned seat.', imageUrl: 'assets/images/placeholder.png' },
@@ -59,7 +57,7 @@ export class ItemListComponent implements OnInit {
       { id: 39, sku: 'SKU019', material: 'Aluminum', name: 'Aluminum Bicycle', quantity: 10, price: 499.99, weight: 12, dimensions: 160, description: 'Lightweight aluminum frame mountain bike.', imageUrl: 'assets/images/placeholder.png' },
       { id: 40, sku: 'SKU020', material: 'Aluminum', name: 'Aluminum Frying Pan', quantity: 25, price: 59.99, weight: 2, dimensions: 30, description: 'Non-stick aluminum frying pan for cooking.', imageUrl: 'assets/images/placeholder.png' }
     ];
-    this.items = [...this.originalItems]; // Initialize displayed items with the original list
+    this.items = [...this.originalItems];
   }
 
   openModal(item: Item): void {
@@ -84,10 +82,8 @@ export class ItemListComponent implements OnInit {
 
   filterItems(): void {
     if (this.selectedCategories.length === 0) {
-      // If no categories are selected, restore the original list
       this.items = [...this.originalItems];
     } else {
-      // Filter items to show those matching any selected category (OR logic)
       this.items = this.originalItems.filter(item => 
         this.selectedCategories.some(category => item.material === category)
       );
@@ -98,13 +94,13 @@ export class ItemListComponent implements OnInit {
     this.items.sort((a, b) => {
       return this.isWeightAscending ? a.weight - b.weight : b.weight - a.weight;
     });
-    this.isWeightAscending = !this.isWeightAscending; // Toggle direction
+    this.isWeightAscending = !this.isWeightAscending;
   }
 
   sortByName(): void {
     this.items.sort((a, b) => {
       return this.isNameAscending ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
     });
-    this.isNameAscending = !this.isNameAscending; // Toggle direction
+    this.isNameAscending = !this.isNameAscending;
   }
 }

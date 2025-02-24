@@ -100,6 +100,10 @@ export class ProfileAdminComponent implements OnInit {
       newPassword
     };
 
+
+
+
+    // Jelszó változtatás -----------------------------------------------------------------------------------
     this.http.put('http://127.0.0.1:8080/raktarproject-1.0-SNAPSHOT/webresources/user/passwordChangeByUserId', 
       passwordRequest
     ).subscribe({
@@ -133,6 +137,8 @@ export class ProfileAdminComponent implements OnInit {
       }
     });
   }
+// -----------------------------------------------------------------------------------
+
 
   updateUsername(): void {
     this.message = '';
@@ -150,6 +156,8 @@ export class ProfileAdminComponent implements OnInit {
       newUsername
     };
 
+
+    // Username változtatás ------------------------------------------------------
     this.http.put('http://127.0.0.1:8080/raktarproject-1.0-SNAPSHOT/webresources/user/usernameChangeByUserId', 
       usernameRequest
     ).subscribe({
@@ -183,6 +191,11 @@ export class ProfileAdminComponent implements OnInit {
       }
     });
   }
+// -------------------------------------------------------------------------------------
+
+
+
+
 
   signOut(): void {
     this.authService.logout();
@@ -193,5 +206,6 @@ export class ProfileAdminComponent implements OnInit {
     (document.getElementById('userName') as HTMLElement).textContent = localStorage.getItem('userName') || 'Unknown';
     (document.getElementById('firstName') as HTMLElement).textContent = localStorage.getItem('firstName') || 'Unknown';
     (document.getElementById('lastName') as HTMLElement).textContent = localStorage.getItem('lastName') || 'Unknown';
+    (document.getElementById('role') as HTMLElement).textContent = localStorage.getItem('isAdmin') || 'Unknown';
   }
 }
