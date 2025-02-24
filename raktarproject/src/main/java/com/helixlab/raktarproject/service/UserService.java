@@ -164,8 +164,8 @@ public class UserService {
                     status = "UserAlreadyExists";
                     statusCode = 417;
                 } else {
-                    boolean registerUser = layer.registerUser(u);
-                    if (registerUser == false) {
+                    boolean registerAdmin = layer.registerAdmin(u);
+                    if (registerAdmin == false) {
                         status = "fail";
                         statusCode = 417;
                     }

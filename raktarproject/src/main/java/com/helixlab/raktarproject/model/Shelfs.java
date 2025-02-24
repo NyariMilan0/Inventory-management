@@ -2,7 +2,9 @@ package com.helixlab.raktarproject.model;
 
 import static com.helixlab.raktarproject.model.Users.emf;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,6 +16,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Persistence;
+import javax.persistence.StoredProcedureQuery;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -97,19 +100,12 @@ public class Shelfs implements Serializable {
             em.close();
         }
     }
-
-    public Shelfs(Integer id, String name, String locationInStorage, Integer maxCapacity, Integer currentCapacity, Integer height, Integer length, Integer width, Integer levels, boolean isFull) {
-        this.id = id;
-        this.name = name;
-        this.locationInStorage = locationInStorage;
-        this.maxCapacity = maxCapacity;
+    
+    public Shelfs(Integer currentCapacity, Integer maxCapacity){
         this.currentCapacity = currentCapacity;
-        this.height = height;
-        this.length = length;
-        this.width = width;
-        this.levels = levels;
-        this.isFull = isFull;
+        this.maxCapacity = maxCapacity;
     }
+    
 
     public Integer getId() {
         return id;
@@ -231,6 +227,33 @@ public class Shelfs implements Serializable {
     public void setLevels(Integer levels) {
         this.levels = levels;
     }
+    
+    public static ShelfCapacitySummaryDTO getCapacityByShelfUsage() {
+        EntityManager em = emf.createEntityManager();
+        ShelfCapacitySummaryDTO summary = null;
+
+        try {
+            StoredProcedureQuery spq = em.createStoredProcedureQuery("getCapacityByShelfUsage");
+            spq.execute();
+
+            List<Object[]> results = spq.getResultList();
+            if (!results.isEmpty()) {
+                Object[] result = results.get(0);
+                summary = new ShelfCapacitySummaryDTO(
+                    result[0] != null ? ((Number) result[0]).intValue() : 0, // currentFreeSpaces
+                    result[1] != null ? ((Number) result[1]).intValue() : 0  // maxCapacity
+                );
+            }
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getLocalizedMessage());
+        } finally {
+            em.clear();
+            em.close();
+        }
+
+        return summary;
+    }
+    
 
     public Collection<PalletsXShelfs> getPalletsXShelfsCollection() {
         return palletsXShelfsCollection;
