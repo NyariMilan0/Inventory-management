@@ -22,7 +22,9 @@ public class ApplicationConfig extends Application {
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
         resources.add(com.helixlab.raktarproject.controller.CorsFilter.class);
+        resources.add(com.helixlab.raktarproject.controller.ItemController.class);
         resources.add(com.helixlab.raktarproject.controller.ShelfController.class);
+        resources.add(com.helixlab.raktarproject.controller.StorageController.class);
         resources.add(com.helixlab.raktarproject.controller.UserController.class);
     }
 

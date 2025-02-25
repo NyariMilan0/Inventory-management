@@ -4,9 +4,11 @@
  */
 package com.helixlab.raktarproject.service;
 
+import com.helixlab.raktarproject.model.PalletShelfDTO;
 import com.helixlab.raktarproject.model.ShelfCapacitySummaryDTO;
 import com.helixlab.raktarproject.model.Shelfs;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -49,6 +51,22 @@ public class ShelfService {
         } catch (Exception e) {
             throw new RuntimeException("Service layer error: " + e.getMessage(), e);
         }
+    }
+    
+    public List<PalletShelfDTO> getPalletsWithShelfs() {
+        List<PalletShelfDTO> result = null;
+
+        try {
+            result = Shelfs.getPalletsWithShelfs();
+            if (result == null || result.isEmpty()) {
+                throw new RuntimeException("No pallets and shelfs found");
+            }
+        } catch (Exception e) {
+            System.err.println("Error fetching pallets and shelfs: " + e.getMessage());
+            throw new RuntimeException("Service layer error: " + e.getMessage(), e);
+        }
+
+        return result;
     }
 
 }

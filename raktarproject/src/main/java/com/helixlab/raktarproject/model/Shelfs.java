@@ -102,8 +102,8 @@ public class Shelfs implements Serializable {
             em.close();
         }
     }
-    
-    public Shelfs(Integer id, String name, String locationInStorage, Integer maxCapacity, Integer currentCapacity, Integer height, Integer length, Integer width, Integer levels, boolean  isFull){
+
+    public Shelfs(Integer id, String name, String locationInStorage, Integer maxCapacity, Integer currentCapacity, Integer height, Integer length, Integer width, Integer levels, boolean isFull) {
         this.id = id;
         this.name = name;
         this.locationInStorage = locationInStorage;
@@ -140,11 +140,9 @@ public class Shelfs implements Serializable {
     //public String getCapacity() {
     //    return capacity;
     //}
-
     //public void setCapacity(String capacity) {
     //    this.capacity = capacity;
     //}
-
     public String getLocationInStorage() {
         return locationInStorage;
     }
@@ -328,6 +326,35 @@ public class Shelfs implements Serializable {
             em.clear();
             em.close();
         }
+    }
+
+    public static List<PalletShelfDTO> getPalletsWithShelfs() {
+        EntityManager em = emf.createEntityManager();
+        List<PalletShelfDTO> resultList = new ArrayList<>();
+
+        try {
+            StoredProcedureQuery spq = em.createStoredProcedureQuery("getPalletsWithShelfs");
+            spq.execute();
+
+            List<Object[]> result = spq.getResultList();
+            for (Object[] row : result) {
+                Integer palletId = (Integer) row[0];
+                String palletName = (String) row[1];
+                Integer shelfId = (Integer) row[2];
+                String shelfName = (String) row[3];
+                String shelfLocation = (String) row[4];
+
+                resultList.add(new PalletShelfDTO(palletId, palletName, shelfId, shelfName, shelfLocation));
+
+            }
+        } catch (Exception e) {
+            System.err.println("Error fetching pallets and shelfs: " + e.getLocalizedMessage());
+        } finally {
+            em.clear();
+            em.close();
+        }
+
+        return resultList;
     }
 
     public Collection<PalletsXShelfs> getPalletsXShelfsCollection() {
