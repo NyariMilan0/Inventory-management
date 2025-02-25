@@ -108,7 +108,7 @@ public class Users implements Serializable {
             this.createdAt = u.getCreatedAt();
             this.picture = u.getPicture();
         } catch (Exception ex) {
-            System.err.println("Hiba: " + ex.getLocalizedMessage());
+            System.err.println("Error: " + ex.getLocalizedMessage());
         } finally {
             em.clear();
             em.close();
