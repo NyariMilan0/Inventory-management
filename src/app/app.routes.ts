@@ -10,7 +10,7 @@ import { ItemListComponent } from './_components/item-list/item-list.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
-  { path: 'storage', component: StorageManagementComponent,canActivate: [authGuard] },
+  { path: 'storage', component: StorageManagementComponent},
   { path: 'register', component: RegisterComponent,canActivate: [authGuard] },
   // { path: 'pallet-management', component: PalletManagementComponent },
   { path: 'items', component: ItemListComponent },

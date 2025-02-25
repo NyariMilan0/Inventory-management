@@ -2,13 +2,13 @@
   <div class="sidebar" style="width: 100px; background-color: #e0e7e4; min-height: 100vh;"></div>
   <div class="main-content flex-grow-1">
     <app-navbar></app-navbar>
-    <div class="container-fluid p-4" style="background-color: #f0f7f4;">
+    <div class="roboto-condensed container-fluid p-4" style="background-color: #F1FAEE;">
       <div class="row justify-content-center">
         <div class="col-12 col-md-10 col-lg-8">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <div class="d-flex align-items-center gap-2">
               <div class="dropdown">
-                <button class="btn btn-outline-secondary dropdown-toggle open-button" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <button class="btn dropdown-toggle open-button" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                   Open
                 </button>
                 <div class="dropdown-menu p-3" aria-labelledby="filterDropdown" style="border-radius: 10px; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); width: 200px;">
@@ -30,11 +30,11 @@
                   </div>
                 </div>
               </div>
-              <button class="btn btn-outline-secondary weight-button" (click)="sortByWeight()">
+              <button class="btn weight-button" (click)="sortByWeight()">
                 <i class="fa-solid fa-weight-hanging"></i>Weight
                 <i class="fas fa-arrow-down arrow-icon" [ngClass]="{'rotate-up': isWeightAscending}"></i>
               </button>
-              <button class="btn btn-outline-secondary abc-button" (click)="sortByName()">
+              <button class="btn abc-button" (click)="sortByName()">
                 <span class="abc-text" [ngClass]="{'abc-descending': !isNameAscending, 'abc-ascending': isNameAscending}">ABC</span>
                 <i class="fas fa-arrow-down arrow-icon" [ngClass]="{'rotate-up': isNameAscending}"></i>
               </button>
@@ -48,7 +48,7 @@
               <div class="card shadow-sm h-100 larger-card">
                 <div class="card-body d-flex flex-column p-3">
                   <div class="d-flex align-items-center gap-3">
-                    <div class="item-square bg-info bg-opacity-25 me-3">
+                    <div class="item-square bg-opacity-25 me-3">
                       Item
                     </div>
                     <div>
@@ -59,7 +59,7 @@
                       </p>
                     </div>
                   </div>
-                  <button class="btn btn-info details-button" (click)="openModal(item)">Details</button>
+                  <button class="btn details-button" (click)="openModal(item)">Details</button>
                 </div>
               </div>
             </div>
@@ -92,7 +92,7 @@
               </div>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="btn close-button" data-bs-dismiss="modal">Close</button>
             </div>
           </div>
         </div>
