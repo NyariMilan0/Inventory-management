@@ -5,15 +5,19 @@ import java.util.Collection;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.ParameterMode;
+import javax.persistence.Persistence;
+import javax.persistence.StoredProcedureQuery;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
 
 @Entity
 @Table(name = "storage")
@@ -43,10 +47,10 @@ public class Storage implements Serializable {
     @Size(max = 255)
     @Column(name = "name")
     private String name;
-    @Lob
-    @Size(max = 65535)
-    @Column(name = "capacity")
-    private String capacity;
+    //@Lob
+    //@Size(max = 65535)
+    //@Column(name = "capacity")
+    //private String capacity;
     @Size(max = 255)
     @Column(name = "location")
     private String location;
@@ -57,11 +61,39 @@ public class Storage implements Serializable {
     @OneToMany(mappedBy = "storageId")
     private Collection<UserXStorage> userXStorageCollection;
 
+    static EntityManagerFactory emf = Persistence.createEntityManagerFactory("com.helixLab_raktarproject_war_1.0-SNAPSHOTPU");
+
     public Storage() {
     }
 
     public Storage(Integer id) {
+        EntityManager em = emf.createEntityManager();
+
+        try {
+            Storage st = em.find(Storage.class, id);
+
+            this.id = st.getId();
+            this.name = st.getName();
+            this.location = st.getLocation();
+            this.maxCapacity = st.getMaxCapacity();
+            this.currentCapacity = st.getCurrentCapacity();
+            this.isFull = st.getIsFull();
+
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getLocalizedMessage());
+        } finally {
+            em.clear();
+            em.close();
+        }
+    }
+
+    public Storage(Integer id, String name, String location, Integer maxCapacity, Integer currentCapacity, boolean isFull) {
         this.id = id;
+        this.name = name;
+        this.location = location;
+        this.maxCapacity = maxCapacity;
+        this.currentCapacity = currentCapacity;
+        this.isFull = isFull;
     }
 
     public Integer getId() {
@@ -80,14 +112,12 @@ public class Storage implements Serializable {
         this.name = name;
     }
 
-    public String getCapacity() {
-        return capacity;
-    }
-
-    public void setCapacity(String capacity) {
-        this.capacity = capacity;
-    }
-
+    //public String getCapacity() {
+    //    return capacity;
+    //}
+    //public void setCapacity(String capacity) {
+    //    this.capacity = capacity;
+    //}
     public String getLocation() {
         return location;
     }
@@ -175,6 +205,34 @@ public class Storage implements Serializable {
 
     public void setInventorymovementCollection1(Collection<Inventorymovement> inventorymovementCollection1) {
         this.inventorymovementCollection1 = inventorymovementCollection1;
+    }
+
+    public static void addStorage(String storageName, String location) {
+        EntityManager em = emf.createEntityManager();
+
+        try {
+            em.getTransaction().begin();
+
+            StoredProcedureQuery spq = em.createStoredProcedureQuery("addStorage");
+            spq.registerStoredProcedureParameter("storageNameIn", String.class, javax.persistence.ParameterMode.IN);
+            spq.registerStoredProcedureParameter("locationIn", String.class, javax.persistence.ParameterMode.IN);
+
+            spq.setParameter("storageNameIn", storageName);
+            spq.setParameter("locationIn", location);
+
+            spq.execute();
+
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            System.err.println("Error adding storage: " + e.getLocalizedMessage());
+            throw new RuntimeException("Failed to add storage", e);
+        } finally {
+            em.clear();
+            em.close();
+        }
     }
 
 }

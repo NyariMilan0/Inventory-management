@@ -1,10 +1,12 @@
 package com.helixlab.raktarproject.controller;
 
+import com.helixlab.raktarproject.model.PalletShelfDTO;
 import com.helixlab.raktarproject.model.ShelfCapacitySummaryDTO;
 import com.helixlab.raktarproject.model.Shelfs;
 import com.helixlab.raktarproject.model.Users;
 import com.helixlab.raktarproject.service.ShelfService;
 import java.util.ArrayList;
+import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -159,6 +161,49 @@ public class ShelfController {
                            .entity(responseObj.toString())
                            .type(MediaType.APPLICATION_JSON)
                            .build();
+        }
+    }
+    
+    
+    @GET
+    @Path("getPalletsWithShelfs")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getPalletsAndShelfs() {
+        JSONObject responseObj = new JSONObject();
+
+        try {
+            List<PalletShelfDTO> palletShelfList = layer.getPalletsWithShelfs();
+
+            if (palletShelfList != null && !palletShelfList.isEmpty()) {
+                JSONArray palletShelfArray = new JSONArray();
+                for (PalletShelfDTO dto : palletShelfList) {
+                    JSONObject palletShelfJson = new JSONObject();
+                    palletShelfJson.put("palletId", dto.getPalletId());
+                    palletShelfJson.put("palletName", dto.getPalletName());
+                    palletShelfJson.put("shelfId", dto.getShelfId());
+                    palletShelfJson.put("shelfName", dto.getShelfName());
+                    palletShelfJson.put("shelfLocation", dto.getShelfLocation());
+                    palletShelfArray.put(palletShelfJson);
+                }
+
+                responseObj.put("statusCode", 200);
+                responseObj.put("palletsAndShelfs", palletShelfArray);
+            } else {
+                responseObj.put("statusCode", 404);
+                responseObj.put("message", "No pallets and shelfs found");
+            }
+
+            return Response.ok(responseObj.toString(), MediaType.APPLICATION_JSON).build();
+
+        } catch (Exception e) {
+            responseObj.put("statusCode", 500);
+            responseObj.put("message", "Failed to retrieve pallets and shelfs");
+            responseObj.put("error", e.getMessage());
+
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(responseObj.toString())
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
         }
     }
 
