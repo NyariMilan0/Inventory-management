@@ -3,11 +3,12 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, ValidatorFn, A
 import { CommonModule } from '@angular/common';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { HttpClient } from '@angular/common/http';
+import { ProfileAdminComponent } from '../profile-admin/profile-admin.component';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [NavbarComponent, CommonModule, ReactiveFormsModule],
+  imports: [NavbarComponent, CommonModule, ReactiveFormsModule, ProfileAdminComponent],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
@@ -25,9 +26,8 @@ export class RegisterComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Initialize User Form with corrected field names
     this.userForm = this.fb.group({
-      userName: ['', Validators.required], // Changed from username
+      userName: ['', Validators.required],
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
@@ -36,12 +36,11 @@ export class RegisterComponent implements OnInit {
         Validators.minLength(6),
         this.passwordComplexityValidator()
       ]],
-      picture: ['https://www.w3schools.com/howto/img_avatar.png'] // Default value, no input for now
+      picture: ['https://www.w3schools.com/howto/img_avatar.png']
     });
 
-    // Initialize Admin Form with corrected field names
     this.adminForm = this.fb.group({
-      userName: ['', Validators.required], // Changed from username
+      userName: ['', Validators.required], 
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
@@ -50,11 +49,10 @@ export class RegisterComponent implements OnInit {
         Validators.minLength(6),
         this.passwordComplexityValidator()
       ]],
-      picture: ['https://www.w3schools.com/howto/img_avatar.png'] // Default value, no input for now
+      picture: ['https://www.w3schools.com/howto/img_avatar.png']
     });
   }
 
-  // Custom validator for password complexity
   passwordComplexityValidator(): ValidatorFn {
     return (control: AbstractControl): { [key: string]: any } | null => {
       const value = control.value || '';

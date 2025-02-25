@@ -1,70 +1,83 @@
-<app-navbar></app-navbar>
-<div class="main-content">
-  <h1>Dashboard</h1>
-  <div id="profile">
-    <h2>Profil</h2>
-    <p>Username: {{ userName }}</p>
-    <p>Name: {{ firstName }} {{ lastName }}</p>
-    <p>Email: {{ email }}</p>
+<div class="container-fluid warehouse-container">
+  <div class="row">
+    <div class="col-md-6 warehouse-management">
+      <h2 class="text-center mb-4">Warehouse Management</h2>
+      <div class="warehouse-tabs">
+        <ul class="nav nav-tabs" role="tablist">
+          @for (warehouse of warehouses; track warehouse.name; let i = $index) {
+            <li class="nav-item">
+              <a class="nav-link" [class.active]="i === 0" data-bs-toggle="tab" [attr.href]="'#warehouse' + i">
+                {{ warehouse.name }}
+              </a>
+            </li>
+          }
+        </ul>
+        <div class="tab-content">
+          @for (warehouse of warehouses; track warehouse.name; let i = $index) {
+            <div class="tab-pane fade show" [class.active]="i === 0" [id]="'warehouse' + i">
+              <div class="shelf-grid" role="grid">
+                @for (section of warehouse.sections; track section.name) {
+                  <div class="shelf-rows">
+                    @for (place of getShelves(section.freePlaces, section.usedPlaces); track $index) {
+                      <div class="shelf-row">
+                        <div class="shelf" [class.used]="place.used" [class.free]="!place.used"></div>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+              <div class="space-stats d-flex justify-content-between mb-3">
+                <div class="stat-card bg-light text-dark">
+                  <span>Free Places</span>
+                  <strong>{{ warehouse.totalFree }}</strong>
+                </div>
+                <div class="stat-card bg-light text-dark">
+                  <span>Used Places</span>
+                  <strong>{{ warehouse.totalUsed }}</strong>
+                </div>
+              </div>
+              <div class="sections-list">
+                @for (section of warehouse.sections; track section.name) {
+                  <div class="progress-container">
+                    <div class="d-flex justify-content-between mb-2">
+                      <span class="section-name">{{ section.name }}</span>
+                      <span class="section-date">{{ section.date }}</span>
+                    </div>
+                    <div class="progress">
+                      <div class="progress-bar" 
+                           [ngStyle]="{'width': section.usagePercentage + '%', 
+                                      'background-color': section.usagePercentage >= 90 ? '#ff0000' : '#003366'}">
+                        <span class="progress-text">{{ section.usagePercentage | number:'1.0-0' }}%</span>
+                      </div>
+                    </div>
+                    <div class="d-flex justify-content-between mt-2">
+                      <small>Free: {{ 100 - section.usagePercentage | number:'1.0-0' }}%</small>
+                      <small>Used: {{ section.usagePercentage | number:'1.0-0' }}%</small>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 warehouse-capacity">
+      <h2 class="text-center mb-4">Warehouse Storage Capacity</h2>
+      <div class="capacity-spinner">
+        <div class="spinner-ring" [style.background]="getSpinnerBackground(warehouses[0].overallCapacity)"></div>
+        <div class="spinner-value">{{ warehouses[0].overallCapacity | number:'1.0-0' }}%</div>
+      </div>
+      <div class="categories mt-3">
+        @for (category of categories; track category.name) {
+          <div class="category-card mb-2">
+            <i class="fas fa-box me-2"></i>
+            <span class="category-name">{{ category.name }}</span>
+            <span class="category-item">{{ category.item }}</span>
+            <span class="low-stock">{{ category.lowStock ? 'Low in stock' : '' }} {{ category.stockPercentage }}%</span>
+          </div>
+        }
+      </div>
+    </div>
   </div>
-  <button (click)="logout()">Kijelentkezés</button>
-  <p>{{ message }}</p>
 </div>
-<!-- <div class="main-content">
-  <div class="dashboard-container">
-    <header>
-      <h1>Warehouse Management</h1>
-      <input type="text" placeholder="Search">
-    </header>
-    <div class="main-content">
-      <div class="warehouse-section">
-        <h2>Section 01</h2>
-        <div class="grid"> -->
-          <!-- Example of filled and empty slots -->
-          <!-- <div class="slot" *NgFor="let slot of section01Slots" [class]="{'used': slot.used}"></div>
-        </div>
-        <div class="usage-stats">
-          <span>25 Free place</span>
-          <span>15 Used place</span>
-          <div class="progress-bar">
-            <div class="progress" [style.width]="section01Usage + '%'">{{ section01Usage }}%</div>
-          </div>
-        </div> -->
-        <!-- Repeat similar structure for other sections -->
-        <!-- <div class="section" *NgFor="let section of sections">
-          <h2>Section {{ section.id }}</h2>
-          <p>{{ section.date }}</p>
-          <div class="progress-bar">
-            <div class="progress" [style.width]="section.usage + '%'" [class]="{'red': section.usage > 80}">{{ section.usage }}%</div>
-          </div>
-        </div>
-      </div>
-      <div class="storage-capacity">
-        <h2>Warehouse Storage Capacity</h2>
-        <div class="circular-progress">
-          <svg viewBox="0 0 36 36">
-            <path class="bg" d="M18 2.0845
-            a 15.9155 15.9155 0 0 1 0 31.831
-            a 15.9155 15.9155 0 0 1 0 -31.831"/>
-            <path class="progress" [attr.stroke-dasharray]="warehouseCapacityPercentage + ', 100'" d="M18 2.0845
-            a 15.9155 15.9155 0 0 1 0 31.831
-            a 15.9155 15.9155 0 0 1 0 -31.831"/>
-          </svg>
-          <div class="percentage">{{ warehouseCapacityPercentage }}%</div>
-        </div>
-        <div class="low-stock-items">
-          <div class="item" *NgFor="let item of lowStockItems">
-            <div class="item-info">
-              <span>Item</span>
-              <span>{{ item.name }}</span>
-            </div>
-            <div class="category-info">
-              <span>Category {{ item.category }}</span>
-              <span class="low-stock">Low in stock {{ item.stock }}%</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>  -->
-  <!-- </div>
-</div> -->

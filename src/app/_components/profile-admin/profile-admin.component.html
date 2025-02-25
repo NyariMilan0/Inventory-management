@@ -1,138 +1,111 @@
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#profileModal">
-    Profil megnyitása
-</button>
+<app-navbar></app-navbar>
 
 <div class="roboto-condensed">
-    <div class="modal fade" id="profileModal">
-        <div class="modal-dialog modal-dialog-centered modal-lg custom-modal-dialog">
-            <div class="modal-content shadow custom-modal-content">
-                <div class="popup-header">
-                    <div class="row">
-                        <div class="col-10">
-                            <h5 class="modal-title">Profile Information</h5>
-                        </div>
-                        <div class="closeButtonContainer col-2"><button class="closeButton" data-bs-dismiss="modal">×</button></div>
-                    </div>
-                </div>
-
-                <div class="modal-body custom-modal-body">
-                    <div class="belsobox">
-                        <div class="d-flex align-items-start mb-4">
-                            <div class="col-6" style="padding-left:30px;">
-                                <img
-                                    src="https://www.w3schools.com/howto/img_avatar.png"
-                                    alt="Profile Picture"
-                                    class="profileImg"
-                                >
-                            </div>
-                            <div class="col-6" style="padding:100px 0px 0px 10px;">
-                                <p class="mb-1"><span id="userName" class="fw-bold"></span></p>
-                            </div>
-                        </div>
-                        <div class="middleDiv">
-                            <p class="mb-1">First Name: <span id="firstName"></span></p>
-                            <br>
-                            <p class="mb-1">Last Name: <span id="lastName"></span></p>
-                            <br>
-                            <p class="mb-1">Role: <span id="role"></span></p>
-                        </div>
-                        <div class="informations row">
-                            <div class="col-4">
-                                <form [formGroup]="passwordForm">
-                                    @if (message) {
-                                        <div [class]="messageClass">
-                                            <i class="fas fa-exclamation-circle"></i> {{ message }}
-                                        </div>
-                                    }
-                                    <div class="mb-3">
-                                        <input
-                                            type="password"
-                                            class="form-control custom-input {{ passwordForm.get('oldPassword')?.invalid && passwordForm.get('oldPassword')?.touched ? 'invalid' : '' }}"
-                                            id="oldPassword"
-                                            formControlName="oldPassword"
-                                            placeholder="Enter old password"
-                                        >
-                                        @if (passwordForm.get('oldPassword')?.invalid && passwordForm.get('oldPassword')?.touched) {
-                                            <span class="error-text">
-                                                @if (passwordForm.get('oldPassword')?.errors?.['required']) {
-                                                    Old password is required
-                                                } @else if (passwordForm.get('oldPassword')?.errors?.['serverError']) {
-                                                    {{ passwordForm.get('oldPassword')?.errors?.['serverError'] }}
-                                                }
-                                            </span>
-                                        }
-                                    </div>
-                                    <div class="mb-3">
-                                        <input
-                                            type="password"
-                                            class="form-control custom-input {{ passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched ? 'invalid' : '' }}"
-                                            id="newPassword"
-                                            formControlName="newPassword"
-                                            placeholder="Enter new password"
-                                        >
-                                        @if (passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched) {
-                                            <span class="error-text">
-                                                @if (passwordForm.get('newPassword')?.errors?.['required']) {
-                                                    New password is required
-                                                } @else if (passwordForm.get('newPassword')?.errors?.['minlength']) {
-                                                    New password must be at least 6 characters
-                                                } @else if (passwordForm.get('newPassword')?.errors?.['complexity']) {
-                                                    Password must include lowercase, uppercase, and special characters
-                                                }
-                                            </span>
-                                        }
-                                    </div>
-                                    <div class="mb-3">
-                                        <input
-                                            type="password"
-                                            class="form-control custom-input {{ passwordForm.get('newPasswordAgain')?.invalid && passwordForm.get('newPasswordAgain')?.touched ? 'invalid' : '' }}"
-                                            id="newPasswordAgain"
-                                            formControlName="newPasswordAgain"
-                                            placeholder="Re-enter new password"
-                                        >
-                                        @if (passwordForm.get('newPasswordAgain')?.touched && (passwordForm.get('newPasswordAgain')?.invalid || passwordForm.errors?.['mismatch'])) {
-                                            <span class="error-text">
-                                                @if (passwordForm.get('newPasswordAgain')?.errors?.['required']) {
-                                                    Please re-enter your new password
-                                                } @else if (passwordForm.errors?.['mismatch']) {
-                                                    Passwords are not matching
-                                                }
-                                            </span>
-                                        }
-                                    </div>
-                                    <div class="mb-4 profileButtons">
-                                        <button class="updateButton" type="button" (click)="updatePassword()">Update password</button>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="col-4">
-                                <form [formGroup]="usernameForm">
-                                    <div class="mb-3">
-                                        <input
-                                            type="text"
-                                            class="form-control custom-input {{ usernameForm.get('newUsername')?.invalid && usernameForm.get('newUsername')?.touched ? 'invalid' : '' }}"
-                                            id="newUsername"
-                                            formControlName="newUsername"
-                                            placeholder="Enter new username"
-                                        >
-                                        @if (usernameForm.get('newUsername')?.invalid && usernameForm.get('newUsername')?.touched) {
-                                            <span class="error-text">
-                                                New username is required
-                                            </span>
-                                        }
-                                    </div>
-                                    <div class="mb-4 profileButtons">
-                                        <button class="editButton" type="button" (click)="updateUsername()">Edit username</button>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="buttonDiv col-4">
-                                <button class="btn btn-danger signOutButton" type="button" (click)="signOut()">Sign out</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+  <div class="modal fade" id="profileModal" [class.show]="showModal" [style.display]="showModal ? 'block' : 'none'">
+    <div class="modal-dialog modal-dialog-centered modal-lg custom-modal-dialog">
+      <div class="modal-content shadow custom-modal-content">
+        <div class="popup-header">
+          <div class="row">
+            <div class="col-10">
+              <h5 class="modal-title">Profile Information</h5>
             </div>
+            <div class="closeButtonContainer col-2">
+              <button class="closeButton" (click)="closeModal()">×</button>
+            </div>
+          </div>
         </div>
+        <div class="modal-body custom-modal-body">
+          <div class="belsobox">
+            <div class="d-flex align-items-start mb-4">
+              <div class="col-6" style="padding-left:30px;">
+                <img [src]="profilePictureUrl" alt="Profile Picture" class="profileImg"
+                  (error)="profilePictureUrl = 'https://www.w3schools.com/howto/img_avatar.png'">
+              </div>
+              <div class="col-6" style="padding:100px 0px 0px 10px;">
+                <p class="mb-1"><span id="userName" class="fw-bold"></span></p>
+              </div>
+            </div>
+            <div class="middleDiv">
+              <p class="mb-1">First Name: <span id="firstName"></span></p>
+              <br>
+              <p class="mb-1">Last Name: <span id="lastName"></span></p>
+              <br>
+              <p class="mb-1">Role: <span id="role"></span></p>
+            </div>
+            <div class="informations row">
+              <div class="col-4">
+                <form [formGroup]="passwordForm">
+                  @if (message) {
+                  <div [class]="messageClass">
+                    <i class="fas fa-exclamation-circle"></i> {{ message }}
+                  </div>
+                  }
+                  <div class="mb-3">
+                    <input type="password"
+                      class="form-control custom-input {{ passwordForm.get('oldPassword')?.invalid && passwordForm.get('oldPassword')?.touched ? 'invalid' : '' }}"
+                      id="oldPassword" formControlName="oldPassword" placeholder="Enter old password">
+                    @if (passwordForm.get('oldPassword')?.invalid && passwordForm.get('oldPassword')?.touched) {
+                    <span class="error-text">
+                      @if (passwordForm.get('oldPassword')?.errors?.['required']) { Old password is required }
+                      @else if (passwordForm.get('oldPassword')?.errors?.['serverError']) {
+                      {{ passwordForm.get('oldPassword')?.errors?.['serverError'] }} }
+                    </span>
+                    }
+                  </div>
+                  <div class="mb-3">
+                    <input type="password"
+                      class="form-control custom-input {{ passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched ? 'invalid' : '' }}"
+                      id="newPassword" formControlName="newPassword" placeholder="Enter new password">
+                    @if (passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched) {
+                    <span class="error-text">
+                      @if (passwordForm.get('newPassword')?.errors?.['required']) { New password is required }
+                      @else if (passwordForm.get('newPassword')?.errors?.['minlength']) { New password must be at least
+                      6 characters }
+                      @else if (passwordForm.get('newPassword')?.errors?.['complexity']) { Password must include
+                      lowercase, uppercase, and special characters }
+                    </span>
+                    }
+                  </div>
+                  <div class="mb-3">
+                    <input type="password"
+                      class="form-control custom-input {{ passwordForm.get('newPasswordAgain')?.invalid && passwordForm.get('newPasswordAgain')?.touched ? 'invalid' : '' }}"
+                      id="newPasswordAgain" formControlName="newPasswordAgain" placeholder="Re-enter new password">
+                    @if (passwordForm.get('newPasswordAgain')?.touched && (passwordForm.get('newPasswordAgain')?.invalid
+                    || passwordForm.errors?.['mismatch'])) {
+                    <span class="error-text">
+                      @if (passwordForm.get('newPasswordAgain')?.errors?.['required']) { Please re-enter your new
+                      password }
+                      @else if (passwordForm.errors?.['mismatch']) { Passwords are not matching }
+                    </span>
+                    }
+                  </div>
+                  <div class="mb-4 profileButtons">
+                    <button class="updateButton" type="button" (click)="updatePassword()">Update password</button>
+                  </div>
+                </form>
+              </div>
+              <div class="col-4">
+                <form [formGroup]="usernameForm">
+                  <div class="mb-3">
+                    <input type="text"
+                      class="form-control custom-input {{ usernameForm.get('newUsername')?.invalid && usernameForm.get('newUsername')?.touched ? 'invalid' : '' }}"
+                      id="newUsername" formControlName="newUsername" placeholder="Enter new username">
+                    @if (usernameForm.get('newUsername')?.invalid && usernameForm.get('newUsername')?.touched) {
+                    <span class="error-text">New username is required</span>
+                    }
+                  </div>
+                  <div class="mb-4 profileButtons">
+                    <button class="editButton" type="button" (click)="updateUsername()">Edit username</button>
+                  </div>
+                </form>
+              </div>
+              <div class="buttonDiv col-4">
+                <button class="btn btn-danger signOutButton" type="button" (click)="signOut()">Sign out</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </div>

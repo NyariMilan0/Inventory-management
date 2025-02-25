@@ -1,9 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+// src/app/components/profile-admin/profile-admin.component.ts
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { FormBuilder, FormGroup, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { AuthService } from '../../_services/auth.service';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, ValidatorFn, AbstractControl } from '@angular/forms';
+import { ModalService } from '../../_services/modal.service';
+import { Subscription } from 'rxjs';
 
 interface PasswordChangeRequest {
   userId: number;
@@ -24,33 +29,33 @@ interface ErrorResponse {
 @Component({
   selector: 'app-profile-admin',
   standalone: true,
-  imports: [NavbarComponent, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, NavbarComponent],
   templateUrl: './profile-admin.component.html',
-  styleUrl: './profile-admin.component.css'
+  styleUrls: ['./profile-admin.component.css']
 })
-export class ProfileAdminComponent implements OnInit {
+export class ProfileAdminComponent implements OnInit, OnDestroy {
+  private subscription: Subscription = new Subscription();
   private userId: number;
   passwordForm: FormGroup;
   usernameForm: FormGroup;
   message: string = '';
   messageClass: string = '';
+  profilePictureUrl: string = '';
+  showModal: boolean = false;
 
   constructor(
     private http: HttpClient,
     private authService: AuthService,
     private router: Router,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private modalService: ModalService
   ) {
     const storedId = localStorage.getItem('id');
     this.userId = storedId ? parseInt(storedId, 10) : 0;
 
     this.passwordForm = this.fb.group({
       oldPassword: ['', Validators.required],
-      newPassword: ['', [
-        Validators.required,
-        Validators.minLength(6),
-        this.passwordComplexityValidator()
-      ]],
+      newPassword: ['', [Validators.required, Validators.minLength(6), this.passwordComplexityValidator()]],
       newPasswordAgain: ['', Validators.required]
     }, { validators: this.passwordMatchValidator });
 
@@ -60,7 +65,20 @@ export class ProfileAdminComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.subscription = this.modalService.showProfileModal$.subscribe(show => {
+      this.showModal = show;
+      if (show) {
+        this.openModal();
+      } else {
+        this.closeModal();
+      }
+    });
     this.updateUserInfo();
+  }
+
+  ngOnDestroy(): void {
+    this.modalService.closeProfileModal();
+    this.subscription.unsubscribe();
   }
 
   passwordComplexityValidator(): ValidatorFn {
@@ -69,11 +87,7 @@ export class ProfileAdminComponent implements OnInit {
       const hasLowercase = /[a-z]/.test(value);
       const hasUppercase = /[A-Z]/.test(value);
       const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(value);
-
-      if (!hasLowercase || !hasUppercase || !hasSpecial) {
-        return { complexity: true };
-      }
-      return null;
+      return hasLowercase && hasUppercase && hasSpecial ? null : { complexity: true };
     };
   }
 
@@ -83,121 +97,104 @@ export class ProfileAdminComponent implements OnInit {
     return newPassword === newPasswordAgain ? null : { mismatch: true };
   }
 
-  updatePassword(): void {
-    this.message = '';
-    this.messageClass = '';
+  openModal(): void {
+    const modalElement = document.getElementById('profileModal');
+    if (modalElement) {
+      const bootstrap = (window as any).bootstrap;
+      if (bootstrap && bootstrap.Modal) {
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+      }
+    }
+  }
 
+  closeModal(): void {
+    const modalElement = document.getElementById('profileModal');
+    if (modalElement) {
+      const bootstrap = (window as any).bootstrap;
+      if (bootstrap && bootstrap.Modal) {
+        const modal = bootstrap.Modal.getInstance(modalElement);
+        if (modal) {
+          modal.hide();
+        }
+      }
+    }
+  }
+
+  updatePassword(): void {
     if (this.passwordForm.invalid) {
       this.passwordForm.markAllAsTouched();
       return;
     }
-
     const { oldPassword, newPassword } = this.passwordForm.value;
-
-    const passwordRequest: PasswordChangeRequest = {
-      userId: this.userId,
-      oldPassword,
-      newPassword
-    };
-
-
-
-
-    // Jelszó változtatás -----------------------------------------------------------------------------------
-    this.http.put('http://127.0.0.1:8080/raktarproject-1.0-SNAPSHOT/webresources/user/passwordChangeByUserId', 
-      passwordRequest
-    ).subscribe({
-      next: (response) => {
-        this.message = 'Password updated successfully!';
-        this.messageClass = 'success-message';
-        this.passwordForm.reset();
-        this.updateUserInfo();
-      },
-      error: (error) => {
-        const errorResponse: ErrorResponse = error.error;
-        if (error.status === 400 || error.status === 403) {
-          this.passwordForm.get('oldPassword')?.setErrors({ serverError: 'Password does not match' });
-        } else if (errorResponse && errorResponse.status) {
-          switch (errorResponse.status) {
-            case 'invalidNewPassword':
-              this.message = 'The new password is invalid. Please ensure it meets the requirements.';
-              break;
-            default:
-              this.message = `Error: ${errorResponse.status} (Code: ${errorResponse.statusCode})`;
+    const passwordRequest: PasswordChangeRequest = { userId: this.userId, oldPassword, newPassword };
+    this.http.put('http://127.0.0.1:8080/raktarproject-1.0-SNAPSHOT/webresources/user/passwordChangeByUserId', passwordRequest)
+      .subscribe({
+        next: () => {
+          this.message = 'Password updated successfully!';
+          this.messageClass = 'success-message';
+          this.passwordForm.reset();
+          this.updateUserInfo();
+        },
+        error: (error) => {
+          const errorResponse: ErrorResponse = error.error;
+          if (error.status === 400 || error.status === 403) {
+            this.passwordForm.get('oldPassword')?.setErrors({ serverError: 'Password does not match' });
+          } else if (errorResponse && errorResponse.status) {
+            this.message = errorResponse.status === 'invalidNewPassword' 
+              ? 'The new password is invalid. Please ensure it meets the requirements.' 
+              : `Error: ${errorResponse.status} (Code: ${errorResponse.statusCode})`;
+            this.messageClass = 'error-message';
+          } else {
+            this.message = 'An unexpected error occurred while updating the password.';
+            this.messageClass = 'error-message';
           }
-          this.messageClass = 'error-message';
-        } else {
-          this.message = 'An unexpected error occurred while updating the password.';
-          this.messageClass = 'error-message';
+          if (error.status === 401) {
+            this.authService.logout();
+            this.router.navigate(['/login']);
+          }
         }
-        if (error.status === 401) {
-          this.authService.logout();
-          this.router.navigate(['/login']);
-        }
-      }
-    });
+      });
   }
-// -----------------------------------------------------------------------------------
-
 
   updateUsername(): void {
-    this.message = '';
-    this.messageClass = '';
-
     if (this.usernameForm.invalid) {
       this.usernameForm.markAllAsTouched();
       return;
     }
-
     const { newUsername } = this.usernameForm.value;
-
-    const usernameRequest: UsernameChangeRequest = {
-      userId: this.userId,
-      newUsername
-    };
-
-
-    // Username változtatás ------------------------------------------------------
-    this.http.put('http://127.0.0.1:8080/raktarproject-1.0-SNAPSHOT/webresources/user/usernameChangeByUserId', 
-      usernameRequest
-    ).subscribe({
-      next: (response) => {
-        this.message = 'Username updated successfully!';
-        this.messageClass = 'success-message';
-        localStorage.setItem('userName', newUsername);
-        (document.getElementById('userName') as HTMLElement).textContent = newUsername;
-        this.usernameForm.reset();
-        this.updateUserInfo();
-      },
-      error: (error) => {
-        const errorResponse: ErrorResponse = error.error;
-        if (errorResponse && errorResponse.status) {
-          switch (errorResponse.status) {
-            case 'invalidNewUsername':
-              this.message = 'The new username is invalid or already taken.';
-              break;
-            default:
-              this.message = `Error: ${errorResponse.status} (Code: ${errorResponse.statusCode})`;
+    const usernameRequest: UsernameChangeRequest = { userId: this.userId, newUsername };
+    this.http.put('http://127.0.0.1:8080/raktarproject-1.0-SNAPSHOT/webresources/user/usernameChangeByUserId', usernameRequest)
+      .subscribe({
+        next: () => {
+          this.message = 'Username updated successfully!';
+          this.messageClass = 'success-message';
+          localStorage.setItem('userName', newUsername);
+          (document.getElementById('userName') as HTMLElement).textContent = newUsername;
+          this.usernameForm.reset();
+          this.updateUserInfo();
+        },
+        error: (error) => {
+          const errorResponse: ErrorResponse = error.error;
+          if (errorResponse && errorResponse.status) {
+            this.message = errorResponse.status === 'invalidNewUsername' 
+              ? 'The new username is invalid or already taken.' 
+              : `Error: ${errorResponse.status} (Code: ${errorResponse.statusCode})`;
+            this.messageClass = 'error-message';
+          } else {
+            this.message = 'An unexpected error occurred while updating the username.';
+            this.messageClass = 'error-message';
           }
-          this.messageClass = 'error-message';
-        } else {
-          this.message = 'An unexpected error occurred while updating the username.';
-          this.messageClass = 'error-message';
+          if (error.status === 401) {
+            this.authService.logout();
+            this.router.navigate(['/login']);
+          }
         }
-        if (error.status === 401) {
-          this.authService.logout();
-          this.router.navigate(['/login']);
-        }
-      }
-    });
+      });
   }
-// -------------------------------------------------------------------------------------
-
-
-
-
 
   signOut(): void {
+    this.closeModal();
     this.authService.logout();
     this.router.navigate(['/login']);
   }
@@ -206,6 +203,7 @@ export class ProfileAdminComponent implements OnInit {
     (document.getElementById('userName') as HTMLElement).textContent = localStorage.getItem('userName') || 'Unknown';
     (document.getElementById('firstName') as HTMLElement).textContent = localStorage.getItem('firstName') || 'Unknown';
     (document.getElementById('lastName') as HTMLElement).textContent = localStorage.getItem('lastName') || 'Unknown';
-    (document.getElementById('role') as HTMLElement).textContent = localStorage.getItem('isAdmin') || 'Unknown';
+    const isAdmin = localStorage.getItem('isAdmin');
+    (document.getElementById('role') as HTMLElement).textContent = isAdmin === 'true' ? 'Admin' : isAdmin === 'false' ? 'User' : 'Unknown';
   }
 }

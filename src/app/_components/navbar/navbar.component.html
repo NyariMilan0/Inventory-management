@@ -26,12 +26,16 @@
         <img class="navbarIcons" src="/assets/ItemManagementIcon.svg" alt="Pallet Management">
         <span class="menu-text">Item management</span>
       </a>
+      <a routerLink="/adminPanel" class="menu-item">
+        <i class="fa-solid fa-screwdriver-wrench navbarIcons"></i> 
+        <span class="menu-text">Admin Panel</span>
+      </a>
       <br>
       <p>User</p>
       <hr class="navbarSeparatorLine">
-      <a routerLink="/profileAdmin" class="menu-item">
+      <a class="menu-item" (click)="openProfileModal()">
         <img class="navbarIcons" src="/assets/profileIcon.svg" alt="Profile User">
-        <span class="menu-text">User Profile</span>
+        <span class="menu-text">Felhasználói profil</span>
       </a>
 
 

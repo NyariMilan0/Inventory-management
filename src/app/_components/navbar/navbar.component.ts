@@ -1,28 +1,64 @@
 import { Component, HostListener } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
+import { AuthService } from '../../_services/auth.service';
+import { ModalService } from '../../_services/modal.service';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
   imports: [RouterModule],
   templateUrl: './navbar.component.html',
-  styleUrl: './navbar.component.css'
+  styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent {
   isExpanded = false;
   isVisible = true;
+  isMobile = window.innerWidth <= 768; 
+
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private modalService: ModalService
+  
+  ) {}
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: Event) {
+    this.isMobile = window.innerWidth <= 768;
+    if (!this.isMobile) {
+      this.isExpanded = false;
+    }
+  }
 
   @HostListener('mouseenter') onMouseEnter() {
-    this.isExpanded = true;
+    if (!this.isMobile) {
+      this.isExpanded = true;
+    }
   }
 
   @HostListener('mouseleave') onMouseLeave() {
-    this.isExpanded = false;
+    if (!this.isMobile) {
+      this.isExpanded = false;
+    }
+  }
+
+  toggleMenu() {
+    if (this.isMobile) {
+      this.isExpanded = !this.isExpanded;
+    }
   }
 
   menuItems = [
     { path: '/storage', icon: 'DiagramIcon.svg', text: 'Storage' },
-    { path: '/profileAdmin', icon: 'profileIcon.svg', text: 'User Profile' },
     { path: '/pallet-management', icon: 'PalletIcon.svg', text: 'Pallet Management' },
   ];
+
+  openProfileModal(): void {
+    this.modalService.openProfileModal();
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
 }

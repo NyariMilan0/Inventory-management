@@ -18,13 +18,14 @@ export class AuthService {
         localStorage.setItem('firstName', res.result.firstName);
         localStorage.setItem('lastName', res.result.lastName);
         localStorage.setItem('email', res.result.email);
+        localStorage.setItem('isAdmin', res.result.isAdmin);
       }),
       catchError(this.handleError)
     );
   }
 
   logout() {
-    // localStorage.clear();
+    localStorage.removeItem('jwtToken');
   }
 
   private handleError(error: HttpErrorResponse) {

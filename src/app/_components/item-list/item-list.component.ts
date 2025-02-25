@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavbarComponent } from '../navbar/navbar.component';
+import { ProfileAdminComponent } from '../profile-admin/profile-admin.component';
 
 export interface Item {
   id: number;
@@ -18,7 +19,7 @@ export interface Item {
 @Component({
   selector: 'app-item-list',
   standalone: true,
-  imports: [CommonModule, NavbarComponent],
+  imports: [CommonModule, NavbarComponent, ProfileAdminComponent],
   templateUrl: './item-list.component.html',
   styleUrls: ['./item-list.component.css']
 })

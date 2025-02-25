@@ -49,6 +49,7 @@
 
 .navbarIcons {
   padding-left: 8px;
+  color: white;
 }
 
 .navbarCompanyLogo {
@@ -109,6 +110,7 @@
 
 .menu-item:hover {
   background: rgba(29,53,87,0.25);
+  cursor: pointer;
 }
 
 .bi {
