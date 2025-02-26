@@ -10,12 +10,17 @@ import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.ParameterMode;
+import javax.persistence.Persistence;
+import javax.persistence.StoredProcedureQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -60,11 +65,38 @@ public class Pallets implements Serializable {
     @OneToMany(mappedBy = "palletId")
     private Collection<PalletsXItems> palletsXItemsCollection;
 
+    static EntityManagerFactory emf = Persistence.createEntityManagerFactory("com.helixLab_raktarproject_war_1.0-SNAPSHOTPU");
+
     public Pallets() {
     }
 
     public Pallets(Integer id) {
+        EntityManager em = emf.createEntityManager();
+
+        try {
+            Pallets p = em.find(Pallets.class, id);
+
+            this.id = p.getId();
+            this.name = p.getName();
+            this.createdAt = p.getCreatedAt();
+            this.height = p.getHeight();
+            this.length = p.getLength();
+            this.width = p.getWidth();
+        } catch (Exception ex) {
+            System.err.println("Error: " + ex.getLocalizedMessage());
+        } finally {
+            em.clear();
+            em.close();
+        }
+    }
+
+    public Pallets(Integer id, String name, Date createdAt, Integer height, Integer lenght, Integer width) {
         this.id = id;
+        this.name = name;
+        this.createdAt = createdAt;
+        this.height = height;
+        this.length = lenght;
+        this.width = width;
     }
 
     public Integer getId() {
@@ -155,5 +187,69 @@ public class Pallets implements Serializable {
     public String toString() {
         return "com.helixlab.raktarproject.model.Pallets[ id=" + id + " ]";
     }
-    
+
+    public Pallets getPalletsById(Integer id) {
+        try {
+            return new Pallets(id);
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getLocalizedMessage());
+            return null;
+        }
+    }
+
+    public Boolean deletePalletById(Integer id) {
+        EntityManager em = emf.createEntityManager();
+        Boolean toReturn = false;
+
+        try {
+
+            StoredProcedureQuery spq = em.createStoredProcedureQuery("deletePalletById");
+            spq.registerStoredProcedureParameter("palletId", Integer.class, ParameterMode.IN);
+            spq.setParameter("palletId", id);
+
+            spq.execute();
+
+            toReturn = true;
+
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getLocalizedMessage());
+            toReturn = false;
+        } finally {
+            em.clear();
+            em.close();
+            return toReturn;
+        }
+
+    }
+
+    public static void addPalletToShelf(String skuCode, Integer shelfId, Integer height) {
+        EntityManager em = emf.createEntityManager();
+
+        try {
+            em.getTransaction().begin();
+
+            StoredProcedureQuery spq = em.createStoredProcedureQuery("addPalletToShelf");
+            spq.registerStoredProcedureParameter("skuCodeIn", String.class, javax.persistence.ParameterMode.IN);
+            spq.registerStoredProcedureParameter("shelfId", Integer.class, javax.persistence.ParameterMode.IN);
+            spq.registerStoredProcedureParameter("heightIn", Integer.class, javax.persistence.ParameterMode.IN);
+
+            spq.setParameter("skuCodeIn", skuCode);
+            spq.setParameter("shelfId", shelfId);
+            spq.setParameter("heightIn", height);
+
+            spq.execute();
+
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            System.err.println("Error adding pallet to shelf: " + e.getLocalizedMessage());
+            throw new RuntimeException("Failed to add pallet to shelf", e);
+        } finally {
+            em.clear();
+            em.close();
+        }
+    }
+
 }

@@ -426,7 +426,7 @@ public class Users implements Serializable {
             toReturn = true;
 
         } catch (Exception e) {
-            System.err.println("Hiba: " + e.getLocalizedMessage());
+            System.err.println("Error: " + e.getLocalizedMessage());
             toReturn = false;
         } finally {
             em.clear();

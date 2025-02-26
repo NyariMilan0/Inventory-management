@@ -1,5 +1,6 @@
 C:\Users\nidid\Documents\inventory-managements\Inventory-management\raktarproject\src\main\java\com\helixlab\raktarproject\controller\UserController.java
 C:\Users\nidid\Documents\inventory-managements\Inventory-management\raktarproject\src\main\java\com\helixlab\raktarproject\model\PalletsXItems.java
+C:\Users\nidid\Documents\inventory-managements\Inventory-management\raktarproject\src\main\java\com\helixlab\raktarproject\service\PalletService.java
 C:\Users\nidid\Documents\inventory-managements\Inventory-management\raktarproject\src\main\java\com\helixlab\raktarproject\model\ShelfsXStorage.java
 C:\Users\nidid\Documents\inventory-managements\Inventory-management\raktarproject\src\main\java\com\helixlab\raktarproject\controller\CorsFilter.java
 C:\Users\nidid\Documents\inventory-managements\Inventory-management\raktarproject\src\main\java\com\helixlab\raktarproject\service\ShelfService.java
@@ -11,6 +12,7 @@ C:\Users\nidid\Documents\inventory-managements\Inventory-management\raktarprojec
 C:\Users\nidid\Documents\inventory-managements\Inventory-management\raktarproject\src\main\java\com\helixlab\raktarproject\model\Inventorymovement.java
 C:\Users\nidid\Documents\inventory-managements\Inventory-management\raktarproject\src\main\java\com\helixlab\raktarproject\model\Material.java
 C:\Users\nidid\Documents\inventory-managements\Inventory-management\raktarproject\src\main\java\com\helixlab\raktarproject\model\Shelfs.java
+C:\Users\nidid\Documents\inventory-managements\Inventory-management\raktarproject\src\main\java\com\helixlab\raktarproject\controller\PalletController.java
 C:\Users\nidid\Documents\inventory-managements\Inventory-management\raktarproject\src\main\java\com\helixlab\raktarproject\controller\ItemController.java
 C:\Users\nidid\Documents\inventory-managements\Inventory-management\raktarproject\src\main\java\com\helixlab\raktarproject\model\PalletsXShelfs.java
 C:\Users\nidid\Documents\inventory-managements\Inventory-management\raktarproject\src\main\java\com\helixlab\raktarproject\service\StorageService.java
