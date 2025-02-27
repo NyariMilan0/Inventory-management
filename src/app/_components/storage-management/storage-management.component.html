@@ -1,82 +1,94 @@
-<div class="container-fluid warehouse-container">
-  <div class="row">
-    <div class="col-md-6 warehouse-management">
-      <h2 class="text-center mb-4">Warehouse Management</h2>
-      <div class="warehouse-tabs">
-        <ul class="nav nav-tabs" role="tablist">
-          @for (warehouse of warehouses; track warehouse.name; let i = $index) {
-            <li class="nav-item">
-              <a class="nav-link" [class.active]="i === 0" data-bs-toggle="tab" [attr.href]="'#warehouse' + i">
-                {{ warehouse.name }}
-              </a>
-            </li>
-          }
-        </ul>
-        <div class="tab-content">
-          @for (warehouse of warehouses; track warehouse.name; let i = $index) {
-            <div class="tab-pane fade show" [class.active]="i === 0" [id]="'warehouse' + i">
-              <div class="shelf-grid" role="grid">
-                @for (section of warehouse.sections; track section.name) {
-                  <div class="shelf-rows">
-                    @for (place of getShelves(section.freePlaces, section.usedPlaces); track $index) {
-                      <div class="shelf-row">
-                        <div class="shelf" [class.used]="place.used" [class.free]="!place.used"></div>
-                      </div>
-                    }
+<app-navbar></app-navbar>
+<app-profile-admin></app-profile-admin>
+<div class="container-fluid">
+  <div class="row flex-fill h-100">
+    <div class="col-12">
+      <div class="row flex-fill h-100 roboto-condensed">
+        <!-- Left panel -->
+        <div class="col-8 left-panel">
+          <h2 class="text-center">Warehouse Management</h2>
+          <div class="search-bar">
+            <input type="text" placeholder="Search" #searchInput />
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          </div>
+          <div class="tabs">
+            <button *ngFor="let section of filteredSections" 
+                    [class.active]="section === selectedSection" 
+                    (click)="selectSection(section)">
+              {{ section.name }}
+            </button>
+          </div>
+          <div class="warehouse-management">
+            <div class="section">
+              <div class="section-header">
+                <span class="section-name" style="font-size: large;">{{ selectedSection.name }}</span>
+                <div class="usage-info">
+                  
+                  <span class="free-place">{{ selectedSection.free }} Free place</span>
+                  <span class="used-place">{{ selectedSection.used }} Used place</span>
+                  <div class="progress-bar" [class.critical]="selectedSection.critical">
+                    <div class="progress" [style.width.%]="selectedSection.usage"></div>
                   </div>
-                }
-              </div>
-              <div class="space-stats d-flex justify-content-between mb-3">
-                <div class="stat-card bg-light text-dark">
-                  <span>Free Places</span>
-                  <strong>{{ warehouse.totalFree }}</strong>
-                </div>
-                <div class="stat-card bg-light text-dark">
-                  <span>Used Places</span>
-                  <strong>{{ warehouse.totalUsed }}</strong>
+                  <span>{{ selectedSection.usage }}% Usage | {{ 100 - selectedSection.usage }}%</span>
                 </div>
               </div>
-              <div class="sections-list">
-                @for (section of warehouse.sections; track section.name) {
-                  <div class="progress-container">
-                    <div class="d-flex justify-content-between mb-2">
-                      <span class="section-name">{{ section.name }}</span>
-                      <span class="section-date">{{ section.date }}</span>
-                    </div>
-                    <div class="progress">
-                      <div class="progress-bar" 
-                           [ngStyle]="{'width': section.usagePercentage + '%', 
-                                      'background-color': section.usagePercentage >= 90 ? '#ff0000' : '#003366'}">
-                        <span class="progress-text">{{ section.usagePercentage | number:'1.0-0' }}%</span>
-                      </div>
-                    </div>
-                    <div class="d-flex justify-content-between mt-2">
-                      <small>Free: {{ 100 - section.usagePercentage | number:'1.0-0' }}%</small>
-                      <small>Used: {{ section.usagePercentage | number:'1.0-0' }}%</small>
-                    </div>
+              <div class="grid-container flex-fill">
+                <div class="grid-row">
+                  <div class="grid" *ngFor="let grid of getSectionSpaces().slice(0, 2)">
+                    <div class="square" *ngFor="let space of grid" 
+                         [class.used]="space.used" 
+                         [class.free]="!space.used"></div>
                   </div>
-                }
+                </div>
+                <div class="grid-row">
+                  <div class="grid" *ngFor="let grid of getSectionSpaces().slice(2, 4)">
+                    <div class="square" *ngFor="let space of grid" 
+                         [class.used]="space.used" 
+                         [class.free]="!space.used"></div>
+                  </div>
+                </div>
+                <div class="grid-row">
+                  <div class="grid" *ngFor="let grid of getSectionSpaces().slice(0, 2)">
+                    <div class="square" *ngFor="let space of grid" 
+                         [class.used]="space.used" 
+                         [class.free]="!space.used"></div>
+                  </div>
+                </div>
+                <div class="grid-row">
+                  <div class="grid" *ngFor="let grid of getSectionSpaces().slice(2, 4)">
+                    <div class="square" *ngFor="let space of grid" 
+                         [class.used]="space.used" 
+                         [class.free]="!space.used"></div>
+                  </div>
+                </div>
               </div>
             </div>
-          }
-        </div>
-      </div>
-    </div>
-    <div class="col-md-6 warehouse-capacity">
-      <h2 class="text-center mb-4">Warehouse Storage Capacity</h2>
-      <div class="capacity-spinner">
-        <div class="spinner-ring" [style.background]="getSpinnerBackground(warehouses[0].overallCapacity)"></div>
-        <div class="spinner-value">{{ warehouses[0].overallCapacity | number:'1.0-0' }}%</div>
-      </div>
-      <div class="categories mt-3">
-        @for (category of categories; track category.name) {
-          <div class="category-card mb-2">
-            <i class="fas fa-box me-2"></i>
-            <span class="category-name">{{ category.name }}</span>
-            <span class="category-item">{{ category.item }}</span>
-            <span class="low-stock">{{ category.lowStock ? 'Low in stock' : '' }} {{ category.stockPercentage }}%</span>
           </div>
-        }
+        </div>
+        <!-- Right panel -->
+        <div class="col-4 right-panel text-center">
+          <div class="storage-capacity">
+            <h2>Warehouse Storage Capacity</h2>
+            <div class="circular-progress"
+                 [ngStyle]="{'background': 'conic-gradient(#2c3e50 ' + storageCapacity + '%, #e6f3f0 0)'}">
+              <span>{{ storageCapacity }}%</span>
+            </div>
+          </div>
+          <hr class="separator" />
+          <div class="low-stock-carousel">
+            <div class="carousel-container" #carouselContainer>
+              <div class="carousel-items" #carouselItems>
+                <div class="item" *ngFor="let item of lowStockItems">
+                  <i class="fa-solid fa-box item-icon"></i>
+                  <span>{{ item.category }}</span>
+                  <span>{{ item.name }}</span>
+                  <span class="low-stock">Low in stock</span>
+                  <span class="stock-level">{{ item.stock }}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
