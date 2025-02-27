@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { ProfileAdminComponent } from '../profile-admin/profile-admin.component';
+import { FormsModule } from '@angular/forms';
 
 export interface Item {
   id: number;
@@ -20,7 +21,7 @@ export interface Item {
 @Component({
   selector: 'app-item-list',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, NavbarComponent, ProfileAdminComponent],
+  imports: [CommonModule, HttpClientModule, NavbarComponent, ProfileAdminComponent, FormsModule],
   templateUrl: './item-list.component.html',
   styleUrls: ['./item-list.component.css']
 })
@@ -31,6 +32,7 @@ export class ItemListComponent implements OnInit {
   selectedCategories: string[] = [];
   isWeightAscending: boolean = true;
   isNameAscending: boolean = true;
+  searchTerm: string = '';
 
   @ViewChild('itemModal', { static: false }) modalElement!: ElementRef;
 
@@ -50,7 +52,6 @@ export class ItemListComponent implements OnInit {
             weight: item.weight,
             dimensions: item.size,
             description: item.description,
-            imageUrl: 'assets/images/placeholder.png'
           }));
           this.items = [...this.originalItems];
         },
@@ -83,13 +84,25 @@ export class ItemListComponent implements OnInit {
   }
 
   filterItems(): void {
-    if (this.selectedCategories.length === 0) {
-      this.items = [...this.originalItems];
-    } else {
-      this.items = this.originalItems.filter(item => 
+    let filteredItems = [...this.originalItems];
+
+    if (this.selectedCategories.length > 0) {
+      filteredItems = filteredItems.filter(item => 
         this.selectedCategories.some(category => item.material === category)
       );
     }
+
+    if (this.searchTerm.trim()) {
+      filteredItems = filteredItems.filter(item => 
+        item.name.toLowerCase().includes(this.searchTerm.trim().toLowerCase())
+      );
+    }
+
+    this.items = filteredItems;
+  }
+
+  searchItems(): void {
+    this.filterItems();
   }
 
   sortByWeight(): void {

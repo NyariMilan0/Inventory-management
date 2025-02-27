@@ -1,25 +1,25 @@
 import { Component, HostListener } from '@angular/core';
 import { RouterModule, Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { AuthService } from '../../_services/auth.service';
 import { ModalService } from '../../_services/modal.service';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterModule],
+  imports: [RouterModule, CommonModule],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent {
   isExpanded = false;
   isVisible = true;
-  isMobile = window.innerWidth <= 768; 
+  isMobile = window.innerWidth <= 768;
 
   constructor(
     private authService: AuthService,
     private router: Router,
     private modalService: ModalService
-  
   ) {}
 
   @HostListener('window:resize', ['$event'])

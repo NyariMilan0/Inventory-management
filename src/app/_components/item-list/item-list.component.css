@@ -9,31 +9,39 @@
 .abc-button {
   position: relative;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
+  min-width: 80px;
+  height: 50px;
+  padding: 0 12px;
+  border-radius: 8px;
   overflow: hidden;
-  min-width: 45px;
-  height: 45px;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.abc-icon {
+  margin-right: 5px;
+  font-size: 1.2rem;
+  transition: transform 0.3s ease;
+}
+
+.abc-icon i {
+  transition: all 0.3s ease;
+}
+
+.abc-button:hover .abc-icon {
+  transform: scale(1.1);
 }
 
 .abc-text {
-  position: absolute;
-  transition: transform 0.5s ease;
-}
-
-.abc-descending {
-  transform: translateY(-50%);
-}
-
-.abc-ascending {
-  transform: translateY(50%);
+  font-weight: 500;
+  transition: transform 0.3s ease;
 }
 
 .open-button {
   text-align: left;
-  width: 200px;
-  height: 45px;
+  width: 220px;
+  height: 50px;
 }
 
 .open-button:hover {
@@ -50,7 +58,6 @@
   position: relative;
   box-shadow: 2px 2px 5px #a3a3a3;
   border-radius: 10px;
-  
 }
 
 .details-button {
@@ -80,8 +87,15 @@ body {
 }
 
 .weight-button {
-  min-width: 45px;
-  height: 45px;
+  min-width: 80px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.weight-text {
+  margin-left: 5px;
 }
 
 .card {
@@ -91,11 +105,9 @@ body {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-
-
-.details-button:hover, .close-button:hover{
+.details-button:hover, .close-button:hover {
   background-color: #457B9D;
-  color:white;
+  color: white;
 }
 
 .bg-info.bg-opacity-25 {
@@ -146,8 +158,6 @@ h2 {
   color: white;
 }
 
-
-
 .item-square {
   display: flex;
   align-items: center;
@@ -157,6 +167,7 @@ h2 {
   height: 100px;
   width: 100px;
   border-radius: 5px;
+  overflow: hidden;
 }
 
 .card-title, .card-text, .card-text strong {
@@ -169,7 +180,7 @@ h2 {
 }
 
 .dropdown-toggle {
-  border-color:#457B9D;
+  border-color: #457B9D;
   color: #1D3557;
 }
 
@@ -207,7 +218,31 @@ h2 {
   gap: 1rem;
 }
 
-.item-square{
+.item-square {
   background-color: #A8DADC;
   color: #1D3557;
+}
+
+.search-input {
+  border-color: #457B9D;
+  color: #1D3557;
+  max-width: 220px;
+  height: 50px;
+}
+
+.search-input:focus {
+  box-shadow: 0 0 0 0.2rem #A8DADC;
+  outline: none;
+  border-color: #457B9D;
+}
+
+.search-input::placeholder {
+  color: #4a5568;
+}
+
+.input-group-text {
+  background-color: #A8DADC;
+  border-color: #457B9D;
+  color: #1D3557;
+  height: 50px;
 }

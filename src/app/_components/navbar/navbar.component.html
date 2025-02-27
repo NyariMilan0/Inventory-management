@@ -1,5 +1,5 @@
-<div class="sidebar-container roboto-condensed" [class.visible]="isVisible">
-  <div class="sidebar" [class.expanded]="isExpanded">
+<div class="sidebar-container roboto-condensed" [class.visible]="isVisible" [class.expanded]="isExpanded">
+  <div class="sidebar">
     <a class="menuMain">
       <img class="navbarCompanyLogo" src="/assets/CompanyLogo.svg" alt="Company Logo">
       <span class="navbarLogoText">WareTech</span>
@@ -12,22 +12,20 @@
         <img class="navbarIcons" src="/assets/DiagramIcon.svg" alt="Storage">
         <span class="menu-text">Storage</span>
       </a>
-
       <a routerLink="/pallet-management" class="menu-item">
         <img class="navbarIcons" src="/assets/PalletIcon.svg" alt="Pallet Management">
         <span class="menu-text">Pallet Management</span>
       </a>
-
       <a routerLink="/items" class="menu-item">
-        <img class="navbarIcons" src="/assets/Items.svg" alt="Pallet Management">
+        <img class="navbarIcons" src="/assets/Items.svg" alt="Items">
         <span class="menu-text">Items</span>
       </a>
       <a routerLink="/" class="menu-item">
-        <img class="navbarIcons" src="/assets/ItemManagementIcon.svg" alt="Pallet Management">
+        <img class="navbarIcons" src="/assets/ItemManagementIcon.svg" alt="Item Management">
         <span class="menu-text">Item management</span>
       </a>
       <a routerLink="/adminPanel" class="menu-item">
-        <i class="fa-solid fa-screwdriver-wrench navbarIcons"></i> 
+        <i class="fa-solid fa-screwdriver-wrench navbarIcons"></i>
         <span class="menu-text">Admin Panel</span>
       </a>
       <br>
@@ -37,8 +35,11 @@
         <img class="navbarIcons" src="/assets/profileIcon.svg" alt="Profile User">
         <span class="menu-text">Felhasználói profil</span>
       </a>
-
-
     </div>
   </div>
+</div>
+<div class="main-content">
+  <button *ngIf="isMobile" class="hamburger" (click)="toggleMenu()">
+    <i class="fa-solid fa-bars"></i>
+  </button>
 </div>

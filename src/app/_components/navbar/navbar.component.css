@@ -3,8 +3,8 @@
   top: 0;
   left: 0;
   z-index: 1000;
-  visibility: visible; /* Changed from hidden to visible */
-  opacity: 1; /* Changed from 0 to 1 */
+  visibility: visible;
+  opacity: 1;
   transition: opacity 0.5s linear;
 }
 
@@ -13,7 +13,7 @@
   opacity: 1;
 }
 
-.sidebar {
+.sidebar-container .sidebar {
   width: 100px;
   height: 100vh;
   background: #457B9D;
@@ -29,10 +29,9 @@
   left: 0;
   top: 0;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  
 }
 
-.sidebar.expanded {
+.sidebar-container.expanded .sidebar {
   width: 250px;
   align-items: flex-start;
 }
@@ -83,10 +82,9 @@
   text-decoration: none;
   margin-top: 10px;
   margin-left: 10px;
-  text-decoration: dotted;
 }
 
-.sidebar.expanded .navbarLogoText {
+.sidebar-container.expanded .navbarLogoText {
   opacity: 1;
 }
 
@@ -109,7 +107,7 @@
 }
 
 .menu-item:hover {
-  background: rgba(29,53,87,0.25);
+  background: rgba(29, 53, 87, 0.25);
   cursor: pointer;
 }
 
@@ -127,7 +125,7 @@
   color: white;
 }
 
-.sidebar.expanded .menu-text {
+.sidebar-container.expanded .menu-text {
   opacity: 1;
 }
 
@@ -140,13 +138,43 @@
 }
 
 .main-content {
-  margin-left: 100px; /* Match the width of the sidebar when not expanded */
-  transition: margin-left 0.3s ease; /* Smooth transition when expanding */
+  margin-left: 100px;
+  transition: margin-left 0.3s ease;
+  position: relative;
 }
 
-.sidebar.expanded ~ .main-content {
+.sidebar-container.expanded ~ .main-content {
   margin-left: 250px;
 }
+
 app-navbar {
-  width: auto; /* Let it grow naturally with content */
+  width: auto;
+}
+
+.hamburger {
+  background-color: #F1FAEE;
+  border: none;
+  color: #457B9D;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 10px;
+  display: inline-block;
+}
+
+@media (max-width: 768px) {
+  .sidebar-container .sidebar {
+    width: 0;
+    transform: translateX(-100%);
+  }
+  .sidebar-container.expanded .sidebar {
+    width: 250px;
+    transform: translateX(0);
+  }
+  .main-content {
+    margin-left: 0;
+    background-color: #F1FAEE;
+  }
+  .sidebar-container.expanded ~ .main-content {
+    margin-left: 250px;
+  }
 }

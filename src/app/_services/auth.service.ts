@@ -26,6 +26,12 @@ export class AuthService {
 
   logout() {
     localStorage.removeItem('jwtToken');
+    localStorage.removeItem('isAdmin');
+    localStorage.removeItem('email');
+    localStorage.removeItem('firstName');
+    localStorage.removeItem('lastName');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('id');
   }
 
   private handleError(error: HttpErrorResponse) {

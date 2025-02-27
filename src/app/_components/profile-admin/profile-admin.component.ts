@@ -29,7 +29,7 @@ interface ErrorResponse {
 @Component({
   selector: 'app-profile-admin',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, NavbarComponent],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './profile-admin.component.html',
   styleUrls: ['./profile-admin.component.css']
 })
