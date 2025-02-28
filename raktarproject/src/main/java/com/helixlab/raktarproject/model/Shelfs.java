@@ -1,6 +1,5 @@
 package com.helixlab.raktarproject.model;
 
-import static com.helixlab.raktarproject.model.Users.emf;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,7 +10,6 @@ import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Id;
-import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -355,6 +353,26 @@ public class Shelfs implements Serializable {
         }
 
         return resultList;
+    }
+    
+    public static ArrayList<Shelfs> getAllShelfs(){
+        EntityManager em = emf.createEntityManager();
+        ArrayList<Shelfs> shelfList = new ArrayList<>();
+        
+        try {
+            StoredProcedureQuery spq = em.createStoredProcedureQuery("getAllShelfs", Shelfs.class);
+            spq.execute();
+            shelfList = new ArrayList<>(spq.getResultList());
+            
+            
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getLocalizedMessage());
+        } finally {
+            em.clear();
+            em.close();
+        }
+
+        return shelfList;
     }
 
     public Collection<PalletsXShelfs> getPalletsXShelfsCollection() {

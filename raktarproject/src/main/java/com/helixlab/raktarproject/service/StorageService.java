@@ -1,6 +1,7 @@
 package com.helixlab.raktarproject.service;
 
 import com.helixlab.raktarproject.model.Storage;
+import java.util.ArrayList;
 import org.json.JSONObject;
 
 
@@ -16,7 +17,16 @@ public class StorageService {
         }
     }
     
-    
+    public ArrayList<Storage> getAllStorages(){
+        ArrayList<Storage> storageList = new ArrayList<>();
+        try {
+            storageList = layer.getAllStorages();
+        } catch (Exception e) {
+            System.err.println("Error fetching storages: " + e.getMessage());
+        }
+
+        return storageList;
+    }
     
     
     

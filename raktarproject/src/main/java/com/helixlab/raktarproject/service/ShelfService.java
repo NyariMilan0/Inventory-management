@@ -68,5 +68,16 @@ public class ShelfService {
 
         return result;
     }
+    
+    public ArrayList<Shelfs> getAllShelfs(){
+        ArrayList<Shelfs> shelfList = new ArrayList<>();
+        try {
+            shelfList = layer.getAllShelfs();
+        } catch (Exception e) {
+            System.err.println("Error fetching shelfs: " + e.getMessage());
+        }
+
+        return shelfList;
+    }
 
 }

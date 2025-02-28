@@ -1,6 +1,7 @@
 package com.helixlab.raktarproject.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -233,6 +234,25 @@ public class Storage implements Serializable {
             em.clear();
             em.close();
         }
+    }
+    public static ArrayList<Storage> getAllStorages(){
+        EntityManager em = emf.createEntityManager();
+        ArrayList<Storage> storageList = new ArrayList<>();
+        
+        try {
+            StoredProcedureQuery spq = em.createStoredProcedureQuery("getAllStorages", Storage.class);
+            spq.execute();
+            storageList = new ArrayList<>(spq.getResultList());
+            
+            
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getLocalizedMessage());
+        } finally {
+            em.clear();
+            em.close();
+        }
+
+        return storageList;
     }
 
 }
