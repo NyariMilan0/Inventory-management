@@ -235,16 +235,16 @@ public class Storage implements Serializable {
             em.close();
         }
     }
-    public static ArrayList<Storage> getAllStorages(){
+
+    public static ArrayList<Storage> getAllStorages() {
         EntityManager em = emf.createEntityManager();
         ArrayList<Storage> storageList = new ArrayList<>();
-        
+
         try {
             StoredProcedureQuery spq = em.createStoredProcedureQuery("getAllStorages", Storage.class);
             spq.execute();
             storageList = new ArrayList<>(spq.getResultList());
-            
-            
+
         } catch (Exception e) {
             System.err.println("Error: " + e.getLocalizedMessage());
         } finally {
@@ -253,6 +253,37 @@ public class Storage implements Serializable {
         }
 
         return storageList;
+    }
+
+    public static Boolean deleteStorageById(Integer storageId) {
+        EntityManager em = emf.createEntityManager();
+        Boolean isDeleted = false;
+
+        try {
+            em.getTransaction().begin();
+
+            StoredProcedureQuery spq = em.createStoredProcedureQuery("deleteStorageById");
+            spq.registerStoredProcedureParameter("storageIdIn", Integer.class, ParameterMode.IN);
+            spq.setParameter("storageIdIn", storageId);
+
+            spq.execute();
+
+            // Ellenőrizzük, hogy törlés történt-e (ha a sorok száma > 0, akkor sikeres)
+            isDeleted = spq.getUpdateCount() > 0;
+
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            System.err.println("Error deleting storage: " + e.getLocalizedMessage());
+            isDeleted = false;
+        } finally {
+            em.clear();
+            em.close();
+        }
+
+        return isDeleted;
     }
 
 }

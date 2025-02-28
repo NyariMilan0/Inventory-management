@@ -87,7 +87,7 @@ public class UserController {
                 body.getString("password")
         );
 
-        JSONObject obj = layer.registerUser(u);
+        JSONObject obj = layer.registerAdmin(u);
         return Response.status(obj.getInt("statusCode")).entity(obj.toString()).type(MediaType.APPLICATION_JSON).build();
     }
 
