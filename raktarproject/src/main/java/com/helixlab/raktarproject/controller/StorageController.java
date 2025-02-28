@@ -4,7 +4,9 @@
  */
 package com.helixlab.raktarproject.controller;
 
+import com.helixlab.raktarproject.model.Storage;
 import com.helixlab.raktarproject.service.StorageService;
+import java.util.ArrayList;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -15,6 +17,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 @Path("storage")
@@ -71,5 +74,46 @@ public class StorageController {
                            .type(MediaType.APPLICATION_JSON)
                            .build();
         }
+    }
+    
+    @GET
+    @Path("getAllStorages")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllStorages() {
+        JSONObject responseObj = new JSONObject();
+
+        try {
+            ArrayList<Storage> storageList = layer.getAllStorages();
+
+            JSONArray storageArray = new JSONArray();
+
+            for (Storage s : storageList) {
+                JSONObject storageJson = new JSONObject();
+                storageJson.put("id", s.getId());
+                storageJson.put("name", s.getName());
+                storageJson.put("location", s.getLocation());
+                storageJson.put("maxCapacity", s.getMaxCapacity());
+                storageJson.put("currentCapacity", s.getCurrentCapacity());
+                storageJson.put("isFull", s.getIsFull());
+               
+
+                storageArray.put(storageJson);
+
+            }
+            
+            responseObj.put("statusCode", 200);
+            responseObj.put("Storages", storageArray);
+
+            // Return the response with a 200 OK status
+            return Response.ok(responseObj.toString(), MediaType.APPLICATION_JSON).build();
+
+        } catch (Exception e) {
+            // Handle any exceptions
+            responseObj.put("statusCode", 500);
+            responseObj.put("message", "Failed to retrieve storages");
+            responseObj.put("error", e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(responseObj.toString()).type(MediaType.APPLICATION_JSON).build();
+        }
+
     }
 }

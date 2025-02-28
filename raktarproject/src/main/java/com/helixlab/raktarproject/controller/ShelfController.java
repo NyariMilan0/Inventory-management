@@ -122,7 +122,7 @@ public class ShelfController {
         return Response.status(Response.Status.OK).entity(toReturn.toString()).type(MediaType.APPLICATION_JSON).build();
 
     }
-    
+
     @POST
     @Path("addShelfToStorage")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -147,9 +147,9 @@ public class ShelfController {
             responseObj.put("shelfName", shelfName);
 
             return Response.status(Response.Status.CREATED)
-                           .entity(responseObj.toString())
-                           .type(MediaType.APPLICATION_JSON)
-                           .build();
+                    .entity(responseObj.toString())
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
 
         } catch (Exception e) {
             // Hiba esetén válasz
@@ -158,13 +158,12 @@ public class ShelfController {
             responseObj.put("error", e.getMessage());
 
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                           .entity(responseObj.toString())
-                           .type(MediaType.APPLICATION_JSON)
-                           .build();
+                    .entity(responseObj.toString())
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
         }
     }
-    
-    
+
     @GET
     @Path("getPalletsWithShelfs")
     @Produces(MediaType.APPLICATION_JSON)
@@ -205,6 +204,50 @@ public class ShelfController {
                     .type(MediaType.APPLICATION_JSON)
                     .build();
         }
+    }
+
+    @GET
+    @Path("getAllShelfs")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllShelfs() {
+        JSONObject responseObj = new JSONObject();
+
+        try {
+            ArrayList<Shelfs> shelfList = layer.getAllShelfs();
+
+            JSONArray shelfsArray = new JSONArray();
+
+            for (Shelfs s : shelfList) {
+                JSONObject shelfJson = new JSONObject();
+                shelfJson.put("id", s.getId());
+                shelfJson.put("name", s.getName());
+                shelfJson.put("locationInStorage", s.getLocationInStorage());
+                shelfJson.put("maxCapacity", s.getMaxCapacity());
+                shelfJson.put("currentCapacity", s.getCurrentCapacity());
+                shelfJson.put("height", s.getHeight());
+                shelfJson.put("length", s.getLength());
+                shelfJson.put("width", s.getWidth());
+                shelfJson.put("levels", s.getLevels());
+                shelfJson.put("isFull", s.getIsFull());
+
+                shelfsArray.put(shelfJson);
+
+            }
+            
+            responseObj.put("statusCode", 200);
+            responseObj.put("shelfs", shelfsArray);
+
+            // Return the response with a 200 OK status
+            return Response.ok(responseObj.toString(), MediaType.APPLICATION_JSON).build();
+
+        } catch (Exception e) {
+            // Handle any exceptions
+            responseObj.put("statusCode", 500);
+            responseObj.put("message", "Failed to retrieve shelfs");
+            responseObj.put("error", e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(responseObj.toString()).type(MediaType.APPLICATION_JSON).build();
+        }
+
     }
 
 }
