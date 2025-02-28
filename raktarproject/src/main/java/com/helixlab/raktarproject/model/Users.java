@@ -328,7 +328,7 @@ public class Users implements Serializable {
 
             return true;
         } catch (Exception e) {
-            System.err.println("Hiba: " + e.getLocalizedMessage());
+            System.err.println("Error: " + e.getLocalizedMessage());
             return false;
         } finally {
             em.clear();
@@ -352,8 +352,8 @@ public class Users implements Serializable {
             spq.setParameter("emailIn", u.getEmail());
             spq.setParameter("firstNameIn", u.getFirstName());
             spq.setParameter("lastNameIn", u.getLastName());
-            spq.setParameter("userNameIn", u.getUserName());
             spq.setParameter("pictureIn", u.getPicture());
+            spq.setParameter("userNameIn", u.getUserName());
             spq.setParameter("passwordIn", u.getPassword());
             spq.execute();
 

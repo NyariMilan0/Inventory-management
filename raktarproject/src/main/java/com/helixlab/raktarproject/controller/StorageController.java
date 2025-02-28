@@ -8,11 +8,13 @@ import com.helixlab.raktarproject.model.Storage;
 import com.helixlab.raktarproject.service.StorageService;
 import java.util.ArrayList;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -22,12 +24,12 @@ import org.json.JSONObject;
 
 @Path("storage")
 public class StorageController {
-    
+
     @Context
     private UriInfo context;
     private StorageService layer = new StorageService();
-    
-   @GET
+
+    @GET
     @Produces(MediaType.APPLICATION_XML)
     public String getXml() {
         //TODO return proper representation object
@@ -39,7 +41,7 @@ public class StorageController {
     public void putXml(String content) {
 
     }
-    
+
     @POST
     @Path("addStorage")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -60,9 +62,9 @@ public class StorageController {
             responseObj.put("location", location);
 
             return Response.status(Response.Status.CREATED)
-                           .entity(responseObj.toString())
-                           .type(MediaType.APPLICATION_JSON)
-                           .build();
+                    .entity(responseObj.toString())
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
 
         } catch (Exception e) {
             responseObj.put("statusCode", 500);
@@ -70,12 +72,12 @@ public class StorageController {
             responseObj.put("error", e.getMessage());
 
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                           .entity(responseObj.toString())
-                           .type(MediaType.APPLICATION_JSON)
-                           .build();
+                    .entity(responseObj.toString())
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
         }
     }
-    
+
     @GET
     @Path("getAllStorages")
     @Produces(MediaType.APPLICATION_JSON)
@@ -95,12 +97,11 @@ public class StorageController {
                 storageJson.put("maxCapacity", s.getMaxCapacity());
                 storageJson.put("currentCapacity", s.getCurrentCapacity());
                 storageJson.put("isFull", s.getIsFull());
-               
 
                 storageArray.put(storageJson);
 
             }
-            
+
             responseObj.put("statusCode", 200);
             responseObj.put("Storages", storageArray);
 
@@ -115,5 +116,39 @@ public class StorageController {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(responseObj.toString()).type(MediaType.APPLICATION_JSON).build();
         }
 
+    }
+
+    @DELETE
+    @Path("deleteStorageById")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteStorageById(@QueryParam("id") Integer storageId) {
+        JSONObject responseObj = new JSONObject();
+
+        try {
+            Boolean isDeleted = layer.deleteStorageById(storageId);
+
+            if (isDeleted) {
+                responseObj.put("statusCode", 200);
+                responseObj.put("message", "Storage successfully deleted");
+                responseObj.put("storageId", storageId);
+                return Response.ok(responseObj.toString(), MediaType.APPLICATION_JSON).build();
+            } else {
+                responseObj.put("statusCode", 400); // Bad Request, mert a feltétel nem teljesült
+                responseObj.put("message", "Storage could not be deleted: It may have associated shelves or does not exist");
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(responseObj.toString())
+                        .type(MediaType.APPLICATION_JSON)
+                        .build();
+            }
+        } catch (Exception e) {
+            responseObj.put("statusCode", 500);
+            responseObj.put("message", "Failed to delete storage");
+            responseObj.put("error", e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(responseObj.toString())
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
     }
 }
