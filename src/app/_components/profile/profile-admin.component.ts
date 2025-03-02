@@ -1,4 +1,3 @@
-// src/app/components/profile-admin/profile-admin.component.ts
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -201,6 +200,7 @@ export class ProfileAdminComponent implements OnInit, OnDestroy {
 
   private updateUserInfo(): void {
     (document.getElementById('userName') as HTMLElement).textContent = localStorage.getItem('userName') || 'Unknown';
+    (document.getElementById('email') as HTMLElement).textContent = localStorage.getItem('email') || 'Unknown';
     (document.getElementById('firstName') as HTMLElement).textContent = localStorage.getItem('firstName') || 'Unknown';
     (document.getElementById('lastName') as HTMLElement).textContent = localStorage.getItem('lastName') || 'Unknown';
     const isAdmin = localStorage.getItem('isAdmin');

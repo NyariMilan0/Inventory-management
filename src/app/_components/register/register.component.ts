@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, ValidatorFn, A
 import { CommonModule } from '@angular/common';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { HttpClient } from '@angular/common/http';
-import { ProfileAdminComponent } from '../profile-admin/profile-admin.component';
+import { ProfileAdminComponent } from '../profile/profile-admin.component';
 
 @Component({
   selector: 'app-register',

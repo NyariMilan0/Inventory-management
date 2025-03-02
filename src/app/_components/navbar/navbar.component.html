@@ -12,7 +12,7 @@
         <img class="navbarIcons" src="/assets/DiagramIcon.svg" alt="Storage">
         <span class="menu-text">Storage</span>
       </a>
-      <a routerLink="/pallet-management" class="menu-item">
+      <a routerLink="/pallets" class="menu-item">
         <img class="navbarIcons" src="/assets/PalletIcon.svg" alt="Pallet Management">
         <span class="menu-text">Pallet Management</span>
       </a>
@@ -20,11 +20,7 @@
         <img class="navbarIcons" src="/assets/Items.svg" alt="Items">
         <span class="menu-text">Items</span>
       </a>
-      <a routerLink="/" class="menu-item">
-        <img class="navbarIcons" src="/assets/ItemManagementIcon.svg" alt="Item Management">
-        <span class="menu-text">Item management</span>
-      </a>
-      <a routerLink="/adminPanel" class="menu-item">
+      <a class="menu-item" (click)="openAdminModal()">
         <i class="fa-solid fa-screwdriver-wrench navbarIcons"></i>
         <span class="menu-text">Admin Panel</span>
       </a>
@@ -33,7 +29,7 @@
       <hr class="navbarSeparatorLine">
       <a class="menu-item" (click)="openProfileModal()">
         <img class="navbarIcons" src="/assets/profileIcon.svg" alt="Profile User">
-        <span class="menu-text">Felhasználói profil</span>
+        <span class="menu-text">User Profile</span>
       </a>
     </div>
   </div>
@@ -42,4 +38,5 @@
   <button *ngIf="isMobile" class="hamburger" (click)="toggleMenu()">
     <i class="fa-solid fa-bars"></i>
   </button>
+  <ng-content></ng-content>
 </div>

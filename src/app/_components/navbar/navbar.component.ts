@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../_services/auth.service';
 import { ModalService } from '../../_services/modal.service';
 
+
 @Component({
   selector: 'app-navbar',
   standalone: true,
@@ -55,6 +56,9 @@ export class NavbarComponent {
 
   openProfileModal(): void {
     this.modalService.openProfileModal();
+  }
+  openAdminModal(): void {
+    this.modalService.openAdminModal();
   }
 
   logout(): void {

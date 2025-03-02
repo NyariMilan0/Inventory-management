@@ -5,14 +5,25 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root'
 })
 export class ModalService {
-  private showProfileModalSource = new BehaviorSubject<boolean>(false);
-  showProfileModal$ = this.showProfileModalSource.asObservable();
+  private showProfileModal = new BehaviorSubject<boolean>(false);
+  private showAdminModal = new BehaviorSubject<boolean>(false);
+  
+  showProfileModal$ = this.showProfileModal.asObservable();
+  showAdminModal$ = this.showAdminModal.asObservable();
 
   openProfileModal() {
-    this.showProfileModalSource.next(true);
+    this.showProfileModal.next(true);
   }
 
   closeProfileModal() {
-    this.showProfileModalSource.next(false);
+    this.showProfileModal.next(false);
+  }
+
+  openAdminModal() {
+    this.showAdminModal.next(true);
+  }
+
+  closeAdminModal() {
+    this.showAdminModal.next(false);
   }
 }

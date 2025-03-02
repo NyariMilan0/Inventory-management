@@ -2,8 +2,9 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { NavbarComponent } from '../navbar/navbar.component';
-import { ProfileAdminComponent } from '../profile-admin/profile-admin.component';
+import { ProfileAdminComponent } from '../profile/profile-admin.component';
 import { FormsModule } from '@angular/forms';
+import { AdminPanelComponent } from '../admin-panel/admin-panel.component';
 
 export interface Item {
   id: number;
@@ -21,7 +22,7 @@ export interface Item {
 @Component({
   selector: 'app-item-list',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, NavbarComponent, ProfileAdminComponent, FormsModule],
+  imports: [CommonModule, HttpClientModule, NavbarComponent, ProfileAdminComponent, FormsModule, AdminPanelComponent],
   templateUrl: './item-list.component.html',
   styleUrls: ['./item-list.component.css']
 })
