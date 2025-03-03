@@ -233,7 +233,7 @@ public class ShelfController {
                 shelfsArray.put(shelfJson);
 
             }
-            
+
             responseObj.put("statusCode", 200);
             responseObj.put("shelfs", shelfsArray);
 
@@ -248,6 +248,53 @@ public class ShelfController {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(responseObj.toString()).type(MediaType.APPLICATION_JSON).build();
         }
 
+    }
+
+    @GET
+    @Path("getShelfsByStorageId")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getShelfsByStorageId(@QueryParam("storageId") Integer storageId) {
+        JSONObject responseObj = new JSONObject();
+
+        try {
+            if (storageId == null || storageId <= 0) {
+                responseObj.put("statusCode", 400);
+                responseObj.put("message", "Invalid or missing storageId parameter");
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(responseObj.toString())
+                        .type(MediaType.APPLICATION_JSON)
+                        .build();
+            }
+
+            List<Shelfs> shelfList = layer.getShelfsByStorageId(storageId);
+
+            JSONArray shelfsArray = new JSONArray();
+            for (Shelfs shelf : shelfList) {
+                JSONObject shelfJson = new JSONObject();
+                shelfJson.put("shelfId", shelf.getId());
+                shelfJson.put("shelfName", shelf.getName());
+                shelfJson.put("shelfLocation", shelf.getLocationInStorage());
+                shelfJson.put("shelfMaxCapacity", shelf.getMaxCapacity());
+                shelfJson.put("shelfIsFull", shelf.getIsFull());
+                shelfsArray.put(shelfJson);
+            }
+
+            responseObj.put("statusCode", 200);
+            responseObj.put("shelves", shelfsArray);
+            responseObj.put("totalShelves", shelfsArray.length());
+
+            return Response.ok(responseObj.toString(), MediaType.APPLICATION_JSON).build();
+
+        } catch (Exception e) {
+            // Handle errors
+            responseObj.put("statusCode", 500);
+            responseObj.put("message", "Failed to retrieve shelves for storage");
+            responseObj.put("error", e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(responseObj.toString())
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
     }
 
 }

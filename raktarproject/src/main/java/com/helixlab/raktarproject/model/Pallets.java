@@ -252,4 +252,36 @@ public class Pallets implements Serializable {
         }
     }
 
+    public static void movePalletBetweenShelfs(Integer palletId, Integer fromShelfId, Integer toShelfId, Integer userId) {
+        EntityManager em = emf.createEntityManager();
+
+        try {
+            em.getTransaction().begin();
+
+            StoredProcedureQuery spq = em.createStoredProcedureQuery("movePalletBetweenShelfs");
+            spq.registerStoredProcedureParameter("palletIdIn", Integer.class, javax.persistence.ParameterMode.IN);
+            spq.registerStoredProcedureParameter("fromShelfIdIn", Integer.class, javax.persistence.ParameterMode.IN);
+            spq.registerStoredProcedureParameter("toShelfIdIn", Integer.class, javax.persistence.ParameterMode.IN);
+            spq.registerStoredProcedureParameter("userIdIn", Integer.class, javax.persistence.ParameterMode.IN);
+
+            spq.setParameter("palletIdIn", palletId);
+            spq.setParameter("fromShelfIdIn", fromShelfId);
+            spq.setParameter("toShelfIdIn", toShelfId);
+            spq.setParameter("userIdIn", userId);
+
+            spq.execute();
+
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            System.err.println("Error moving pallet between shelfs: " + e.getLocalizedMessage());
+            throw new RuntimeException("Failed to move pallet between shelfs", e);
+        } finally {
+            em.clear();
+            em.close();
+        }
+    }
+
 }
