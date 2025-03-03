@@ -4,7 +4,6 @@
     [attr.inert]="!showModal ? '' : null" tabindex="-1" aria-labelledby="adminPanelModalLabel">
     <div class="modal-dialog modal-dialog-centered modal-lg custom-modal-dialog">
       <div class="modal-content shadow custom-modal-content">
-
 <!-- Felugró ablak fejléce (Modal Header) -->
         <div class="popup-header">
           <div class="row">
@@ -55,7 +54,6 @@
 
 <!-- Tab tartalmak (Tab Content) -->
             <div class="tab-content mt-3">
-              
 <!-- Felhasználó regisztráció tab (Register User Tab) -->
               <div class="tab-pane" [class.active]="activeTab === 'registerUser'" id="registerUser">
                 <div class="register-section">
@@ -291,10 +289,10 @@
                     <div class="mb-3">
                       <label for="storageName" class="form-label">Storage Name</label>
                       <input type="text" class="form-control custom-input"
-                        [class.invalid]="storageForm.get('name')?.invalid && storageForm.get('name')?.touched"
-                        id="storageName" formControlName="name" placeholder="Storage Name (e.g., Raktar_01)">
-                      <span class="error-text" *ngIf="storageForm.get('name')?.invalid && storageForm.get('name')?.touched">
-                        {{ getErrorMessage(storageForm.get('name'), 'Storage Name') }}
+                        [class.invalid]="storageForm.get('storageName')?.invalid && storageForm.get('storageName')?.touched"
+                        id="storageName" formControlName="storageName" placeholder="Storage Name (e.g., Raktar_01)">
+                      <span class="error-text" *ngIf="storageForm.get('storageName')?.invalid && storageForm.get('storageName')?.touched">
+                        {{ getErrorMessage(storageForm.get('storageName'), 'Storage Name') }}
                       </span>
                     </div>
                     <div class="mb-3">
@@ -330,7 +328,7 @@
                         id="storageId" formControlName="storageId">
                         <option value="" disabled>Select a storage</option>
                         @for (storage of storages; track storage.id) {
-                        <option [value]="storage.id">{{ storage.name }}</option>
+                        <option [value]="storage.id">{{ storage.storageName }}</option>
                         }
                       </select>
                       <span class="error-text" *ngIf="shelfForm.get('storageId')?.invalid && shelfForm.get('storageId')?.touched">
@@ -340,17 +338,17 @@
                     <div class="mb-3">
                       <label for="shelfName" class="form-label">Shelf Name</label>
                       <input type="text" class="form-control custom-input"
-                        [class.invalid]="shelfForm.get('name')?.invalid && shelfForm.get('name')?.touched"
-                        id="shelfName" formControlName="name" placeholder="Shelf Name (e.g., Polc_02)">
-                      <span class="error-text" *ngIf="shelfForm.get('name')?.invalid && shelfForm.get('name')?.touched">
-                        {{ getErrorMessage(shelfForm.get('name'), 'Shelf Name') }}
+                        [class.invalid]="shelfForm.get('shelfName')?.invalid && shelfForm.get('shelfName')?.touched"
+                        id="shelfName" formControlName="shelfName" placeholder="Shelf Name (e.g., Polc_02)">
+                      <span class="error-text" *ngIf="shelfForm.get('shelfName')?.invalid && shelfForm.get('shelfName')?.touched">
+                        {{ getErrorMessage(shelfForm.get('shelfName'), 'Shelf Name') }}
                       </span>
                     </div>
                     <div class="mb-3">
-                      <label for="shelfLocationIn" class="form-label">Location In Storage</label>
+                      <label for="locationIn" class="form-label">Location In Storage</label>
                       <input type="text" class="form-control custom-input"
                         [class.invalid]="shelfForm.get('locationIn')?.invalid && shelfForm.get('locationIn')?.touched"
-                        id="shelfLocationIn" formControlName="locationIn" placeholder="Location In (e.g., A-13)">
+                        id="locationIn" formControlName="locationIn" placeholder="Location In (e.g., A-13)">
                       <span class="error-text" *ngIf="shelfForm.get('locationIn')?.invalid && shelfForm.get('locationIn')?.touched">
                         {{ getErrorMessage(shelfForm.get('locationIn'), 'Location In Storage') }}
                       </span>
@@ -379,7 +377,7 @@
                         id="deleteShelfStorageId" formControlName="storageId" (change)="onStorageChange($event)">
                         <option value="" disabled>Select a storage</option>
                         @for (storage of storages; track storage.id) {
-                        <option [value]="storage.id">{{ storage.name }}</option>
+                        <option [value]="storage.id">{{ storage.storageName }}</option>
                         }
                       </select>
                       <span class="error-text" *ngIf="deleteShelfForm.get('storageId')?.invalid && deleteShelfForm.get('storageId')?.touched">
@@ -392,8 +390,8 @@
                         [class.invalid]="deleteShelfForm.get('shelfId')?.invalid && deleteShelfForm.get('shelfId')?.touched"
                         id="deleteShelfId" formControlName="shelfId">
                         <option value="" disabled>Select a shelf</option>
-                        @for (shelf of shelves; track shelf.shelfId) {
-                        <option [value]="shelf.shelfId">{{ shelf.shelfName }} ({{ shelf.shelfLocation }}) - {{ shelf.shelfIsFull ? 'Full' : 'Not Full' }}</option>
+                        @for (shelf of shelves; track shelf.id) {
+                        <option [value]="shelf.id">{{ shelf.shelfName }} - {{ shelf.shelfLocation }}</option>
                         }
                       </select>
                       <span class="error-text" *ngIf="deleteShelfForm.get('shelfId')?.invalid && deleteShelfForm.get('shelfId')?.touched">
@@ -403,9 +401,9 @@
                     <div class="shelf-list">
                       <h5>Shelves in Selected Storage:</h5>
                       <ul class="list-group">
-                        @for (shelf of shelves; track shelf.shelfId) {
+                        @for (shelf of shelves; track shelf.id) {
                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                          <span>{{ shelf.shelfName }} ({{ shelf.shelfLocation }})</span>
+                          <span>{{ shelf.shelfName }} - {{ shelf.shelfLocation }}</span>
                           <span class="badge" [ngClass]="{'bg-success': shelf.shelfIsFull, 'bg-secondary': !shelf.shelfIsFull}">
                             {{ shelf.shelfIsFull ? 'Full' : 'Not Full' }}
                           </span>
@@ -421,7 +419,7 @@
                 </div>
               </div>
 
-<!-- Tároló törlése tab (Delete Storage Tab) -->
+<!-- Raktár törlése tab (Delete Storage Tab) -->
               <div class="tab-pane" [class.active]="activeTab === 'deleteStorage'" id="deleteStorage">
                 <div class="register-section">
                   <div class="text-center">
@@ -440,7 +438,7 @@
                         id="deleteStorageStorageId" formControlName="storageId">
                         <option value="" disabled>Select a storage</option>
                         @for (storage of storages; track storage.id) {
-                        <option [value]="storage.id">{{ storage.name }} ({{ storage.location }})</option>
+                        <option [value]="storage.id">{{ storage.storageName }} ({{ storage.location }})</option>
                         }
                       </select>
                       <span class="error-text" *ngIf="deleteStorageForm.get('storageId')?.invalid && deleteStorageForm.get('storageId')?.touched">
@@ -452,7 +450,7 @@
                       <ul class="list-group">
                         @for (storage of storages; track storage.id) {
                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                          <span>{{ storage.name }} ({{ storage.location }})</span>
+                          <span>{{ storage.storageName }} ({{ storage.location }})</span>
                           <span class="badge" [ngClass]="{'bg-success': storage.hasShelves, 'bg-secondary': !storage.hasShelves}">
                             {{ storage.hasShelves ? 'Has Shelves' : 'No Shelves' }}
                           </span>

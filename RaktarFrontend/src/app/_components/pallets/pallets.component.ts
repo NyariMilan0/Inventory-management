@@ -1,10 +1,9 @@
-/* Importok és komponens definíció */
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { PalletsService, PalletWithShelf } from '../../_services/pallets.service';
-import { Shelf, Item, ApiResponse, Storage } from '../../_services/admin-panel.service';
+import { Storage, Shelf, Item, ApiResponse } from '../../_services/admin-panel.service';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { AdminPanelComponent } from '../admin-panel/admin-panel.component';
 import { ProfileComponent } from '../profile/profile.component';
@@ -16,8 +15,6 @@ import { ProfileComponent } from '../profile/profile.component';
   templateUrl: './pallets.component.html',
   styleUrls: ['./pallets.component.css']
 })
-
-/* Osztály és változók */
 export class PalletsComponent implements OnInit {
   activeTab: string = 'addRemove';
   addPalletForm: FormGroup;
@@ -29,19 +26,22 @@ export class PalletsComponent implements OnInit {
   addPalletMessageClass: string = '';
   removePalletMessageClass: string = '';
   movePalletMessageClass: string = '';
+  isAddLoading = false;
+  isRemoveLoading = false;
+  isMoveLoading = false;
   filteredItems: Item[] = [];
   filteredShelves: Shelf[] = [];
   filteredAvailableShelves: Shelf[] = [];
   filteredShelvesWithPallets: Shelf[] = [];
   filteredPalletsForRemoval: PalletWithShelf[] = [];
+  filteredPalletsForMove: PalletWithShelf[] = [];
   items: Item[] = [];
   allShelves: Shelf[] = [];
   pallets: PalletWithShelf[] = [];
   storages: Storage[] = [];
 
-  /* Konstruktor */
   constructor(private fb: FormBuilder, private palletsService: PalletsService) {
-    const userId = Number(localStorage.getItem('userId')) || 0;
+    const userId = Number(localStorage.getItem('id')) || 0;
 
     this.addPalletForm = this.fb.group({
       skuCode: ['', Validators.required],
@@ -55,32 +55,35 @@ export class PalletsComponent implements OnInit {
     });
 
     this.movePalletForm = this.fb.group({
-      sourceStorageId: ['', Validators.required],
+      sourceShelfId: ['', Validators.required],
       palletId: ['', Validators.required],
-      targetStorageId: ['', Validators.required],
+      targetStorageId: ['', Validators.required], // Added back
       targetShelfId: ['', Validators.required],
       userId: [userId >= 0 ? userId : '', Validators.required]
     });
   }
 
-  /* Inicializálás (ngOnInit) */
   ngOnInit(): void {
     this.loadInitialData();
   }
 
-  /* Adatok betöltése (Data Loading) */
   loadInitialData(): void {
     this.palletsService.getAllItems().subscribe({
       next: (response: ApiResponse) => {
         if (response.success) {
-          this.items = response.data.items || response.data;
+          this.items = response.data;
           this.filteredItems = this.items;
-          console.log('Items loaded:', this.items);
         } else {
-          console.error('Failed to load items:', response.message);
+          console.error('Failed to load items:', response.message, 'Response:', response);
+          this.items = [];
+          this.filteredItems = [];
         }
       },
-      error: (err) => console.error('Error fetching items:', err)
+      error: (err) => {
+        console.error('Error fetching items:', err);
+        this.items = [];
+        this.filteredItems = [];
+      }
     });
 
     this.palletsService.getAllShelfs().subscribe({
@@ -88,9 +91,8 @@ export class PalletsComponent implements OnInit {
         if (response.success) {
           this.allShelves = response.data;
           this.filteredShelves = this.allShelves;
-          this.filteredAvailableShelves = this.allShelves.filter((shelf: Shelf) => !shelf.shelfIsFull);
+          this.filteredAvailableShelves = this.allShelves.filter(shelf => !shelf.shelfIsFull);
           this.updateShelvesWithPallets();
-          console.log('Shelves loaded:', this.allShelves);
         } else {
           console.error('Failed to load shelves:', response.message);
         }
@@ -102,7 +104,6 @@ export class PalletsComponent implements OnInit {
       next: (response: ApiResponse) => {
         if (response.success) {
           this.storages = response.data;
-          console.log('Storages loaded:', this.storages);
         } else {
           console.error('Failed to load storages:', response.message);
         }
@@ -113,9 +114,8 @@ export class PalletsComponent implements OnInit {
     this.palletsService.getPalletsWithShelfs().subscribe({
       next: (response: ApiResponse) => {
         if (response.success) {
-          this.pallets = response.data.palletsAndShelfs || response.data;
+          this.pallets = response.data;
           this.updateShelvesWithPallets();
-          console.log('Pallets loaded:', this.pallets);
         } else {
           console.error('Failed to load pallets:', response.message);
         }
@@ -124,52 +124,48 @@ export class PalletsComponent implements OnInit {
     });
   }
 
-  /* Tab vezérlés (Tab Control) */
   setActiveTab(tab: string): void {
     this.activeTab = tab;
   }
 
-  /* Szűrő függvények (Filter Functions) */
   filterItems(event: Event): void {
     const searchTerm = (event.target as HTMLInputElement).value.toLowerCase();
-    this.filteredItems = this.items.filter((item: Item) =>
+    this.filteredItems = this.items.filter(item =>
       item.sku.toLowerCase().includes(searchTerm) || item.name.toLowerCase().includes(searchTerm)
     );
   }
 
   filterShelves(event: Event): void {
     const searchTerm = (event.target as HTMLInputElement).value.toLowerCase();
-    this.filteredShelves = this.allShelves.filter((shelf: Shelf) =>
+    this.filteredShelves = this.allShelves.filter(shelf =>
       shelf.shelfName.toLowerCase().includes(searchTerm) || shelf.shelfLocation.toLowerCase().includes(searchTerm)
     );
-    this.filteredAvailableShelves = this.filteredShelves.filter((shelf: Shelf) => !shelf.shelfIsFull);
+    this.filteredAvailableShelves = this.filteredShelves.filter(shelf => !shelf.shelfIsFull);
     this.updateShelvesWithPallets();
   }
 
   updateShelvesWithPallets(): void {
-    this.filteredShelvesWithPallets = this.filteredShelves.filter((shelf: Shelf) =>
-      this.pallets.some((p: PalletWithShelf) => p.shelfId === shelf.shelfId)
+    this.filteredShelvesWithPallets = this.filteredShelves.filter(shelf =>
+      this.pallets.some(p => p.shelfId === shelf.id)
     );
     this.updateFilteredPalletsForRemoval();
   }
 
   updateFilteredPalletsForRemoval(): void {
     const shelfId = Number(this.removePalletForm.get('shelfId')?.value);
-    if (shelfId) {
-      this.filteredPalletsForRemoval = this.pallets.filter((p: PalletWithShelf) => p.shelfId === shelfId);
-    } else {
-      this.filteredPalletsForRemoval = [];
-    }
+    this.filteredPalletsForRemoval = shelfId
+      ? this.pallets.filter(p => p.shelfId === shelfId)
+      : [];
   }
 
-  /* Űrlap műveletek (Form Actions) */
   onAddPalletSubmit(): void {
-    this.addPalletMessage = '';
-    this.addPalletMessageClass = '';
     if (this.addPalletForm.invalid) {
       this.addPalletForm.markAllAsTouched();
       return;
     }
+    this.addPalletMessage = '';
+    this.addPalletMessageClass = '';
+    this.isAddLoading = true;
     this.palletsService.addPalletToShelf(this.addPalletForm.value).subscribe({
       next: (response: ApiResponse) => {
         this.addPalletMessage = response.message;
@@ -178,23 +174,25 @@ export class PalletsComponent implements OnInit {
           this.addPalletForm.reset();
           this.refreshShelvesAndPallets();
         }
+        this.isAddLoading = false;
       },
       error: (err) => {
-        this.addPalletMessage = 'Error adding pallet';
+        this.addPalletMessage = err.error?.message || 'Failed to add pallet.';
         this.addPalletMessageClass = 'error-message';
-        console.error('Add pallet error:', err);
+        this.isAddLoading = false;
       }
     });
   }
 
   onRemovePalletSubmit(): void {
-    this.removePalletMessage = '';
-    this.removePalletMessageClass = '';
     if (this.removePalletForm.invalid) {
       this.removePalletForm.markAllAsTouched();
       return;
     }
-    const palletId = this.removePalletForm.get('palletId')?.value;
+    this.removePalletMessage = '';
+    this.removePalletMessageClass = '';
+    this.isRemoveLoading = true;
+    const palletId = Number(this.removePalletForm.get('palletId')?.value);
     this.palletsService.deletePalletById(palletId).subscribe({
       next: (response: ApiResponse) => {
         this.removePalletMessage = response.message;
@@ -203,77 +201,31 @@ export class PalletsComponent implements OnInit {
           this.removePalletForm.reset();
           this.refreshShelvesAndPallets();
         }
+        this.isRemoveLoading = false;
       },
       error: (err) => {
-        this.removePalletMessage = 'Error removing pallet';
+        this.removePalletMessage = err.error?.message || 'Failed to remove pallet.';
         this.removePalletMessageClass = 'error-message';
-        console.error('Remove pallet error:', err);
+        this.isRemoveLoading = false;
       }
     });
   }
 
-  onMovePalletSubmit(): void {
-    this.movePalletMessage = '';
-    this.movePalletMessageClass = '';
-    if (this.movePalletForm.invalid) {
-      this.movePalletForm.markAllAsTouched();
-      return;
-    }
-    const { palletId, targetShelfId, userId } = this.movePalletForm.value;
-    const fromShelfId = this.pallets.find(p => p.palletId === Number(palletId))?.shelfId;
-    if (!fromShelfId) {
-      this.movePalletMessage = 'Current shelf not found for this pallet.';
-      this.movePalletMessageClass = 'error-message';
-      console.error('Pallet not found in pallets array:', palletId, this.pallets);
-      return;
-    }
-    this.palletsService.movePallet(palletId, fromShelfId, targetShelfId, userId).subscribe({
-      next: (response: ApiResponse) => {
-        this.movePalletMessage = response.message;
-        this.movePalletMessageClass = response.statusCode === 200 ? 'success-message' : 'error-message';
-        if (response.statusCode === 200) {
-          this.movePalletForm.reset();
-          const newUserId = Number(localStorage.getItem('userId')) || 0;
-          this.movePalletForm.patchValue({ userId: newUserId });
-          this.refreshShelvesAndPallets();
-        }
-      },
-      error: (err) => {
-        this.movePalletMessage = 'Error moving pallet';
-        this.movePalletMessageClass = 'error-message';
-        console.error('Move pallet error:', err);
-      }
-    });
-  }
-
-  /* Eseménykezelők (Event Handlers) */
   onShelfChange(event: Event): void {
-    const shelfId = Number((event.target as HTMLInputElement).value);
+    const shelfId = Number((event.target as HTMLSelectElement).value);
     if (shelfId) {
       this.removePalletForm.get('palletId')?.setValue('');
       this.updateFilteredPalletsForRemoval();
     }
   }
 
-  onSourceStorageChange(event: Event): void {
-    const storageId = Number((event.target as HTMLSelectElement).value);
-    if (storageId) {
-      this.palletsService.getShelfsByStorageId(storageId).subscribe({
-        next: (response: ApiResponse) => {
-          if (response.success) {
-            const shelvesWithPallets = response.data.filter((shelf: Shelf) => shelf.shelfIsFull);
-            this.pallets = shelvesWithPallets.flatMap((shelf: Shelf) =>
-              this.pallets.filter((p: PalletWithShelf) => p.shelfId === shelf.shelfId)
-            );
-            console.log('Pallets updated for source storage:', this.pallets);
-          } else {
-            console.error('Failed to load shelves for source storage:', response.message);
-          }
-        },
-        error: (err) => console.error('Error fetching shelves for source storage:', err)
-      });
+  onSourceShelfChange(event: Event): void {
+    const shelfId = Number((event.target as HTMLSelectElement).value);
+    if (shelfId) {
+      this.filteredPalletsForMove = this.pallets.filter(p => p.shelfId === shelfId);
+      this.movePalletForm.get('palletId')?.setValue(''); // Reset pallet selection
     } else {
-      this.pallets = [];
+      this.filteredPalletsForMove = [];
     }
   }
 
@@ -284,30 +236,64 @@ export class PalletsComponent implements OnInit {
         next: (response: ApiResponse) => {
           if (response.success) {
             this.filteredAvailableShelves = response.data.filter((shelf: Shelf) => !shelf.shelfIsFull);
-            console.log('Available shelves updated for target storage:', this.filteredAvailableShelves);
+            this.movePalletForm.get('targetShelfId')?.setValue(''); // Reset target shelf selection
           } else {
-            console.error('Failed to load shelves for target storage:', response.message);
+            console.error('Failed to load target shelves:', response.message);
+            this.filteredAvailableShelves = [];
           }
         },
-        error: (err) => console.error('Error fetching shelves for target storage:', err)
+        error: (err) => {
+          console.error('Error fetching target shelves:', err);
+          this.filteredAvailableShelves = [];
+        }
       });
     } else {
       this.filteredAvailableShelves = [];
     }
   }
 
-  /* Segéd függvények (Helper Functions) */
+  onMovePalletSubmit(): void {
+    if (this.movePalletForm.invalid) {
+      this.movePalletForm.markAllAsTouched();
+      return;
+    }
+    this.movePalletMessage = '';
+    this.movePalletMessageClass = '';
+    this.isMoveLoading = true;
+
+    const palletId = Number(this.movePalletForm.get('palletId')?.value);
+    const sourceShelfId = Number(this.movePalletForm.get('sourceShelfId')?.value);
+    const targetShelfId = Number(this.movePalletForm.get('targetShelfId')?.value);
+    const userId = Number(this.movePalletForm.get('userId')?.value);
+
+    this.palletsService.movePallet(palletId, sourceShelfId, targetShelfId, userId).subscribe({
+      next: (response: ApiResponse) => {
+        this.movePalletMessage = response.message;
+        this.movePalletMessageClass = response.success ? 'success-message' : 'error-message';
+        if (response.success) {
+          this.movePalletForm.reset({ userId });
+          this.filteredPalletsForMove = [];
+          this.filteredAvailableShelves = [];
+          this.refreshShelvesAndPallets();
+        }
+        this.isMoveLoading = false;
+      },
+      error: (err) => {
+        this.movePalletMessage = err.error?.message || 'Failed to move pallet.';
+        this.movePalletMessageClass = 'error-message';
+        this.isMoveLoading = false;
+      }
+    });
+  }
+
   refreshShelvesAndPallets(): void {
     this.palletsService.getAllShelfs().subscribe({
       next: (res: ApiResponse) => {
         if (res.success) {
           this.allShelves = res.data;
           this.filteredShelves = this.allShelves;
-          this.filteredAvailableShelves = this.allShelves.filter((shelf: Shelf) => !shelf.shelfIsFull);
+          this.filteredAvailableShelves = this.allShelves.filter(shelf => !shelf.shelfIsFull);
           this.updateShelvesWithPallets();
-          console.log('Shelves refreshed:', this.allShelves);
-        } else {
-          console.error('Failed to refresh shelves:', res.message);
         }
       },
       error: (err) => console.error('Error refreshing shelves:', err)
@@ -315,22 +301,27 @@ export class PalletsComponent implements OnInit {
     this.palletsService.getPalletsWithShelfs().subscribe({
       next: (res: ApiResponse) => {
         if (res.success) {
-          this.pallets = res.data.palletsAndShelfs || res.data;
+          this.pallets = res.data;
           this.updateShelvesWithPallets();
-          console.log('Pallets refreshed:', this.pallets);
-        } else {
-          console.error('Failed to refresh pallets:', res.message);
         }
       },
       error: (err) => console.error('Error refreshing pallets:', err)
     });
   }
 
-  trackById(index: number, item: any): any {
-    return item.id || item.shelfId;
+  trackByItemId(index: number, item: Item): number {
+    return item.id;
   }
 
-  trackByPalletId(index: number, item: any): any {
-    return item.palletId;
+  trackByShelfId(index: number, shelf: Shelf): number {
+    return shelf.id;
+  }
+
+  trackByStorageId(index: number, storage: Storage): number {
+    return storage.id;
+  }
+
+  trackByPalletId(index: number, pallet: PalletWithShelf): number {
+    return pallet.palletId;
   }
 }
