@@ -1,3 +1,4 @@
+/* Külső konténer (Modal Container) */
 .custom-modal-dialog {
     max-width: 900px;
 }
@@ -15,6 +16,7 @@
     max-width: 300px;
 }
 
+/* Felugró ablak tartalma (Modal Body) */
 .belsobox {
     background-color: #F1FAEE;
     border-radius: 15px;
@@ -22,6 +24,7 @@
     padding: 10px;
 }
 
+/* Felugró ablak fejléce (Modal Header) */
 .popup-header {
     color: #1D3557;
     background-color: #A8DADC;
@@ -59,34 +62,7 @@
     box-shadow: 0 5px 10px rgba(0,0,0,0.2);
 }
 
-.informations {
-    align-items: flex-end;
-    padding-left: 30px;
-}
-
-.signOutButton {
-    float: right;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
-    border: 2px solid rgb(170, 0, 0);
-    border-radius: 10px;
-    background-color: #E63946;
-    font-weight: 600;
-    color: #F1FAEE;
-    padding: 6px 20px;
-    transition: all 0.3s ease;
-}
-
-.signOutButton:hover {
-    background-color: #D32F2F;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 10px rgba(0,0,0,0.2);
-}
-
-.buttonDiv {
-    padding-bottom: 23px;
-    padding-right: 70px;
-}
-
+/* Profil információk (Profile Information) */
 .middleDiv {
     padding: 20px 30px;
     background-color: #a8dadc5e;
@@ -138,14 +114,22 @@
     -webkit-box-shadow: 4px 4px 4px 0px rgba(0,0,0,0.25);
     -moz-box-shadow: 4px 4px 4px 0px rgba(0,0,0,0.25);
 }
+
 .profileImg:hover {
     transform: translateY(-2px);
     box-shadow: 6px 6px 6px 0px rgba(0,0,0,0.25);
     -webkit-box-shadow: 6px 6px 6px 0px rgba(0,0,0,0.25);
     -moz-box-shadow: 6px 6px 6px 0px rgba(0,0,0,0.25);
 }
+
 .col-6 {
     padding-top: 50px;
+}
+
+/* Szerkesztési űrlapok és gombok (Edit Forms and Buttons) */
+.informations {
+    align-items: flex-end;
+    padding-left: 30px;
 }
 
 .custom-input.invalid {
@@ -223,6 +207,31 @@ input:focus {
     box-shadow: 0 5px 10px rgba(0,0,0,0.2);
 }
 
+/* Kijelentkezés gomb (Sign Out Button) */
+.signOutButton {
+    float: right;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+    border: 2px solid rgb(170, 0, 0);
+    border-radius: 10px;
+    background-color: #E63946;
+    font-weight: 600;
+    color: #F1FAEE;
+    padding: 6px 20px;
+    transition: all 0.3s ease;
+}
+
+.signOutButton:hover {
+    background-color: #D32F2F;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+}
+
+.buttonDiv {
+    padding-bottom: 23px;
+    padding-right: 70px;
+}
+
+/* Egyéb stílusok (General Styles) */
 p {
     font-weight: 500;
 }

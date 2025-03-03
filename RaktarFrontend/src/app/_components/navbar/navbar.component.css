@@ -1,3 +1,4 @@
+/* Külső konténer (Sidebar Container) */
 .sidebar-container {
   position: fixed;
   top: 0;
@@ -13,6 +14,7 @@
   opacity: 1;
 }
 
+/* Oldalsáv (Sidebar) */
 .sidebar-container .sidebar {
   width: 100px;
   height: 100vh;
@@ -36,6 +38,7 @@
   align-items: flex-start;
 }
 
+/* Fő menü (Menu Main) */
 .menuMain {
   display: flex;
   align-items: center;
@@ -46,11 +49,6 @@
   color: inherit;
 }
 
-.navbarIcons {
-  padding-left: 8px;
-  color: white;
-}
-
 .navbarCompanyLogo {
   width: 35px;
   height: 35px;
@@ -58,18 +56,6 @@
   margin-left: 15px;
   margin-top: 15px;
   margin-bottom: 0px;
-}
-
-.menu-items p {
-  margin-left: 17px;
-  color: white;
-  padding-bottom: 0px;
-  margin-top: 10px;
-  margin-bottom: 0px;
-  font-size: 14px;
-  font-weight: lighter;
-  text-transform: uppercase;
-  user-select: none;
 }
 
 .navbarLogoText {
@@ -88,6 +74,7 @@
   opacity: 1;
 }
 
+/* Menü elemek (Menu Items) */
 .menu-items {
   width: 100%;
   padding: 0 15px;
@@ -111,6 +98,23 @@
   cursor: pointer;
 }
 
+.navbarIcons {
+  padding-left: 8px;
+  color: white;
+}
+
+.menu-items p {
+  margin-left: 17px;
+  color: white;
+  padding-bottom: 0px;
+  margin-top: 10px;
+  margin-bottom: 0px;
+  font-size: 14px;
+  font-weight: lighter;
+  text-transform: uppercase;
+  user-select: none;
+}
+
 .bi {
   font-size: 1.8rem;
   min-width: 35px;
@@ -129,6 +133,7 @@
   opacity: 1;
 }
 
+/* Elválasztó */
 .navbarSeparatorLine {
   border: 0;
   height: 2px;
@@ -137,6 +142,7 @@
   width: 100%;
 }
 
+/* Fő tartalom (Main Content) */
 .main-content {
   margin-left: 100px;
   transition: margin-left 0.3s ease;
@@ -147,10 +153,7 @@
   margin-left: 250px;
 }
 
-app-navbar {
-  width: auto;
-}
-
+/* Hamburger menü (Hamburger Menu) */
 .hamburger {
   background-color: #F1FAEE;
   border: none;
@@ -161,6 +164,7 @@ app-navbar {
   display: inline-block;
 }
 
+/* Reszponzív média lekérdezések */
 @media (max-width: 768px) {
   .sidebar-container .sidebar {
     width: 0;
@@ -177,4 +181,9 @@ app-navbar {
   .sidebar-container.expanded ~ .main-content {
     margin-left: 250px;
   }
+}
+
+/* Egyéb komponens stílusok (Component Specific) */
+app-navbar {
+  width: auto;
 }

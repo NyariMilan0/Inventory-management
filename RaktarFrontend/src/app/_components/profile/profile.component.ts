@@ -1,3 +1,4 @@
+/* Importok és komponens definíció */
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -32,6 +33,8 @@ interface ErrorResponse {
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css']
 })
+
+/* Osztály és változók */
 export class ProfileComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();
   private userId: number;
@@ -42,6 +45,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   profilePictureUrl: string = '';
   showModal: boolean = false;
 
+  /* Konstruktor */
   constructor(
     private http: HttpClient,
     private authService: AuthService,
@@ -63,6 +67,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     });
   }
 
+  /* Inicializálás (ngOnInit) */
   ngOnInit(): void {
     this.subscription = this.modalService.showProfileModal$.subscribe(show => {
       this.showModal = show;
@@ -75,11 +80,13 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.updateUserInfo();
   }
 
+  /* Megsemmisítés (ngOnDestroy) */
   ngOnDestroy(): void {
     this.modalService.closeProfileModal();
     this.subscription.unsubscribe();
   }
 
+  /* Validátorok (Validators) */
   passwordComplexityValidator(): ValidatorFn {
     return (control: AbstractControl): { [key: string]: any } | null => {
       const value = control.value || '';
@@ -96,6 +103,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     return newPassword === newPasswordAgain ? null : { mismatch: true };
   }
 
+  /* Modál kezelés (Modal Handling) */
   openModal(): void {
     const modalElement = document.getElementById('profileModal');
     if (modalElement) {
@@ -120,6 +128,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     }
   }
 
+  /* Profil műveletek (Profile Actions) */
   updatePassword(): void {
     if (this.passwordForm.invalid) {
       this.passwordForm.markAllAsTouched();
@@ -198,6 +207,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.router.navigate(['/login']);
   }
 
+  /* Segéd függvények (Helper Functions) */
   private updateUserInfo(): void {
     (document.getElementById('userName') as HTMLElement).textContent = localStorage.getItem('userName') || 'Unknown';
     (document.getElementById('email') as HTMLElement).textContent = localStorage.getItem('email') || 'Unknown';

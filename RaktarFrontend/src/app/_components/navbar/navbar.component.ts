@@ -1,9 +1,9 @@
+/* Importok és komponens definíció */
 import { Component, HostListener } from '@angular/core';
 import { RouterModule, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../_services/auth.service';
 import { ModalService } from '../../_services/modal.service';
-
 
 @Component({
   selector: 'app-navbar',
@@ -12,17 +12,27 @@ import { ModalService } from '../../_services/modal.service';
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })
+
+/* Osztály és változók */
 export class NavbarComponent {
   isExpanded = false;
   isVisible = true;
   isMobile = window.innerWidth <= 768;
 
+  /* Menü elemek (Menu Items) */
+  menuItems = [
+    { path: '/storage', icon: 'DiagramIcon.svg', text: 'Storage' },
+    { path: '/pallet-management', icon: 'PalletIcon.svg', text: 'Pallet Management' },
+  ];
+
+  /* Konstruktor */
   constructor(
     private authService: AuthService,
     private router: Router,
     private modalService: ModalService
   ) {}
 
+  /* Eseménykezelők (Event Handlers) */
   @HostListener('window:resize', ['$event'])
   onResize(event: Event) {
     this.isMobile = window.innerWidth <= 768;
@@ -43,20 +53,17 @@ export class NavbarComponent {
     }
   }
 
+  /* Navigáció és menüvezérlés (Navigation and Menu Control) */
   toggleMenu() {
     if (this.isMobile) {
       this.isExpanded = !this.isExpanded;
     }
   }
 
-  menuItems = [
-    { path: '/storage', icon: 'DiagramIcon.svg', text: 'Storage' },
-    { path: '/pallet-management', icon: 'PalletIcon.svg', text: 'Pallet Management' },
-  ];
-
   openProfileModal(): void {
     this.modalService.openProfileModal();
   }
+
   openAdminModal(): void {
     this.modalService.openAdminModal();
   }

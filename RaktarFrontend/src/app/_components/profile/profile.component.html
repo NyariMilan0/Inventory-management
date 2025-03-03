@@ -1,7 +1,10 @@
+<!-- Külső konténer (Modal Container) -->
 <div class="roboto-condensed">
   <div class="modal fade" id="profileModal" [class.show]="showModal" [style.display]="showModal ? 'block' : 'none'">
     <div class="modal-dialog modal-dialog-centered modal-lg custom-modal-dialog">
       <div class="modal-content shadow custom-modal-content">
+
+<!-- Felugró ablak fejléce (Modal Header) -->
         <div class="popup-header">
           <div class="row">
             <div class="col-10">
@@ -12,8 +15,12 @@
             </div>
           </div>
         </div>
+
+<!-- Felugró ablak tartalma (Modal Body) -->
         <div class="modal-body custom-modal-body">
           <div class="belsobox">
+
+<!-- Profil információk (Profile Information) -->
             <div class="d-flex align-items-start mb-4">
               <div class="col-6" style="padding:1px 0px 0px 10px;">
                 <div class="middleDiv">
@@ -29,7 +36,11 @@
                   (error)="profilePictureUrl = 'https://www.w3schools.com/howto/img_avatar.png'">
               </div>
             </div>
+
+<!-- Szerkesztési űrlapok és gombok (Edit Forms and Buttons) -->
             <div class="informations row">
+
+<!-- Jelszó űrlap (Password Form) -->
               <div class="col-4">
                 <form [formGroup]="passwordForm">
                   @if (message) {
@@ -81,6 +92,8 @@
                   </div>
                 </form>
               </div>
+
+<!-- Felhasználónév űrlap (Username Form) -->
               <div class="col-4">
                 <form [formGroup]="usernameForm">
                   <div class="mb-3">
@@ -96,6 +109,8 @@
                   </div>
                 </form>
               </div>
+
+<!-- Kijelentkezés gomb (Sign Out Button) -->
               <div class="buttonDiv col-4">
                 <button class="btn btn-danger signOutButton" type="button" (click)="signOut()">Sign out</button>
               </div>

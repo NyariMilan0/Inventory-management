@@ -1,8 +1,11 @@
+<!-- Külső konténer (Modal Container) -->
 <div class="roboto-condensed">
   <div class="modal fade" id="adminPanelModal" [class.show]="showModal" [style.display]="showModal ? 'block' : 'none'"
     [attr.inert]="!showModal ? '' : null" tabindex="-1" aria-labelledby="adminPanelModalLabel">
     <div class="modal-dialog modal-dialog-centered modal-lg custom-modal-dialog">
       <div class="modal-content shadow custom-modal-content">
+
+<!-- Felugró ablak fejléce (Modal Header) -->
         <div class="popup-header">
           <div class="row">
             <div class="col-10">
@@ -13,8 +16,12 @@
             </div>
           </div>
         </div>
+
+<!-- Felugró ablak tartalma (Modal Body) -->
         <div class="modal-body custom-modal-body">
           <div class="belsobox">
+
+<!-- Navigációs fülek (Navigation Tabs) -->
             <ul class="nav nav-tabs" role="tablist">
               <li class="nav-item">
                 <a class="nav-link" [class.active]="activeTab === 'registerUser'" (click)="setActiveTab('registerUser')"
@@ -46,7 +53,10 @@
               </li>
             </ul>
 
+<!-- Tab tartalmak (Tab Content) -->
             <div class="tab-content mt-3">
+              
+<!-- Felhasználó regisztráció tab (Register User Tab) -->
               <div class="tab-pane" [class.active]="activeTab === 'registerUser'" id="registerUser">
                 <div class="register-section">
                   <div class="text-center">
@@ -109,6 +119,7 @@
                 </div>
               </div>
 
+<!-- Admin regisztráció tab (Register Admin Tab) -->
               <div class="tab-pane" [class.active]="activeTab === 'registerAdmin'" id="registerAdmin">
                 <div class="register-section">
                   <div class="text-center">
@@ -171,6 +182,7 @@
                 </div>
               </div>
 
+<!-- Tétel hozzáadása tab (Add Items Tab) -->
               <div class="tab-pane" [class.active]="activeTab === 'addItems'" id="addItems">
                 <div class="register-section">
                   <div class="text-center">
@@ -264,6 +276,7 @@
                 </div>
               </div>
 
+<!-- Tároló hozzáadása tab (Add Storage Tab) -->
               <div class="tab-pane" [class.active]="activeTab === 'addStorage'" id="addStorage">
                 <div class="register-section">
                   <div class="text-center">
@@ -298,6 +311,7 @@
                 </div>
               </div>
 
+<!-- Polc hozzáadása tab (Add Shelf Tab) -->
               <div class="tab-pane" [class.active]="activeTab === 'addShelf'" id="addShelf">
                 <div class="register-section">
                   <div class="text-center">
@@ -346,6 +360,7 @@
                 </div>
               </div>
 
+<!-- Polc törlése tab (Delete Shelf Tab) -->
               <div class="tab-pane" [class.active]="activeTab === 'deleteShelf'" id="deleteShelf">
                 <div class="register-section">
                   <div class="text-center">
@@ -406,6 +421,7 @@
                 </div>
               </div>
 
+<!-- Tároló törlése tab (Delete Storage Tab) -->
               <div class="tab-pane" [class.active]="activeTab === 'deleteStorage'" id="deleteStorage">
                 <div class="register-section">
                   <div class="text-center">
@@ -457,3 +473,4 @@
       </div>
     </div>
   </div>
+</div>

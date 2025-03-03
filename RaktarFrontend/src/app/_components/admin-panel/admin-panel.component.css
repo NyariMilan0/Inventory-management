@@ -1,3 +1,4 @@
+/* Külső konténer (Modal Container) */
 .custom-modal-dialog {
     max-width: 900px;
 }
@@ -11,6 +12,7 @@
     background-color: #A8DADC;
 }
 
+/* Felugró ablak tartalma (Modal Body) */
 .belsobox {
     background-color: #F1FAEE;
     border-radius: 15px;
@@ -18,6 +20,7 @@
     padding: 10px;
 }
 
+/* Felugró ablak fejléce (Modal Header) */
 .popup-header {
     color: #1D3557;
     background-color: #A8DADC;
@@ -54,6 +57,7 @@
     box-shadow: 0 5px 10px rgba(0,0,0,0.2);
 }
 
+/* Navigációs fülek (Navigation Tabs) */
 .nav-tabs {
     border-bottom: 2px solid #457B9D;
     margin-bottom: 20px;
@@ -81,10 +85,12 @@
     font-weight: 600;
 }
 
+/* Tab tartalom (Tab Content) */
 .tab-content {
     padding: 20px;
 }
 
+/* Regisztrációs szekció (Registration Section) */
 .register-section {
     background: #FFFFFF;
     border-radius: 12px;
@@ -97,6 +103,7 @@
     transform: translateY(-3px);
 }
 
+/* Szövegek és címek (Text and Titles) */
 h3 {
     color: #457B9D;
     font-weight: 600;
@@ -104,6 +111,7 @@ h3 {
     letter-spacing: 0.5px;
 }
 
+/* Profil kép (Profile Image) */
 .avatar {
     width: 100px;
     height: 100px;
@@ -113,6 +121,7 @@ h3 {
     border: 3px solid #457B9D;
 }
 
+/* Űrlap elemek (Form Elements) */
 .form-label {
     color: #457B9D;
     font-weight: 500;
@@ -149,6 +158,7 @@ h3 {
     font-weight: 400;
 }
 
+/* Üzenetek (Messages) */
 .success-message {
     color: #457B9D;
     font-size: 14px;
@@ -173,6 +183,7 @@ h3 {
     margin-right: 8px;
 }
 
+/* Gombok (Buttons) */
 .btn-success {
     background: #A8DADC;
     border: none;
@@ -223,6 +234,7 @@ h3 {
     cursor: not-allowed;
 }
 
+/* Lista elemek (List Items) */
 .shelf-list, .storage-list {
     margin-top: 20px;
 }

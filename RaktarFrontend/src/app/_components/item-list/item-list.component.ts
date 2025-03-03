@@ -1,3 +1,4 @@
+/* Importok és komponens definíció */
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
@@ -6,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { AdminPanelComponent } from '../admin-panel/admin-panel.component';
 import { ProfileComponent } from '../profile/profile.component';
 
+/* Interfész definíció (Interface Definition) */
 export interface Item {
   id: number;
   sku: string;
@@ -26,6 +28,8 @@ export interface Item {
   templateUrl: './item-list.component.html',
   styleUrls: ['./item-list.component.css']
 })
+
+/* Osztály és változók */
 export class ItemListComponent implements OnInit {
   originalItems: Item[] = [];
   items: Item[] = [];
@@ -37,8 +41,10 @@ export class ItemListComponent implements OnInit {
 
   @ViewChild('itemModal', { static: false }) modalElement!: ElementRef;
 
+  /* Konstruktor */
   constructor(private http: HttpClient) {}
 
+  /* Inicializálás (ngOnInit) */
   ngOnInit(): void {
     this.http.get<{ items: any[] }>('http://127.0.0.1:8080/raktarproject-1.0-SNAPSHOT/webresources/items/getItemList')
       .subscribe({
@@ -64,6 +70,7 @@ export class ItemListComponent implements OnInit {
       });
   }
 
+  /* Modál kezelés (Modal Handling) */
   openModal(item: Item): void {
     this.selectedItem = item;
     if (this.modalElement) {
@@ -74,6 +81,7 @@ export class ItemListComponent implements OnInit {
     }
   }
 
+  /* Szűrő és rendezési függvények (Filter and Sort Functions) */
   toggleCategory(category: string): void {
     const index = this.selectedCategories.indexOf(category);
     if (index === -1) {

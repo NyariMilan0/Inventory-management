@@ -1,3 +1,4 @@
+/* Importok és komponens definíció */
 import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -14,6 +15,8 @@ import { Router, NavigationEnd } from '@angular/router';
   templateUrl: './admin-panel.component.html',
   styleUrls: ['./admin-panel.component.css']
 })
+
+/* Osztály és változók */
 export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
   userForm: FormGroup;
   adminForm: FormGroup;
@@ -43,6 +46,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
   private subscription: Subscription = new Subscription();
   private wasClosedByEsc: boolean = false;
 
+  /* Konstruktor */
   constructor(
     private fb: FormBuilder,
     private modalService: ModalService,
@@ -99,6 +103,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
+  /* Inicializálás (ngOnInit) */
   ngOnInit(): void {
     this.subscription.add(
       this.modalService.showAdminModal$.subscribe(show => {
@@ -122,6 +127,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     );
   }
 
+  /* Nézet inicializálása (ngAfterViewInit) */
   ngAfterViewInit(): void {
     const modalElement = document.getElementById('adminPanelModal');
     if (modalElement) {
@@ -143,11 +149,13 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+  /* Megsemmisítés (ngOnDestroy) */
   ngOnDestroy(): void {
     this.modalService.closeAdminModal();
     this.subscription.unsubscribe();
   }
 
+  /* Tab vezérlés (Tab Control) */
   setActiveTab(tab: string): void {
     this.activeTab = tab;
     if (this.showModal) {
@@ -155,6 +163,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+  /* Modál kezelés (Modal Handling) */
   openModal(): void {
     const modalElement = document.getElementById('adminPanelModal');
     if (modalElement && this.showModal) {
@@ -182,6 +191,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+  /* Validátorok (Validators) */
   passwordComplexityValidator(): ValidatorFn {
     return (control: AbstractControl): { [key: string]: any } | null => {
       const value = control.value || '';
@@ -194,6 +204,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     };
   }
 
+  /* Hibakezelés (Error Handling) */
   getErrorMessage(control: AbstractControl | null, fieldName: string): string {
     if (!control || !control.errors || !control.touched) return '';
     const errors = control.errors;
@@ -205,6 +216,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     return `Invalid ${fieldName.toLowerCase()}. Please check and try again!`;
   }
 
+  /* Adatok betöltése (Data Loading) */
   fetchStorages(): void {
     this.adminPanelService.getAllStorages().subscribe({
       next: (response) => this.handleFetchResponse(response, 'storages'),
@@ -229,6 +241,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
+  /* Eseménykezelők (Event Handlers) */
   onStorageChange(event: Event): void {
     const storageId = Number((event.target as HTMLSelectElement).value);
     if (storageId) {
@@ -238,6 +251,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+  /* Űrlap műveletek (Form Actions) */
   onUserSubmit(): void {
     if (this.userForm.invalid) {
       this.userForm.markAllAsTouched();
@@ -371,6 +385,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
+  /* Segéd függvények (Helper Functions) */
   private handleResponse(response: ApiResponse, type: string): void {
     switch (type) {
       case 'user':

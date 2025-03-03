@@ -1,3 +1,4 @@
+/* Importok és komponens definíció */
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -10,6 +11,8 @@ import { AuthService } from '../../_services/auth.service';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
+
+/* Osztály és változók */
 export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   message: string = '';
@@ -17,6 +20,7 @@ export class LoginComponent implements OnInit {
   isLoading: boolean = false;
   showPassword: boolean = false;
 
+  /* Konstruktor */
   constructor(
     private fb: FormBuilder,
     private auth: AuthService,
@@ -29,6 +33,7 @@ export class LoginComponent implements OnInit {
     });
   }
 
+  /* Inicializálás (ngOnInit) */
   ngOnInit(): void {
     const savedUsername = localStorage.getItem('rememberedUsername');
     if (savedUsername) {
@@ -39,6 +44,7 @@ export class LoginComponent implements OnInit {
     }
   }
 
+  /* Űrlap beküldése (onSubmit) */
   onSubmit(): void {
     if (this.loginForm.valid) {
       this.isLoading = true;
@@ -75,6 +81,7 @@ export class LoginComponent implements OnInit {
     }
   }
 
+  /* Jelszó láthatóság váltása (togglePassword) */
   togglePassword(): void {
     this.showPassword = !this.showPassword;
   }

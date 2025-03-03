@@ -1,12 +1,22 @@
+<!-- Navigációs komponens (Navigation Component) -->
 <app-navbar></app-navbar>
+
+<!-- Fő tartalom (Main Content) -->
 <div class="main-content roboto-condensed">
+  <!-- Admin és profil komponensek (Admin and Profile Components) -->
   <app-admin-panel></app-admin-panel>
   <app-profile></app-profile>
+
+<!-- Konténer (Container) -->
   <div class="container-fluid p-4" style="background-color: #F1FAEE;">
     <div class="row justify-content-center">
       <div class="col-12 col-md-10 col-lg-8">
+
+<!-- Szűrő és rendezési sáv (Filter and Sort Bar) -->
         <div class="d-flex justify-content-between align-items-center mb-3">
           <div class="d-flex align-items-center gap-2">
+
+<!-- Kategória legördülő menü (Category Dropdown) -->
             <div class="dropdown">
               <button class="btn dropdown-toggle open-button" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                 Open
@@ -30,15 +40,18 @@
                 </div>
               </div>
             </div>
+<!-- Súly szerinti rendezés gomb (Sort by Weight Button) -->
             <button class="btn weight-button" (click)="sortByWeight()">
               <i class="fa-solid fa-weight-hanging"></i><span class="weight-text">Weight</span>
               <i class="fas fa-arrow-down arrow-icon" [ngClass]="{'rotate-up': isWeightAscending}"></i>
             </button>
+<!-- Név szerinti rendezés gomb (Sort by Name Button) -->
             <button class="btn abc-button" (click)="sortByName()">
               <span class="abc-icon"><i class="fas" [ngClass]="{'fa-sort-alpha-down': !isNameAscending, 'fa-sort-alpha-up': isNameAscending}"></i></span>
               <span class="abc-text">ABC</span>
             </button>
           </div>
+<!-- Keresőmező (Search Field) -->
           <div class="d-flex gap-2">
             <div class="input-group">
               <span class="input-group-text"><i class="fas fa-search"></i></span>
@@ -46,7 +59,11 @@
             </div>
           </div>
         </div>
+
+<!-- Cím (Title) -->
         <h2 class="text-center mb-4">Item List</h2>
+
+<!-- Tétellista (Item List) -->
         <div class="row row-cols-1 row-cols-md-2 row-cols-xl-2 row-cols-xxl-3 g-4">
           <div class="col" *ngFor="let item of items">
             <div class="card shadow-sm h-100 larger-card">
@@ -70,6 +87,8 @@
         </div>
       </div>
     </div>
+
+<!-- Modál ablak (Modal Window) -->
     <div #itemModal class="modal fade" id="itemModal" tabindex="-1" aria-labelledby="itemModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">

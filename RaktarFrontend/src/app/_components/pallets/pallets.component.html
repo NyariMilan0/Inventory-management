@@ -1,13 +1,19 @@
+<!-- Külső konténer (Container) -->
 <div class="container-fluid p-0">
+  <!-- Navigációs komponensek (Navigation Components) -->
   <app-navbar></app-navbar>
   <app-profile></app-profile>
   <app-admin-panel></app-admin-panel>
+
+  <!-- Fő tartalom (Main Content) -->
   <div class="main-content pt-5">
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-12 col-md-10 col-lg-8">
           <div class="card shadow-sm mt-4 enhanced-card">
             <div class="card-body p-4">
+
+<!-- Navigációs fülek (Navigation Tabs) -->
               <ul class="nav nav-tabs mb-4 custom-nav-tabs" role="tablist">
                 <li class="nav-item">
                   <a class="nav-link" [class.active]="activeTab === 'addRemove'" 
@@ -23,10 +29,14 @@
                 </li>
               </ul>
 
+<!-- Tab tartalmak (Tab Content) -->
               <div class="tab-content">
+
+<!-- Hozzáadás/Eltávolítás tab (Add/Remove Tab) -->
                 <div class="tab-pane fade" [class.show]="activeTab === 'addRemove'" 
                      [class.active]="activeTab === 'addRemove'" id="addRemove">
 
+<!-- Raklap hozzáadása űrlap (Add Pallet Form) -->
                   <div class="text-center mb-4">
                     <h3 class="section-title">Add Pallet to Shelf</h3>
                   </div>
@@ -94,6 +104,7 @@
                             [disabled]="addPalletForm.invalid">Add Pallet</button>
                   </form>
 
+<!-- Raklap eltávolítása űrlap (Remove Pallet Form) -->
                   <div class="text-center mt-5 mb-4">
                     <h3 class="section-title">Remove Pallet from Shelf</h3>
                   </div>
@@ -147,8 +158,11 @@
                   </form>
                 </div>
 
+<!-- Mozgatás tab (Move Tab) -->
                 <div class="tab-pane fade" [class.show]="activeTab === 'move'" 
                      [class.active]="activeTab === 'move'" id="move">
+
+<!-- Raklap mozgatása űrlap (Move Pallet Form) -->
                   <div class="text-center mb-4">
                     <h3 class="section-title">Move Pallet to Another Shelf</h3>
                   </div>
@@ -244,3 +258,4 @@
       </div>
     </div>
   </div>
+</div>

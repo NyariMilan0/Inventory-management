@@ -1,3 +1,4 @@
+/* Importok és komponens definíció */
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -15,6 +16,8 @@ import { ProfileComponent } from '../profile/profile.component';
   templateUrl: './pallets.component.html',
   styleUrls: ['./pallets.component.css']
 })
+
+/* Osztály és változók */
 export class PalletsComponent implements OnInit {
   activeTab: string = 'addRemove';
   addPalletForm: FormGroup;
@@ -36,6 +39,7 @@ export class PalletsComponent implements OnInit {
   pallets: PalletWithShelf[] = [];
   storages: Storage[] = [];
 
+  /* Konstruktor */
   constructor(private fb: FormBuilder, private palletsService: PalletsService) {
     const userId = Number(localStorage.getItem('userId')) || 0;
 
@@ -59,10 +63,12 @@ export class PalletsComponent implements OnInit {
     });
   }
 
+  /* Inicializálás (ngOnInit) */
   ngOnInit(): void {
     this.loadInitialData();
   }
 
+  /* Adatok betöltése (Data Loading) */
   loadInitialData(): void {
     this.palletsService.getAllItems().subscribe({
       next: (response: ApiResponse) => {
@@ -118,10 +124,12 @@ export class PalletsComponent implements OnInit {
     });
   }
 
+  /* Tab vezérlés (Tab Control) */
   setActiveTab(tab: string): void {
     this.activeTab = tab;
   }
 
+  /* Szűrő függvények (Filter Functions) */
   filterItems(event: Event): void {
     const searchTerm = (event.target as HTMLInputElement).value.toLowerCase();
     this.filteredItems = this.items.filter((item: Item) =>
@@ -154,6 +162,7 @@ export class PalletsComponent implements OnInit {
     }
   }
 
+  /* Űrlap műveletek (Form Actions) */
   onAddPalletSubmit(): void {
     this.addPalletMessage = '';
     this.addPalletMessageClass = '';
@@ -203,6 +212,41 @@ export class PalletsComponent implements OnInit {
     });
   }
 
+  onMovePalletSubmit(): void {
+    this.movePalletMessage = '';
+    this.movePalletMessageClass = '';
+    if (this.movePalletForm.invalid) {
+      this.movePalletForm.markAllAsTouched();
+      return;
+    }
+    const { palletId, targetShelfId, userId } = this.movePalletForm.value;
+    const fromShelfId = this.pallets.find(p => p.palletId === Number(palletId))?.shelfId;
+    if (!fromShelfId) {
+      this.movePalletMessage = 'Current shelf not found for this pallet.';
+      this.movePalletMessageClass = 'error-message';
+      console.error('Pallet not found in pallets array:', palletId, this.pallets);
+      return;
+    }
+    this.palletsService.movePallet(palletId, fromShelfId, targetShelfId, userId).subscribe({
+      next: (response: ApiResponse) => {
+        this.movePalletMessage = response.message;
+        this.movePalletMessageClass = response.statusCode === 200 ? 'success-message' : 'error-message';
+        if (response.statusCode === 200) {
+          this.movePalletForm.reset();
+          const newUserId = Number(localStorage.getItem('userId')) || 0;
+          this.movePalletForm.patchValue({ userId: newUserId });
+          this.refreshShelvesAndPallets();
+        }
+      },
+      error: (err) => {
+        this.movePalletMessage = 'Error moving pallet';
+        this.movePalletMessageClass = 'error-message';
+        console.error('Move pallet error:', err);
+      }
+    });
+  }
+
+  /* Eseménykezelők (Event Handlers) */
   onShelfChange(event: Event): void {
     const shelfId = Number((event.target as HTMLInputElement).value);
     if (shelfId) {
@@ -252,40 +296,7 @@ export class PalletsComponent implements OnInit {
     }
   }
 
-  onMovePalletSubmit(): void {
-    this.movePalletMessage = '';
-    this.movePalletMessageClass = '';
-    if (this.movePalletForm.invalid) {
-      this.movePalletForm.markAllAsTouched();
-      return;
-    }
-    const { palletId, targetShelfId, userId } = this.movePalletForm.value;
-    const fromShelfId = this.pallets.find(p => p.palletId === Number(palletId))?.shelfId;
-    if (!fromShelfId) {
-      this.movePalletMessage = 'Current shelf not found for this pallet.';
-      this.movePalletMessageClass = 'error-message';
-      console.error('Pallet not found in pallets array:', palletId, this.pallets);
-      return;
-    }
-    this.palletsService.movePallet(palletId, fromShelfId, targetShelfId, userId).subscribe({
-      next: (response: ApiResponse) => {
-        this.movePalletMessage = response.message;
-        this.movePalletMessageClass = response.statusCode === 200 ? 'success-message' : 'error-message';
-        if (response.statusCode === 200) {
-          this.movePalletForm.reset();
-          const newUserId = Number(localStorage.getItem('userId')) || 0;
-          this.movePalletForm.patchValue({ userId: newUserId });
-          this.refreshShelvesAndPallets();
-        }
-      },
-      error: (err) => {
-        this.movePalletMessage = 'Error moving pallet';
-        this.movePalletMessageClass = 'error-message';
-        console.error('Move pallet error:', err);
-      }
-    });
-  }
-
+  /* Segéd függvények (Helper Functions) */
   refreshShelvesAndPallets(): void {
     this.palletsService.getAllShelfs().subscribe({
       next: (res: ApiResponse) => {
