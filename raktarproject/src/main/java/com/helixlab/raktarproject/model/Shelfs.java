@@ -354,19 +354,49 @@ public class Shelfs implements Serializable {
 
         return resultList;
     }
-    
-    public static ArrayList<Shelfs> getAllShelfs(){
+
+    public static ArrayList<Shelfs> getAllShelfs() {
         EntityManager em = emf.createEntityManager();
         ArrayList<Shelfs> shelfList = new ArrayList<>();
-        
+
         try {
             StoredProcedureQuery spq = em.createStoredProcedureQuery("getAllShelfs", Shelfs.class);
             spq.execute();
             shelfList = new ArrayList<>(spq.getResultList());
-            
-            
+
         } catch (Exception e) {
             System.err.println("Error: " + e.getLocalizedMessage());
+        } finally {
+            em.clear();
+            em.close();
+        }
+
+        return shelfList;
+    }
+
+    public ArrayList<Shelfs> getShelfsByStorageId(Integer storageId) {
+        EntityManager em = emf.createEntityManager();
+        ArrayList<Shelfs> shelfList = new ArrayList<>();
+
+        try {
+            StoredProcedureQuery spq = em.createStoredProcedureQuery("getShelfsByStorageId");
+            spq.registerStoredProcedureParameter("storageId", Integer.class, ParameterMode.IN);
+            spq.setParameter("storageId", storageId);
+            spq.execute();
+
+            List<Object[]> results = spq.getResultList();
+            for (Object[] row : results) {
+                Shelfs shelf = new Shelfs();
+                shelf.setId((Integer) row[0]);
+                shelf.setName((String) row[1]);
+                shelf.setLocationInStorage((String) row[2]);
+                shelf.setMaxCapacity((Integer) row[3]);
+                shelf.setIsFull((Boolean) row[4]);
+                shelfList.add(shelf);
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error fetching shelves by storage ID: " + e.getLocalizedMessage());
         } finally {
             em.clear();
             em.close();

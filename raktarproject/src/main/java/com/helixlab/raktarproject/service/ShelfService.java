@@ -52,7 +52,7 @@ public class ShelfService {
             throw new RuntimeException("Service layer error: " + e.getMessage(), e);
         }
     }
-    
+
     public List<PalletShelfDTO> getPalletsWithShelfs() {
         List<PalletShelfDTO> result = null;
 
@@ -68,8 +68,8 @@ public class ShelfService {
 
         return result;
     }
-    
-    public ArrayList<Shelfs> getAllShelfs(){
+
+    public ArrayList<Shelfs> getAllShelfs() {
         ArrayList<Shelfs> shelfList = new ArrayList<>();
         try {
             shelfList = layer.getAllShelfs();
@@ -77,6 +77,16 @@ public class ShelfService {
             System.err.println("Error fetching shelfs: " + e.getMessage());
         }
 
+        return shelfList;
+    }
+
+    public ArrayList<Shelfs> getShelfsByStorageId(Integer storageId) {
+        ArrayList<Shelfs> shelfList = new ArrayList<>();
+        try {
+            shelfList = layer.getShelfsByStorageId(storageId);
+        } catch (Exception e) {
+            System.err.println("Error fetching shelves by storage ID: " + e.getMessage());
+        }
         return shelfList;
     }
 

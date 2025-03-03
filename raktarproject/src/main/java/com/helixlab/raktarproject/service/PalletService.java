@@ -2,6 +2,8 @@ package com.helixlab.raktarproject.service;
 
 import com.helixlab.raktarproject.model.Items;
 import com.helixlab.raktarproject.model.Pallets;
+import com.helixlab.raktarproject.model.Shelfs;
+import com.helixlab.raktarproject.model.Users;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -50,6 +52,55 @@ public class PalletService {
 
             // Ha a validáció sikeres, hívjuk meg a model metódust
             Pallets.addPalletToShelf(skuCode, shelfId, height);
+        } catch (Exception e) {
+            throw new RuntimeException("Service layer error: " + e.getMessage(), e);
+        }
+    }
+    
+    public void movePalletBetweenShelfs(Integer palletId, Integer fromShelfId, Integer toShelfId, Integer userId) {
+        try {
+            // Validáció: Ellenőrizzük, hogy a pallet létezik-e
+            Pallets pallet = getPalletsById(palletId);
+            if (pallet == null) {
+                throw new IllegalArgumentException("Pallet with id " + palletId + " does not exist");
+            }
+
+            // Validáció: Ellenőrizzük, hogy a fromShelf és toShelf létezik-e
+            EntityManagerFactory emf = Persistence.createEntityManagerFactory("com.helixLab_raktarproject_war_1.0-SNAPSHOTPU");
+            EntityManager em = emf.createEntityManager();
+
+            try {
+                Query fromQuery = em.createQuery("SELECT s FROM Shelfs s WHERE s.id = :shelfId");
+                fromQuery.setParameter("shelfId", fromShelfId);
+                Shelfs fromShelf = (Shelfs) fromQuery.getSingleResult();
+                if (fromShelf == null) {
+                    throw new IllegalArgumentException("From shelf with id " + fromShelfId + " does not exist");
+                }
+
+                Query toQuery = em.createQuery("SELECT s FROM Shelfs s WHERE s.id = :shelfId");
+                toQuery.setParameter("shelfId", toShelfId);
+                Shelfs toShelf = (Shelfs) toQuery.getSingleResult();
+                if (toShelf == null) {
+                    throw new IllegalArgumentException("To shelf with id " + toShelfId + " does not exist");
+                }
+            } catch (javax.persistence.NoResultException e) {
+                throw new IllegalArgumentException("One of the shelves does not exist: " + e.getMessage());
+            } finally {
+                em.close();
+            }
+
+            // Validáció: Ellenőrizzük, hogy a user létezik-e
+            try {
+                Users user = new Users(userId); // Feltételezem, hogy van getShelfsById-szerű konstruktor a Users-ben
+                if (user == null) {
+                    throw new IllegalArgumentException("User with id " + userId + " does not exist");
+                }
+            } catch (Exception e) {
+                throw new IllegalArgumentException("User with id " + userId + " does not exist: " + e.getMessage());
+            }
+
+            // Ha a validációk sikeresek, hívjuk meg a model metódust
+            Pallets.movePalletBetweenShelfs(palletId, fromShelfId, toShelfId, userId);
         } catch (Exception e) {
             throw new RuntimeException("Service layer error: " + e.getMessage(), e);
         }

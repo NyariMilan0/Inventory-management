@@ -17,15 +17,13 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.json.JSONObject;
 
-
 @Path("pallet")
 public class PalletController {
-    
+
     @Context
     private UriInfo context;
     private PalletService layer = new PalletService();
-    
-    
+
     @GET
     @Produces(MediaType.APPLICATION_XML)
     public String getXml() {
@@ -38,6 +36,7 @@ public class PalletController {
     public void putXml(String content) {
 
     }
+
     @GET
     @Path("getPalletsById")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -46,17 +45,16 @@ public class PalletController {
         JSONObject palletJson = new JSONObject();
 
         palletJson.put("id", response.getId());
-        palletJson.put("email", response.getName());
-        palletJson.put("firstName", response.getCreatedAt());
-        palletJson.put("lastName", response.getHeight());
-        palletJson.put("password", response.getLength());
-        palletJson.put("isAdmin", response.getWidth());
-        
+        palletJson.put("name", response.getName());
+        palletJson.put("CreatedAt", response.getCreatedAt());
+        palletJson.put("Height", response.getHeight());
+        palletJson.put("Length", response.getLength());
+        palletJson.put("Width", response.getWidth());
 
         return Response.status(Response.Status.OK).entity(palletJson.toString()).type(MediaType.APPLICATION_JSON).build();
 
     }
-    
+
     @DELETE
     @Path("deletePalletById")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -77,8 +75,7 @@ public class PalletController {
         return Response.status(Response.Status.OK).entity(toReturn.toString()).type(MediaType.APPLICATION_JSON).build();
 
     }
-    
-    
+
     @POST
     @Path("addPalletToShelf")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -101,18 +98,18 @@ public class PalletController {
             responseObj.put("height", height);
 
             return Response.status(Response.Status.CREATED)
-                           .entity(responseObj.toString())
-                           .type(MediaType.APPLICATION_JSON)
-                           .build();
+                    .entity(responseObj.toString())
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
 
         } catch (IllegalArgumentException e) {
             // Ha a SKU nem létezik, 400 Bad Request-et adunk vissza
             responseObj.put("statusCode", 400);
             responseObj.put("message", "Invalid SKU code: " + e.getMessage());
             return Response.status(Response.Status.BAD_REQUEST)
-                           .entity(responseObj.toString())
-                           .type(MediaType.APPLICATION_JSON)
-                           .build();
+                    .entity(responseObj.toString())
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
         } catch (Exception e) {
             // Egyéb hibák esetén 500 Internal Server Error
             responseObj.put("statusCode", 500);
@@ -120,10 +117,59 @@ public class PalletController {
             responseObj.put("error", e.getMessage());
 
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                           .entity(responseObj.toString())
-                           .type(MediaType.APPLICATION_JSON)
-                           .build();
+                    .entity(responseObj.toString())
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
         }
     }
-    
+
+    @POST
+    @Path("movePalletBetweenShelfs")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response movePalletBetweenShelfs(String jsonInput) {
+        JSONObject responseObj = new JSONObject();
+
+        try {
+            JSONObject input = new JSONObject(jsonInput);
+            Integer palletId = input.getInt("palletId");
+            Integer fromShelfId = input.getInt("fromShelfId");
+            Integer toShelfId = input.getInt("toShelfId");
+            Integer userId = input.getInt("userId");
+
+            layer.movePalletBetweenShelfs(palletId, fromShelfId, toShelfId, userId);
+
+            responseObj.put("statusCode", 200); // OK
+            responseObj.put("message", "Pallet successfully moved between shelves");
+            responseObj.put("palletId", palletId);
+            responseObj.put("fromShelfId", fromShelfId);
+            responseObj.put("toShelfId", toShelfId);
+            responseObj.put("userId", userId);
+
+            return Response.status(Response.Status.OK)
+                    .entity(responseObj.toString())
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+
+        } catch (IllegalArgumentException e) {
+            // Ha a pallet, shelf, vagy user nem létezik, 400 Bad Request-et adunk vissza
+            responseObj.put("statusCode", 400);
+            responseObj.put("message", "Invalid input: " + e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(responseObj.toString())
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        } catch (Exception e) {
+            // Egyéb hibák esetén 500 Internal Server Error
+            responseObj.put("statusCode", 500);
+            responseObj.put("message", "Failed to move pallet between shelves");
+            responseObj.put("error", e.getMessage());
+
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(responseObj.toString())
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+    }
+
 }
