@@ -1,0 +1,213 @@
+<app-navbar></app-navbar>
+<app-profile></app-profile>
+<div class="main-content">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-5 mb-4">
+        <div class="register-section">
+          <div class="text-center">
+            <h3 class="mb-4">Register User</h3>
+            <img
+              src="https://www.w3schools.com/howto/img_avatar.png"
+              alt="User Avatar"
+              class="avatar mb-3"
+            >
+          </div>
+          <form [formGroup]="userForm" (ngSubmit)="onUserSubmit()">
+            @if (userMessage) {
+              <div [class]="userMessageClass">
+                <i class="fas fa-exclamation-circle"></i> {{ userMessage }}
+              </div>
+            }
+            <div class="mb-3">
+              <label for="userUsername" class="form-label">Username</label>
+              <input 
+                type="text" 
+                class="form-control custom-input" 
+                [class.invalid]="userForm.get('userName')?.invalid && userForm.get('userName')?.touched"
+                id="userUsername" 
+                formControlName="userName" 
+                placeholder="Username" 
+                required
+              >
+              @if (userForm.get('userName')?.invalid && userForm.get('userName')?.touched) {
+                <span class="error-text">Username is required</span>
+              }
+            </div>
+            <div class="mb-3">
+              <label for="userFirstName" class="form-label">First Name</label>
+              <input 
+                type="text" 
+                class="form-control custom-input" 
+                [class.invalid]="userForm.get('firstName')?.invalid && userForm.get('firstName')?.touched"
+                id="userFirstName" 
+                formControlName="firstName" 
+                placeholder="First Name" 
+                required
+              >
+              @if (userForm.get('firstName')?.invalid && userForm.get('firstName')?.touched) {
+                <span class="error-text">First Name is required</span>
+              }
+            </div>
+            <div class="mb-3">
+              <label for="userLastName" class="form-label">Last Name</label>
+              <input 
+                type="text" 
+                class="form-control custom-input" 
+                [class.invalid]="userForm.get('lastName')?.invalid && userForm.get('lastName')?.touched"
+                id="userLastName" 
+                formControlName="lastName" 
+                placeholder="Last Name" 
+                required
+              >
+              @if (userForm.get('lastName')?.invalid && userForm.get('lastName')?.touched) {
+                <span class="error-text">Last Name is required</span>
+              }
+            </div>
+            <div class="mb-3">
+              <label for="userEmail" class="form-label">Email</label>
+              <input 
+                type="email" 
+                class="form-control custom-input" 
+                [class.invalid]="userForm.get('email')?.invalid && userForm.get('email')?.touched"
+                id="userEmail" 
+                formControlName="email" 
+                placeholder="Email" 
+                required
+              >
+              @if (userForm.get('email')?.invalid && userForm.get('email')?.touched) {
+                <span class="error-text">
+                  @if (userForm.get('email')?.errors?.['required']) { Email is required }
+                  @else if (userForm.get('email')?.errors?.['email']) { Please enter a valid email address }
+                </span>
+              }
+            </div>
+            <div class="mb-3">
+              <label for="userPassword" class="form-label">Password</label>
+              <input 
+                type="password" 
+                class="form-control custom-input" 
+                [class.invalid]="userForm.get('password')?.invalid && userForm.get('password')?.touched"
+                id="userPassword" 
+                formControlName="password" 
+                placeholder="Password" 
+                required
+              >
+              @if (userForm.get('password')?.invalid && userForm.get('password')?.touched) {
+                <span class="error-text">
+                  @if (userForm.get('password')?.errors?.['required']) { Password is required }
+                  @else if (userForm.get('password')?.errors?.['minlength']) { Password must be at least 6 characters }
+                  @else if (userForm.get('password')?.errors?.['complexity']) { Password must include lowercase, uppercase, and special characters }
+                </span>
+              }
+            </div>
+            <button type="submit" class="btn btn-success w-100" [disabled]="userForm.invalid">Register</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="col-md-5 mb-4">
+        <div class="register-section">
+          <div class="text-center">
+            <h3 class="mb-4">Register Admin</h3>
+            <img
+              src="https://www.w3schools.com/howto/img_avatar.png"
+              alt="Admin Avatar"
+              class="avatar mb-3"
+            >
+          </div>
+          <form [formGroup]="adminForm" (ngSubmit)="onAdminSubmit()">
+            @if (adminMessage) {
+              <div [class]="adminMessageClass">
+                <i class="fas fa-exclamation-circle"></i> {{ adminMessage }}
+              </div>
+            }
+            <div class="mb-3">
+              <label for="adminUsername" class="form-label">Username</label>
+              <input 
+                type="text" 
+                class="form-control custom-input" 
+                [class.invalid]="adminForm.get('userName')?.invalid && adminForm.get('userName')?.touched"
+                id="adminUsername" 
+                formControlName="userName" 
+                placeholder="Username" 
+                required
+              >
+              @if (adminForm.get('userName')?.invalid && adminForm.get('userName')?.touched) {
+                <span class="error-text">Username is required</span>
+              }
+            </div>
+            <div class="mb-3">
+              <label for="adminFirstName" class="form-label">First Name</label>
+              <input 
+                type="text" 
+                class="form-control custom-input" 
+                [class.invalid]="adminForm.get('firstName')?.invalid && adminForm.get('firstName')?.touched"
+                id="adminFirstName" 
+                formControlName="firstName" 
+                placeholder="First Name" 
+                required
+              >
+              @if (adminForm.get('firstName')?.invalid && adminForm.get('firstName')?.touched) {
+                <span class="error-text">First Name is required</span>
+              }
+            </div>
+            <div class="mb-3">
+              <label for="adminLastName" class="form-label">Last Name</label>
+              <input 
+                type="text" 
+                class="form-control custom-input" 
+                [class.invalid]="adminForm.get('lastName')?.invalid && adminForm.get('lastName')?.touched"
+                id="adminLastName" 
+                formControlName="lastName" 
+                placeholder="Last Name" 
+                required
+              >
+              @if (adminForm.get('lastName')?.invalid && adminForm.get('lastName')?.touched) {
+                <span class="error-text">Last Name is required</span>
+              }
+            </div>
+            <div class="mb-3">
+              <label for="adminEmail" class="form-label">Email</label>
+              <input 
+                type="email" 
+                class="form-control custom-input" 
+                [class.invalid]="adminForm.get('email')?.invalid && adminForm.get('email')?.touched"
+                id="adminEmail" 
+                formControlName="email" 
+                placeholder="Email" 
+                required
+              >
+              @if (adminForm.get('email')?.invalid && adminForm.get('email')?.touched) {
+                <span class="error-text">
+                  @if (adminForm.get('email')?.errors?.['required']) { Email is required }
+                  @else if (adminForm.get('email')?.errors?.['email']) { Please enter a valid email address }
+                </span>
+              }
+            </div>
+            <div class="mb-3">
+              <label for="adminPassword" class="form-label">Password</label>
+              <input 
+                type="password" 
+                class="form-control custom-input" 
+                [class.invalid]="adminForm.get('password')?.invalid && adminForm.get('password')?.touched"
+                id="adminPassword" 
+                formControlName="password" 
+                placeholder="Password" 
+                required
+              >
+              @if (adminForm.get('password')?.invalid && adminForm.get('password')?.touched) {
+                <span class="error-text">
+                  @if (adminForm.get('password')?.errors?.['required']) { Password is required }
+                  @else if (adminForm.get('password')?.errors?.['minlength']) { Password must be at least 6 characters }
+                  @else if (adminForm.get('password')?.errors?.['complexity']) { Password must include lowercase, uppercase, and special characters }
+                </span>
+              }
+            </div>
+            <button type="submit" class="btn btn-success w-100" [disabled]="adminForm.invalid">Register</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
