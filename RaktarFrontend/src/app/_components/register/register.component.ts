@@ -3,12 +3,12 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, ValidatorFn, A
 import { CommonModule } from '@angular/common';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { HttpClient } from '@angular/common/http';
-import { ProfileAdminComponent } from '../profile/profile-admin.component';
+import { ProfileComponent } from '../profile/profile.component';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [NavbarComponent, CommonModule, ReactiveFormsModule, ProfileAdminComponent],
+  imports: [NavbarComponent, CommonModule, ReactiveFormsModule, ProfileComponent],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })

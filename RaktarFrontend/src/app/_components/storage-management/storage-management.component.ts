@@ -2,13 +2,13 @@ import { Component, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@ang
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { NavbarComponent } from '../navbar/navbar.component';
-import { ProfileAdminComponent } from '../profile/profile-admin.component';
+import { ProfileComponent } from '../profile/profile.component';
 import { AdminPanelComponent } from '../admin-panel/admin-panel.component';
 
 @Component({
   selector: 'app-storage-management',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, NavbarComponent, ProfileAdminComponent, AdminPanelComponent],
+  imports: [CommonModule, HttpClientModule, NavbarComponent, ProfileComponent, AdminPanelComponent],
   templateUrl: './storage-management.component.html',
   styleUrls: ['./storage-management.component.css']
 })

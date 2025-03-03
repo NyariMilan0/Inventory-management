@@ -144,11 +144,14 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
 
   openModal(): void {
     const modalElement = document.getElementById('adminPanelModal');
-    if (modalElement) {
+    if (modalElement && this.showModal) {
       const bootstrap = (window as any).bootstrap;
       if (bootstrap && bootstrap.Modal) {
-        const modal = new bootstrap.Modal(modalElement);
-        modal.show();
+        const modalInstance = bootstrap.Modal.getInstance(modalElement);
+        if (!modalInstance) {
+          const modal = new bootstrap.Modal(modalElement);
+          modal.show();
+        }
       }
     }
   }

@@ -26,13 +26,13 @@ interface ErrorResponse {
 }
 
 @Component({
-  selector: 'app-profile-admin',
+  selector: 'app-profile',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './profile-admin.component.html',
-  styleUrls: ['./profile-admin.component.css']
+  templateUrl: './profile.component.html',
+  styleUrls: ['./profile.component.css']
 })
-export class ProfileAdminComponent implements OnInit, OnDestroy {
+export class ProfileComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();
   private userId: number;
   passwordForm: FormGroup;

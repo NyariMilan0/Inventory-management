@@ -5,11 +5,13 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { PalletsService, PalletWithShelf } from '../../_services/pallets.service';
 import { Shelf, Item, ApiResponse, Storage } from '../../_services/admin-panel.service';
 import { NavbarComponent } from '../navbar/navbar.component';
+import { AdminPanelComponent } from '../admin-panel/admin-panel.component';
+import { ProfileComponent } from '../profile/profile.component';
 
 @Component({
   selector: 'app-pallets',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, NavbarComponent],
+  imports: [CommonModule, ReactiveFormsModule, NavbarComponent, AdminPanelComponent, ProfileComponent],
   templateUrl: './pallets.component.html',
   styleUrls: ['./pallets.component.css']
 })

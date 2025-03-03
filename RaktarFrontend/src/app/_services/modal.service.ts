@@ -4,6 +4,7 @@ import { BehaviorSubject } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
+
 export class ModalService {
   private showProfileModal = new BehaviorSubject<boolean>(false);
   private showAdminModal = new BehaviorSubject<boolean>(false);
@@ -24,6 +25,11 @@ export class ModalService {
   }
 
   closeAdminModal() {
+    this.showAdminModal.next(false);
+  }
+
+  resetModals() {
+    this.showProfileModal.next(false);
     this.showAdminModal.next(false);
   }
 }
