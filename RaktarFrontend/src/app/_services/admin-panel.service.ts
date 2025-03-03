@@ -15,9 +15,16 @@ export interface Storage {
 
 export interface Shelf {
   id: number;
-  name: string;
-  locationIn: string;
-  hasPallet: boolean;
+  shelfId: number;          
+  shelfName: string;      
+  shelfLocation: string;    
+  shelfIsFull: boolean;      
+  shelfMaxCapacity: number;  
+  currentCapacity?: number;  
+  length?: number;           
+  width?: number;            
+  levels?: number;          
+  height?: number;
 }
 
 export interface Item {
@@ -36,6 +43,9 @@ export interface ApiResponse {
   success: boolean;
   message: string;
   data?: any;
+  totalShelves?: number; 
+  shelves?: Shelf[]; 
+  statusCode?: number; 
 }
 
 @Injectable({ providedIn: 'root' })
@@ -99,10 +109,20 @@ export class AdminPanelService {
   }
 
   getShelvesByStorage(storageId: number): Observable<ApiResponse> {
-    return this.http.get<Shelf[]>(`${this.baseUrl}/shelfs/getShelvesByStorageId?storageId=${storageId}`).pipe(
+    return this.http.get<any>(`${this.baseUrl}/shelfs/getShelfsByStorageId?storageId=${storageId}`).pipe(
       map(response => {
-        if (Array.isArray(response)) {
-          return { success: true, message: 'Shelves loaded successfully', data: response };
+        if (response && Array.isArray(response.shelves)) {
+          return {
+            success: true,
+            message: 'Shelves loaded successfully',
+            data: response.shelves.map((shelf: any) => ({
+              shelfId: shelf.shelfId,
+              shelfLocation: shelf.shelfLocation,
+              shelfIsFull: shelf.shelfIsFull,
+              shelfName: shelf.shelfName,
+              shelfMaxCapacity: shelf.shelfMaxCapacity
+            }))
+          };
         }
         return { success: false, message: 'Invalid shelves data', data: [] };
       }),

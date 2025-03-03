@@ -5,7 +5,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { ModalService } from '../../_services/modal.service';
 import { AdminPanelService, Storage, Shelf, Item, ApiResponse } from '../../_services/admin-panel.service';
-
+import { Router, NavigationEnd } from '@angular/router';
 
 @Component({
   selector: 'app-admin-panel',
@@ -46,7 +46,8 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(
     private fb: FormBuilder,
     private modalService: ModalService,
-    private adminPanelService: AdminPanelService
+    private adminPanelService: AdminPanelService,
+    private router: Router
   ) {
     this.userForm = this.fb.group({
       userName: ['', Validators.required],
@@ -78,13 +79,13 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     });
 
     this.storageForm = this.fb.group({
-      storageName: ['', Validators.required],
+      name: ['', Validators.required],
       location: ['', Validators.required]
     });
 
     this.shelfForm = this.fb.group({
       storageId: ['', Validators.required],
-      shelfName: ['', Validators.required],
+      name: ['', Validators.required],
       locationIn: ['', Validators.required]
     });
 
@@ -99,15 +100,26 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.subscription = this.modalService.showAdminModal$.subscribe(show => {
-      this.showModal = show;
-      if (show) {
-        this.openModal();
-        this.loadTabData();
-      } else {
-        this.closeModal();
-      }
-    });
+    this.subscription.add(
+      this.modalService.showAdminModal$.subscribe(show => {
+        this.showModal = show;
+        if (show) {
+          this.openModal();
+          this.loadTabData();
+        } else {
+          this.closeModal();
+        }
+      })
+    );
+
+    this.subscription.add(
+      this.router.events.subscribe(event => {
+        if (event instanceof NavigationEnd) {
+          this.modalService.closeAdminModal();
+          this.showModal = false;
+        }
+      })
+    );
   }
 
   ngAfterViewInit(): void {
@@ -132,6 +144,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnDestroy(): void {
+    this.modalService.closeAdminModal();
     this.subscription.unsubscribe();
   }
 
@@ -172,69 +185,46 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
   passwordComplexityValidator(): ValidatorFn {
     return (control: AbstractControl): { [key: string]: any } | null => {
       const value = control.value || '';
-      if (value.length < 6) {
-        return { minlength: true };
-      }
-      if (value.length >= 6) {
-        const hasUppercase = /[A-Z]/.test(value);
-        const hasLowercase = /[a-z]/.test(value);
-        const hasNumber = /\d/.test(value);
-        const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(value);
-        return (!hasUppercase || !hasLowercase || !hasNumber || !hasSpecial) ? { complexity: true } : null;
-      }
-      return null;
+      if (value.length < 6) return { minlength: true };
+      const hasUppercase = /[A-Z]/.test(value);
+      const hasLowercase = /[a-z]/.test(value);
+      const hasNumber = /\d/.test(value);
+      const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(value);
+      return (!hasUppercase || !hasLowercase || !hasNumber || !hasSpecial) ? { complexity: true } : null;
     };
   }
 
   getErrorMessage(control: AbstractControl | null, fieldName: string): string {
-    if (!control || !control.errors || !control.touched) {
-      return '';
-    }
-
+    if (!control || !control.errors || !control.touched) return '';
     const errors = control.errors;
-    if (errors['required']) {
-      return `${fieldName} is required.`;
-    }
-    if (errors['email']) {
-      return `${fieldName} must be a valid email address.`;
-    }
-    if (errors['minlength']) {
-      return `${fieldName} must be at least 6 characters long.`;
-    }
-    if (errors['min']) {
-      return `${fieldName} must be at least ${errors['min'].min}.`;
-    }
-    if (errors['complexity']) {
-      return `${fieldName} must include at least one uppercase letter, one lowercase letter, one number, and one special character.`;
-    }
-    return `Something’s off with the ${fieldName.toLowerCase()}. Please check the input and try again!`;
+    if (errors['required']) return `${fieldName} is required.`;
+    if (errors['email']) return `${fieldName} must be a valid email address.`;
+    if (errors['minlength']) return `${fieldName} must be at least 6 characters long.`;
+    if (errors['min']) return `${fieldName} must be at least ${errors['min'].min}.`;
+    if (errors['complexity']) return `${fieldName} must include at least one uppercase letter, one lowercase letter, one number, and one special character.`;
+    return `Invalid ${fieldName.toLowerCase()}. Please check and try again!`;
   }
 
   fetchStorages(): void {
     this.adminPanelService.getAllStorages().subscribe({
-      next: (response) => {
-        this.handleFetchResponse(response, 'storages');
-        if (response.success) {
-          this.storages.forEach(storage => {
-            this.adminPanelService.getShelvesByStorage(storage.id).subscribe({
-              next: (shelfResponse) => {
-                if (shelfResponse.success) {
-                  storage.hasShelves = shelfResponse.data.length > 0;
-                } else {
-                  storage.hasShelves = false;
-                }
-              }
-            });
-          });
-        }
-      }
+      next: (response) => this.handleFetchResponse(response, 'storages'),
+      error: (err) => console.error('Error fetching storages:', err)
     });
   }
 
   fetchShelvesByStorage(storageId: number): void {
     this.adminPanelService.getShelvesByStorage(storageId).subscribe({
-      next: (response) => {
-        this.handleFetchResponse(response, 'shelves');
+      next: (response) => this.handleFetchResponse(response, 'shelves'),
+      error: (err) => {
+        if (err.status === 404) {
+          this.shelves = [];
+          this.deleteShelfMessage = 'No shelves found for this storage.';
+          this.deleteShelfMessageClass = 'info-message';
+        } else {
+          console.error('Error fetching shelves:', err);
+          this.deleteShelfMessage = 'Error fetching shelves.';
+          this.deleteShelfMessageClass = 'error-message';
+        }
       }
     });
   }
@@ -249,85 +239,100 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onUserSubmit(): void {
-    this.userMessage = '';
-    this.userMessageClass = '';
     if (this.userForm.invalid) {
       this.userForm.markAllAsTouched();
       return;
     }
+    this.userMessage = '';
+    this.userMessageClass = '';
     this.adminPanelService.registerUser(this.userForm.value).subscribe({
-      next: (response) => {
-        this.handleResponse(response, 'user');
+      next: (response) => this.handleResponse(response, 'user'),
+      error: (err) => {
+        this.userMessage = 'Failed to register user.';
+        this.userMessageClass = 'error-message';
+        console.error('Error registering user:', err);
       }
     });
   }
 
   onAdminSubmit(): void {
-    this.adminMessage = '';
-    this.adminMessageClass = '';
     if (this.adminForm.invalid) {
       this.adminForm.markAllAsTouched();
       return;
     }
+    this.adminMessage = '';
+    this.adminMessageClass = '';
     this.adminPanelService.registerAdmin(this.adminForm.value).subscribe({
-      next: (response) => {
-        this.handleResponse(response, 'admin');
+      next: (response) => this.handleResponse(response, 'admin'),
+      error: (err) => {
+        this.adminMessage = 'Failed to register admin.';
+        this.adminMessageClass = 'error-message';
+        console.error('Error registering admin:', err);
       }
     });
   }
 
   onItemSubmit(): void {
-    this.itemMessage = '';
-    this.itemMessageClass = '';
     if (this.itemForm.invalid) {
       this.itemForm.markAllAsTouched();
       return;
     }
+    this.itemMessage = '';
+    this.itemMessageClass = '';
     this.adminPanelService.addItem(this.itemForm.value).subscribe({
-      next: (response) => {
-        this.handleResponse(response, 'item');
+      next: (response) => this.handleResponse(response, 'item'),
+      error: (err) => {
+        this.itemMessage = 'Failed to add item.';
+        this.itemMessageClass = 'error-message';
+        console.error('Error adding item:', err);
       }
     });
   }
 
   onStorageSubmit(): void {
-    this.storageMessage = '';
-    this.storageMessageClass = '';
     if (this.storageForm.invalid) {
       this.storageForm.markAllAsTouched();
       return;
     }
+    this.storageMessage = '';
+    this.storageMessageClass = '';
     this.adminPanelService.addStorage(this.storageForm.value).subscribe({
       next: (response) => {
         this.handleResponse(response, 'storage');
-        if (response.success) {
-          this.fetchStorages();
-        }
+        if (response.success) this.fetchStorages();
+      },
+      error: (err) => {
+        this.storageMessage = 'Failed to add storage.';
+        this.storageMessageClass = 'error-message';
+        console.error('Error adding storage:', err);
       }
     });
   }
 
   onShelfSubmit(): void {
-    this.shelfMessage = '';
-    this.shelfMessageClass = '';
     if (this.shelfForm.invalid) {
       this.shelfForm.markAllAsTouched();
       return;
     }
+    this.shelfMessage = '';
+    this.shelfMessageClass = '';
     this.adminPanelService.addShelf(this.shelfForm.value).subscribe({
-      next: (response) => {
-        this.handleResponse(response, 'shelf');
+      next: (response) => this.handleResponse(response, 'shelf'),
+      error: (err) => {
+        this.shelfMessage = 'Failed to add shelf.';
+        this.shelfMessageClass = 'error-message';
+        console.error('Error adding shelf:', err);
       }
     });
   }
 
   onDeleteShelfSubmit(): void {
-    this.deleteShelfMessage = '';
-    this.deleteShelfMessageClass = '';
     if (this.deleteShelfForm.invalid) {
       this.deleteShelfForm.markAllAsTouched();
       return;
     }
+    this.deleteShelfMessage = '';
+    this.deleteShelfMessageClass = '';
     const shelfId = Number(this.deleteShelfForm.get('shelfId')?.value);
     this.adminPanelService.deleteShelf(shelfId).subscribe({
       next: (response) => {
@@ -336,24 +341,32 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
           const storageId = Number(this.deleteShelfForm.get('storageId')?.value);
           this.fetchShelvesByStorage(storageId);
         }
+      },
+      error: (err) => {
+        this.deleteShelfMessage = 'Failed to delete shelf.';
+        this.deleteShelfMessageClass = 'error-message';
+        console.error('Error deleting shelf:', err);
       }
     });
   }
 
   onDeleteStorageSubmit(): void {
-    this.deleteStorageMessage = '';
-    this.deleteStorageMessageClass = '';
     if (this.deleteStorageForm.invalid) {
       this.deleteStorageForm.markAllAsTouched();
       return;
     }
+    this.deleteStorageMessage = '';
+    this.deleteStorageMessageClass = '';
     const storageId = Number(this.deleteStorageForm.get('storageId')?.value);
     this.adminPanelService.deleteStorage(storageId).subscribe({
       next: (response) => {
         this.handleResponse(response, 'deleteStorage');
-        if (response.success) {
-          this.fetchStorages();
-        }
+        if (response.success) this.fetchStorages();
+      },
+      error: (err) => {
+        this.deleteStorageMessage = 'Failed to delete storage.';
+        this.deleteStorageMessageClass = 'error-message';
+        console.error('Error deleting storage:', err);
       }
     });
   }
@@ -401,16 +414,29 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
   private handleFetchResponse(response: ApiResponse, type: string): void {
     switch (type) {
       case 'storages':
-        this.storages = response.data;
+        this.storages = response.data || [];
         this.shelfMessage = response.success ? '' : response.message;
         this.shelfMessageClass = response.success ? '' : 'error-message';
         this.deleteShelfMessage = response.success ? '' : response.message;
         this.deleteShelfMessageClass = response.success ? '' : 'error-message';
         this.deleteStorageMessage = response.success ? '' : response.message;
         this.deleteStorageMessageClass = response.success ? '' : 'error-message';
+        if (response.success) {
+          this.storages.forEach(storage => {
+            this.adminPanelService.getShelvesByStorage(storage.id).subscribe({
+              next: (shelfResponse) => {
+                storage.hasShelves = shelfResponse.success && shelfResponse.data.length > 0;
+              },
+              error: (err) => {
+                storage.hasShelves = false;
+                console.error(`Error fetching shelves for storage ${storage.id}:`, err);
+              }
+            });
+          });
+        }
         break;
       case 'shelves':
-        this.shelves = response.data;
+        this.shelves = response.data || [];
         this.deleteShelfMessage = response.success ? '' : response.message;
         this.deleteShelfMessageClass = response.success ? '' : 'error-message';
         break;

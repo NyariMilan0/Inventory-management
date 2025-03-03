@@ -4,11 +4,12 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { ProfileComponent } from '../profile/profile.component';
 import { AdminPanelComponent } from '../admin-panel/admin-panel.component';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-storage-management',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, NavbarComponent, ProfileComponent, AdminPanelComponent],
+  imports: [CommonModule, HttpClientModule, NavbarComponent, ProfileComponent, AdminPanelComponent, ReactiveFormsModule],
   templateUrl: './storage-management.component.html',
   styleUrls: ['./storage-management.component.css']
 })

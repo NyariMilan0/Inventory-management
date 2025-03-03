@@ -37,6 +37,8 @@ export class PalletsComponent implements OnInit {
   storages: Storage[] = [];
 
   constructor(private fb: FormBuilder, private palletsService: PalletsService) {
+    const userId = Number(localStorage.getItem('userId')) || 0;
+
     this.addPalletForm = this.fb.group({
       skuCode: ['', Validators.required],
       shelfId: ['', Validators.required],
@@ -52,43 +54,67 @@ export class PalletsComponent implements OnInit {
       sourceStorageId: ['', Validators.required],
       palletId: ['', Validators.required],
       targetStorageId: ['', Validators.required],
-      targetShelfId: ['', Validators.required]
+      targetShelfId: ['', Validators.required],
+      userId: [userId >= 0 ? userId : '', Validators.required]
     });
   }
 
   ngOnInit(): void {
+    this.loadInitialData();
+  }
+
+  loadInitialData(): void {
     this.palletsService.getAllItems().subscribe({
       next: (response: ApiResponse) => {
         if (response.success) {
-          this.items = response.data;
+          this.items = response.data.items || response.data;
           this.filteredItems = this.items;
+          console.log('Items loaded:', this.items);
+        } else {
+          console.error('Failed to load items:', response.message);
         }
-      }
+      },
+      error: (err) => console.error('Error fetching items:', err)
     });
+
     this.palletsService.getAllShelfs().subscribe({
       next: (response: ApiResponse) => {
         if (response.success) {
           this.allShelves = response.data;
           this.filteredShelves = this.allShelves;
-          this.filteredAvailableShelves = this.allShelves.filter((shelf: Shelf) => !shelf.hasPallet);
+          this.filteredAvailableShelves = this.allShelves.filter((shelf: Shelf) => !shelf.shelfIsFull);
           this.updateShelvesWithPallets();
+          console.log('Shelves loaded:', this.allShelves);
+        } else {
+          console.error('Failed to load shelves:', response.message);
         }
-      }
+      },
+      error: (err) => console.error('Error fetching shelves:', err)
     });
+
     this.palletsService.getAllStorages().subscribe({
       next: (response: ApiResponse) => {
         if (response.success) {
           this.storages = response.data;
+          console.log('Storages loaded:', this.storages);
+        } else {
+          console.error('Failed to load storages:', response.message);
         }
-      }
+      },
+      error: (err) => console.error('Error fetching storages:', err)
     });
+
     this.palletsService.getPalletsWithShelfs().subscribe({
       next: (response: ApiResponse) => {
         if (response.success) {
-          this.pallets = response.data.palletsAndShelfs;
+          this.pallets = response.data.palletsAndShelfs || response.data;
           this.updateShelvesWithPallets();
+          console.log('Pallets loaded:', this.pallets);
+        } else {
+          console.error('Failed to load pallets:', response.message);
         }
-      }
+      },
+      error: (err) => console.error('Error fetching pallets:', err)
     });
   }
 
@@ -106,15 +132,15 @@ export class PalletsComponent implements OnInit {
   filterShelves(event: Event): void {
     const searchTerm = (event.target as HTMLInputElement).value.toLowerCase();
     this.filteredShelves = this.allShelves.filter((shelf: Shelf) =>
-      shelf.name.toLowerCase().includes(searchTerm) || shelf.locationIn.toLowerCase().includes(searchTerm)
+      shelf.shelfName.toLowerCase().includes(searchTerm) || shelf.shelfLocation.toLowerCase().includes(searchTerm)
     );
-    this.filteredAvailableShelves = this.filteredShelves.filter((shelf: Shelf) => !shelf.hasPallet);
+    this.filteredAvailableShelves = this.filteredShelves.filter((shelf: Shelf) => !shelf.shelfIsFull);
     this.updateShelvesWithPallets();
   }
 
   updateShelvesWithPallets(): void {
     this.filteredShelvesWithPallets = this.filteredShelves.filter((shelf: Shelf) =>
-      this.pallets.some((p: PalletWithShelf) => p.shelfId === shelf.id)
+      this.pallets.some((p: PalletWithShelf) => p.shelfId === shelf.shelfId)
     );
     this.updateFilteredPalletsForRemoval();
   }
@@ -143,6 +169,11 @@ export class PalletsComponent implements OnInit {
           this.addPalletForm.reset();
           this.refreshShelvesAndPallets();
         }
+      },
+      error: (err) => {
+        this.addPalletMessage = 'Error adding pallet';
+        this.addPalletMessageClass = 'error-message';
+        console.error('Add pallet error:', err);
       }
     });
   }
@@ -163,6 +194,11 @@ export class PalletsComponent implements OnInit {
           this.removePalletForm.reset();
           this.refreshShelvesAndPallets();
         }
+      },
+      error: (err) => {
+        this.removePalletMessage = 'Error removing pallet';
+        this.removePalletMessageClass = 'error-message';
+        console.error('Remove pallet error:', err);
       }
     });
   }
@@ -178,15 +214,19 @@ export class PalletsComponent implements OnInit {
   onSourceStorageChange(event: Event): void {
     const storageId = Number((event.target as HTMLSelectElement).value);
     if (storageId) {
-      this.palletsService.getShelvesByStorage(storageId).subscribe({
+      this.palletsService.getShelfsByStorageId(storageId).subscribe({
         next: (response: ApiResponse) => {
           if (response.success) {
-            const shelvesWithPallets = response.data.filter((shelf: Shelf) => shelf.hasPallet);
+            const shelvesWithPallets = response.data.filter((shelf: Shelf) => shelf.shelfIsFull);
             this.pallets = shelvesWithPallets.flatMap((shelf: Shelf) =>
-              this.pallets.filter((p: PalletWithShelf) => p.shelfId === shelf.id)
+              this.pallets.filter((p: PalletWithShelf) => p.shelfId === shelf.shelfId)
             );
+            console.log('Pallets updated for source storage:', this.pallets);
+          } else {
+            console.error('Failed to load shelves for source storage:', response.message);
           }
-        }
+        },
+        error: (err) => console.error('Error fetching shelves for source storage:', err)
       });
     } else {
       this.pallets = [];
@@ -196,42 +236,87 @@ export class PalletsComponent implements OnInit {
   onTargetStorageChange(event: Event): void {
     const storageId = Number((event.target as HTMLSelectElement).value);
     if (storageId) {
-      this.palletsService.getShelvesByStorage(storageId).subscribe({
+      this.palletsService.getShelfsByStorageId(storageId).subscribe({
         next: (response: ApiResponse) => {
           if (response.success) {
-            this.filteredAvailableShelves = response.data.filter((shelf: Shelf) => !shelf.hasPallet);
+            this.filteredAvailableShelves = response.data.filter((shelf: Shelf) => !shelf.shelfIsFull);
+            console.log('Available shelves updated for target storage:', this.filteredAvailableShelves);
+          } else {
+            console.error('Failed to load shelves for target storage:', response.message);
           }
-        }
+        },
+        error: (err) => console.error('Error fetching shelves for target storage:', err)
       });
     } else {
       this.filteredAvailableShelves = [];
     }
   }
 
-  refreshShelvesAndPallets(): void {
+  onMovePalletSubmit(): void {
+    this.movePalletMessage = '';
+    this.movePalletMessageClass = '';
+    if (this.movePalletForm.invalid) {
+      this.movePalletForm.markAllAsTouched();
+      return;
+    }
+    const { palletId, targetShelfId, userId } = this.movePalletForm.value;
+    const fromShelfId = this.pallets.find(p => p.palletId === Number(palletId))?.shelfId;
+    if (!fromShelfId) {
+      this.movePalletMessage = 'Current shelf not found for this pallet.';
+      this.movePalletMessageClass = 'error-message';
+      console.error('Pallet not found in pallets array:', palletId, this.pallets);
+      return;
+    }
+    this.palletsService.movePallet(palletId, fromShelfId, targetShelfId, userId).subscribe({
+      next: (response: ApiResponse) => {
+        this.movePalletMessage = response.message;
+        this.movePalletMessageClass = response.statusCode === 200 ? 'success-message' : 'error-message';
+        if (response.statusCode === 200) {
+          this.movePalletForm.reset();
+          const newUserId = Number(localStorage.getItem('userId')) || 0;
+          this.movePalletForm.patchValue({ userId: newUserId });
+          this.refreshShelvesAndPallets();
+        }
+      },
+      error: (err) => {
+        this.movePalletMessage = 'Error moving pallet';
+        this.movePalletMessageClass = 'error-message';
+        console.error('Move pallet error:', err);
+      }
+    });
+  }
 
+  refreshShelvesAndPallets(): void {
     this.palletsService.getAllShelfs().subscribe({
       next: (res: ApiResponse) => {
         if (res.success) {
           this.allShelves = res.data;
           this.filteredShelves = this.allShelves;
-          this.filteredAvailableShelves = this.allShelves.filter((shelf: Shelf) => !shelf.hasPallet);
+          this.filteredAvailableShelves = this.allShelves.filter((shelf: Shelf) => !shelf.shelfIsFull);
           this.updateShelvesWithPallets();
+          console.log('Shelves refreshed:', this.allShelves);
+        } else {
+          console.error('Failed to refresh shelves:', res.message);
         }
-      }
+      },
+      error: (err) => console.error('Error refreshing shelves:', err)
     });
     this.palletsService.getPalletsWithShelfs().subscribe({
       next: (res: ApiResponse) => {
         if (res.success) {
-          this.pallets = res.data.palletsAndShelfs;
+          this.pallets = res.data.palletsAndShelfs || res.data;
           this.updateShelvesWithPallets();
+          console.log('Pallets refreshed:', this.pallets);
+        } else {
+          console.error('Failed to refresh pallets:', res.message);
         }
-      }
+      },
+      error: (err) => console.error('Error refreshing pallets:', err)
     });
   }
 
   trackById(index: number, item: any): any {
-    return item.id;
+    return item.id || item.shelfId;
   }
 
   trackByPalletId(index: number, item: any): any {
