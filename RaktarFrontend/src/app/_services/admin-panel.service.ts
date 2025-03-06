@@ -5,7 +5,7 @@ import { catchError, map } from 'rxjs/operators';
 
 export interface Storage {
   id: number;
-  name: string;
+  storageName: string;
   location: string;
   currentCapacity?: number;
   maxCapacity?: number;
@@ -15,15 +15,14 @@ export interface Storage {
 
 export interface Shelf {
   id: number;
-  shelfId: number;          
-  shelfName: string;      
-  shelfLocation: string;    
-  shelfIsFull: boolean;      
-  shelfMaxCapacity: number;  
-  currentCapacity?: number;  
-  length?: number;           
-  width?: number;            
-  levels?: number;          
+  shelfName: string;
+  shelfLocation: string;
+  shelfIsFull: boolean;
+  shelfMaxCapacity: number;
+  currentCapacity?: number;
+  length?: number;
+  width?: number;
+  levels?: number;
   height?: number;
 }
 
@@ -43,9 +42,9 @@ export interface ApiResponse {
   success: boolean;
   message: string;
   data?: any;
-  totalShelves?: number; 
-  shelves?: Shelf[]; 
-  statusCode?: number; 
+  totalShelves?: number;
+  shelves?: Shelf[];
+  statusCode?: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -82,7 +81,7 @@ export class AdminPanelService {
     );
   }
 
-  addShelf(shelfData: any): Observable<ApiResponse> {
+  addShelf(shelfData: { storageId: number; shelfName: string; locationIn: string }): Observable<ApiResponse> {
     return this.http.post(`${this.baseUrl}/shelfs/addShelfToStorage`, shelfData).pipe(
       map(() => ({ success: true, message: 'Shelf added successfully!' })),
       catchError(this.handleHttpError('adding shelf'))
@@ -90,16 +89,22 @@ export class AdminPanelService {
   }
 
   getAllStorages(): Observable<ApiResponse> {
-    return this.http.get<{ Storages: Storage[] }>(`${this.baseUrl}/storage/getAllStorages`).pipe(
+    return this.http.get<{ Storages: any[] }>(`${this.baseUrl}/storage/getAllStorages`).pipe(
       map(response => {
         if (response && Array.isArray(response.Storages)) {
+          const storages: Storage[] = response.Storages.map(storage => ({
+            id: storage.id,
+            storageName: storage.name,
+            location: storage.location,
+            currentCapacity: storage.currentCapacity,
+            maxCapacity: storage.maxCapacity,
+            isFull: storage.isFull,
+            hasShelves: false
+          }));
           return {
             success: true,
             message: 'Storages loaded successfully',
-            data: response.Storages.map(storage => ({
-              ...storage,
-              hasShelves: false
-            }))
+            data: storages
           };
         }
         return { success: false, message: 'Invalid storages data', data: [] };
@@ -112,19 +117,25 @@ export class AdminPanelService {
     return this.http.get<any>(`${this.baseUrl}/shelfs/getShelfsByStorageId?storageId=${storageId}`).pipe(
       map(response => {
         if (response && Array.isArray(response.shelves)) {
+          const shelves: Shelf[] = response.shelves.map((shelf: any) => ({
+            id: shelf.shelfId,
+            shelfName: shelf.shelfName,
+            shelfLocation: shelf.shelfLocation,
+            shelfIsFull: shelf.shelfIsFull,
+            shelfMaxCapacity: shelf.shelfMaxCapacity,
+            currentCapacity: shelf.currentCapacity,
+            length: shelf.length,
+            width: shelf.width,
+            levels: shelf.levels,
+            height: shelf.height
+          }));
           return {
             success: true,
             message: 'Shelves loaded successfully',
-            data: response.shelves.map((shelf: any) => ({
-              shelfId: shelf.shelfId,
-              shelfLocation: shelf.shelfLocation,
-              shelfIsFull: shelf.shelfIsFull,
-              shelfName: shelf.shelfName,
-              shelfMaxCapacity: shelf.shelfMaxCapacity
-            }))
+            data: shelves
           };
         }
-        return { success: false, message: 'Invalid shelves data', data: [] };
+        return { success: false, message: 'No shelves found', data: [] };
       }),
       catchError(this.handleHttpError('fetching shelves', []))
     );

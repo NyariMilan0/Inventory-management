@@ -1,4 +1,3 @@
-/* Importok és komponens definíció */
 import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -83,13 +82,13 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     });
 
     this.storageForm = this.fb.group({
-      name: ['', Validators.required],
+      storageName: ['', Validators.required],
       location: ['', Validators.required]
     });
 
     this.shelfForm = this.fb.group({
       storageId: ['', Validators.required],
-      name: ['', Validators.required],
+      shelfName: ['', Validators.required],
       locationIn: ['', Validators.required]
     });
 
@@ -127,7 +126,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     );
   }
 
-  /* Nézet inicializálása (ngAfterViewInit) */
+  /* Nézet inicializálása */
   ngAfterViewInit(): void {
     const modalElement = document.getElementById('adminPanelModal');
     if (modalElement) {
@@ -149,13 +148,12 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  /* Megsemmisítés (ngOnDestroy) */
+  /* Megsemmisítés */
   ngOnDestroy(): void {
     this.modalService.closeAdminModal();
     this.subscription.unsubscribe();
   }
 
-  /* Tab vezérlés (Tab Control) */
   setActiveTab(tab: string): void {
     this.activeTab = tab;
     if (this.showModal) {
@@ -163,7 +161,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  /* Modál kezelés (Modal Handling) */
+    /* Modál kezelés (Modal Handling) */
   openModal(): void {
     const modalElement = document.getElementById('adminPanelModal');
     if (modalElement && this.showModal) {
@@ -191,7 +189,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  /* Validátorok (Validators) */
+  /* Validátorok a jelszóra (Validators) */
   passwordComplexityValidator(): ValidatorFn {
     return (control: AbstractControl): { [key: string]: any } | null => {
       const value = control.value || '';
@@ -216,7 +214,8 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     return `Invalid ${fieldName.toLowerCase()}. Please check and try again!`;
   }
 
-  /* Adatok betöltése (Data Loading) */
+
+  /* Adatok betöltése */
   fetchStorages(): void {
     this.adminPanelService.getAllStorages().subscribe({
       next: (response) => this.handleFetchResponse(response, 'storages'),
@@ -228,28 +227,25 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     this.adminPanelService.getShelvesByStorage(storageId).subscribe({
       next: (response) => this.handleFetchResponse(response, 'shelves'),
       error: (err) => {
-        if (err.status === 404) {
-          this.shelves = [];
-          this.deleteShelfMessage = 'No shelves found for this storage.';
-          this.deleteShelfMessageClass = 'info-message';
-        } else {
-          console.error('Error fetching shelves:', err);
-          this.deleteShelfMessage = 'Error fetching shelves.';
-          this.deleteShelfMessageClass = 'error-message';
-        }
+        this.shelves = [];
+        this.deleteShelfMessage = err.status === 404 ? 'No shelves found for this storage.' : 'Error fetching shelves.';
+        this.deleteShelfMessageClass = err.status === 404 ? 'info-message' : 'error-message';
       }
     });
   }
 
-  /* Eseménykezelők (Event Handlers) */
+   /* Eseménykezelők (Event Handlers) */
   onStorageChange(event: Event): void {
     const storageId = Number((event.target as HTMLSelectElement).value);
     if (storageId) {
       this.fetchShelvesByStorage(storageId);
     } else {
       this.shelves = [];
+      this.deleteShelfMessage = '';
+      this.deleteShelfMessageClass = '';
     }
   }
+
 
   /* Űrlap műveletek (Form Actions) */
   onUserSubmit(): void {
@@ -330,8 +326,20 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     this.shelfMessage = '';
     this.shelfMessageClass = '';
-    this.adminPanelService.addShelf(this.shelfForm.value).subscribe({
-      next: (response) => this.handleResponse(response, 'shelf'),
+    const shelfData = {
+      storageId: Number(this.shelfForm.get('storageId')?.value),
+      shelfName: this.shelfForm.get('shelfName')?.value,
+      locationIn: this.shelfForm.get('locationIn')?.value
+    };
+    this.adminPanelService.addShelf(shelfData).subscribe({
+      next: (response) => {
+        this.shelfMessage = response.message;
+        this.shelfMessageClass = response.success ? 'success-message' : 'error-message';
+        if (response.success) {
+          this.shelfForm.reset();
+          this.fetchStorages();
+        }
+      },
       error: (err) => {
         this.shelfMessage = 'Failed to add shelf.';
         this.shelfMessageClass = 'error-message';
@@ -354,6 +362,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
         if (response.success) {
           const storageId = Number(this.deleteShelfForm.get('storageId')?.value);
           this.fetchShelvesByStorage(storageId);
+          this.fetchStorages();
         }
       },
       error: (err) => {
@@ -384,6 +393,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     });
   }
+
 
   /* Segéd függvények (Helper Functions) */
   private handleResponse(response: ApiResponse, type: string): void {
@@ -452,8 +462,8 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
         break;
       case 'shelves':
         this.shelves = response.data || [];
-        this.deleteShelfMessage = response.success ? '' : response.message;
-        this.deleteShelfMessageClass = response.success ? '' : 'error-message';
+        this.deleteShelfMessage = response.success && this.shelves.length === 0 ? 'No shelves found for this storage.' : '';
+        this.deleteShelfMessageClass = response.success && this.shelves.length === 0 ? 'info-message' : '';
         break;
     }
   }

@@ -160,13 +160,13 @@ h3 {
 
 /* Üzenetek (Messages) */
 .success-message {
-    color: #457B9D;
+    color: green;
     font-size: 14px;
     margin-bottom: 15px;
     padding: 8px 12px;
     border: 1px solid #457B9D;
     border-radius: 6px;
-    background-color: rgba(69, 123, 157, 0.1);
+    background-color: rgba(207, 255, 207, 0.699);
 }
 
 .error-message {

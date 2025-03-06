@@ -327,7 +327,7 @@ export class StorageManagementComponent implements AfterViewInit, OnDestroy {
     const carousel = this.carouselItems.nativeElement as HTMLElement;
     const containerHeight = this.carouselContainer.nativeElement.offsetHeight;
     const contentHeight = carousel.offsetHeight / 2;
-    const speed = 0.15;
+    const speed = 0.2;
 
     const scroll = () => {
       if (this.isDragging) return;
