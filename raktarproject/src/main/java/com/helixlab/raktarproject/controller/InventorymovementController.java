@@ -50,12 +50,12 @@ public class InventorymovementController {
                 inventoryJSON.put("id", im.getId());
                 inventoryJSON.put("movementDate", im.getMovementDate());
                 inventoryJSON.put("actionType", im.getActionType());
-                inventoryJSON.put("storageFrom", im.getStorageFrom());
-                inventoryJSON.put("storageTo", im.getStorageTo());
-                inventoryJSON.put("fromShelf", im.getFromShelf());
-                inventoryJSON.put("toShelf", im.getToShelf());
+                inventoryJSON.put("storageFrom", (im.getStorageFrom() != null ? im.getStorageFrom().getId() : JSONObject.NULL));
+                inventoryJSON.put("storageTo", (im.getStorageTo() != null ? im.getStorageTo().getId() : JSONObject.NULL));
+                inventoryJSON.put("fromShelf", (im.getFromShelf() != null ? im.getFromShelf().getId() : JSONObject.NULL));
+                inventoryJSON.put("toShelf", (im.getToShelf() != null ? im.getToShelf().getId() : JSONObject.NULL));
                 inventoryJSON.put("palletSKU", im.getPalletSKU());
-                inventoryJSON.put("byUser", im.getByUser());
+                inventoryJSON.put("byUser", (im.getByUser() != null ? im.getByUser().getId() : JSONObject.NULL));
 
                 inventoryArray.put(inventoryJSON);
             }
