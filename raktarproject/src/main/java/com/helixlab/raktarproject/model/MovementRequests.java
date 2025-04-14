@@ -4,16 +4,22 @@
  */
 package com.helixlab.raktarproject.model;
 
+import static com.helixlab.raktarproject.model.Users.emf;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.Persistence;
+import javax.persistence.StoredProcedureQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -71,12 +77,43 @@ public class MovementRequests implements Serializable {
     @Column(name = "timeLimit")
     @Temporal(TemporalType.TIMESTAMP)
     private Date timeLimit;
+    
+    static EntityManagerFactory emf = Persistence.createEntityManagerFactory("com.helixLab_raktarproject_war_1.0-SNAPSHOTPU");
 
     public MovementRequests() {
     }
 
     public MovementRequests(Integer id) {
+        EntityManager em = emf.createEntityManager();
+        
+        try {
+            MovementRequests mr = em.find(MovementRequests.class, id);
+            
+            this.id = mr.getId();
+            this.adminId = mr.getAdminId();
+            this.palletId = mr.getPalletId();
+            this.fromShelfId = mr.getFromShelfId();
+            this.toShelfId = mr.getToShelfId();
+            this.actionType = mr.getActionType();
+            this.status = mr.getStatus();
+            this.timeLimit = mr.getTimeLimit();
+        } catch (Exception ex) {
+        System.err.println("Error: " + ex.getLocalizedMessage());
+        } finally {
+            em.clear();
+            em.close();
+        }
+    }
+    
+    public MovementRequests(Integer id, int adminId, int palletId, int fromshelfId, int  toShelfId, String actionType, String status, Date timeLimit){
         this.id = id;
+        this.adminId = adminId;
+        this.palletId = palletId;
+        this.fromShelfId = fromshelfId;
+        this.toShelfId = toShelfId;
+        this.actionType = actionType;
+        this.status = status;
+        this.timeLimit = timeLimit;
     }
 
     public MovementRequests(Integer id, int adminId, int palletId, String actionType, String status, Date timeLimit) {
@@ -176,5 +213,29 @@ public class MovementRequests implements Serializable {
     public String toString() {
         return "com.helixlab.raktarproject.model.MovementRequests[ id=" + id + " ]";
     }
+    
+    public static ArrayList<MovementRequests> getMovementRequests(){
+        EntityManager em = emf.createEntityManager();
+        ArrayList<MovementRequests> movementList = new ArrayList<>();
+        
+        try {
+            StoredProcedureQuery spq = em.createStoredProcedureQuery("getMovementRequests", MovementRequests.class);
+            spq.execute();
+            movementList = new ArrayList<>(spq.getResultList());
+        } catch (Exception e) {
+        System.err.println("Error: " + e.getLocalizedMessage());
+        } finally {
+            em.clear();
+            em.close();
+        }
+        
+        return movementList;
+    }
+    
+    
+    
+    
+    
+    
     
 }
