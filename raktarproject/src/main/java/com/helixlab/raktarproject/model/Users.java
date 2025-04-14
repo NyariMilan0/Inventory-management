@@ -36,6 +36,7 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "Users.findByFirstName", query = "SELECT u FROM Users u WHERE u.firstName = :firstName"),
     @NamedQuery(name = "Users.findByLastName", query = "SELECT u FROM Users u WHERE u.lastName = :lastName"),
     @NamedQuery(name = "Users.findByUserName", query = "SELECT u FROM Users u WHERE u.userName = :userName"),
+    @NamedQuery(name = "Users.findByPicture", query = "SELECT u FROM Users u WHERE u.picture = :picture"),
     @NamedQuery(name = "Users.findByPassword", query = "SELECT u FROM Users u WHERE u.password = :password"),
     @NamedQuery(name = "Users.findByIsAdmin", query = "SELECT u FROM Users u WHERE u.isAdmin = :isAdmin"),
     @NamedQuery(name = "Users.findByCreatedAt", query = "SELECT u FROM Users u WHERE u.createdAt = :createdAt"),
@@ -100,13 +101,13 @@ public class Users implements Serializable {
             this.email = u.getEmail();
             this.firstName = u.getFirstName();
             this.lastName = u.getLastName();
+            this.userName = u.getUserName();
+            this.picture = u.getPicture();
             this.password = u.getPassword();
             this.isAdmin = u.getIsAdmin();
-            this.userName = u.getUserName();
             this.isDeleted = u.getIsDeleted();
             this.deletedAt = u.getDeletedAt();
             this.createdAt = u.getCreatedAt();
-            this.picture = u.getPicture();
         } catch (Exception ex) {
             System.err.println("Error: " + ex.getLocalizedMessage());
         } finally {
@@ -123,13 +124,13 @@ public class Users implements Serializable {
         this.password = password;
         this.isAdmin = isAdmin;
         this.userName = userName;
+        this.picture = picture;
         this.isDeleted = isDeleted;
         this.deletedAt = deletedAt;
         this.createdAt = createdAt;
-        this.picture = picture;
     }
 
-    public Users(String email, String firstName, String lastName, String picture, String userName, String password) {
+    public Users(String email, String firstName, String lastName, String userName, String picture,  String password) {
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
