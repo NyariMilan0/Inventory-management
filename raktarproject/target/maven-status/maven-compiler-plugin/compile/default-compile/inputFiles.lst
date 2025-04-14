@@ -4,6 +4,7 @@ C:\Users\nidid\Documents\inventory-managements\Inventory-management\raktarprojec
 C:\Users\nidid\Documents\inventory-managements\Inventory-management\raktarproject\src\main\java\com\helixlab\raktarproject\service\PalletService.java
 C:\Users\nidid\Documents\inventory-managements\Inventory-management\raktarproject\src\main\java\com\helixlab\raktarproject\model\ShelfsXStorage.java
 C:\Users\nidid\Documents\inventory-managements\Inventory-management\raktarproject\src\main\java\com\helixlab\raktarproject\controller\CorsFilter.java
+C:\Users\nidid\Documents\inventory-managements\Inventory-management\raktarproject\src\main\java\com\helixlab\raktarproject\service\InventorymovementService.java
 C:\Users\nidid\Documents\inventory-managements\Inventory-management\raktarproject\src\main\java\com\helixlab\raktarproject\service\MovementRequestService.java
 C:\Users\nidid\Documents\inventory-managements\Inventory-management\raktarproject\src\main\java\com\helixlab\raktarproject\service\ShelfService.java
 C:\Users\nidid\Documents\inventory-managements\Inventory-management\raktarproject\src\main\java\com\helixlab\raktarproject\service\UserService.java
@@ -29,4 +30,5 @@ C:\Users\nidid\Documents\inventory-managements\Inventory-management\raktarprojec
 C:\Users\nidid\Documents\inventory-managements\Inventory-management\raktarproject\src\main\java\com\helixlab\raktarproject\model\ShelfCapacitySummaryDTO.java
 C:\Users\nidid\Documents\inventory-managements\Inventory-management\raktarproject\src\main\java\com\helixlab\raktarproject\model\Users.java
 C:\Users\nidid\Documents\inventory-managements\Inventory-management\raktarproject\src\main\java\com\helixlab\raktarproject\config\JWT.java
+C:\Users\nidid\Documents\inventory-managements\Inventory-management\raktarproject\src\main\java\com\helixlab\raktarproject\controller\InventorymovementController.java
 C:\Users\nidid\Documents\inventory-managements\Inventory-management\raktarproject\src\main\java\com\helixlab\raktarproject\model\MovementRequests.java

@@ -20,7 +20,7 @@ public class MovementRequestService {
         try {
             movementList = layer.getMovementRequests();
         } catch (Exception e) {
-        System.err.println("Error fetching users: " + e.getMessage());
+        System.err.println("Error fetching MovementRequests: " + e.getMessage());
         }
         return movementList;
     }

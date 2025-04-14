@@ -4,7 +4,6 @@
  */
 package com.helixlab.raktarproject.model;
 
-import static com.helixlab.raktarproject.model.Users.emf;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
