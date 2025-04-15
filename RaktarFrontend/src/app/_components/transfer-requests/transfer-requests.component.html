@@ -1,0 +1,41 @@
+<div class="page-container">
+  <app-navbar class="sidebar"></app-navbar>
+  <div class="content-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="roboto-condensed">Transfer Requests</h1>
+      <div class="d-flex gap-2">
+        <div class="search-bar roboto-condensed">
+          <i class="bi bi-search"></i>
+          <input type="text" placeholder="Search..." (keyup)="search($event)" />
+        </div>
+        <button class="btn btn-custom" (click)="sortTable()">Sort by: <span>{{ sortDirectionLabel }}</span></button>
+      </div>
+    </div>
+    <div class="table-container">
+      <table class="table table-hover shadow-sm roboto-condensed">
+        <thead>
+          <tr>
+            <th>Pallets</th>
+            <th>Location</th>
+            <th>Target Location</th>
+            <th>Action Type</th>
+            <th>Time Limit</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of filteredData">
+            <td>{{ item.pallet }}</td>
+            <td>{{ item.location }}</td>
+            <td>{{ item.targetLocation }}</td>
+            <td>{{ item.actionType }}</td>
+            <td>{{ item.timeLimit }}</td>
+            <td>
+              <span [class]="item.status === 'Completed' ? 'status-completed' : item.status === 'Failed' ? 'status-failed' : 'status-pending'">{{ item.status }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,166 @@
+/* button shadow kell itt es a warehouse managmentnel a navbar megcsinalasa */
+
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap');
+
+.roboto-condensed {
+    font-family: "Roboto Condensed", serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+}
+
+:host {
+  display: block;
+  min-height: 100vh;
+  margin: 0;
+}
+
+.page-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: #F4F7FA;
+}
+
+.sidebar {
+  width: 60px;
+  background-color: #2C3E50;
+  transition: width 0.3s ease;
+}
+
+.sidebar:hover {
+  width: 200px;
+}
+
+.content-container {
+  flex: 1;
+  padding: 20px 20px 20px 0; /* Remove left padding to align with sidebar */
+  font-family: Arial, sans-serif;
+  margin-left: 45px; /* Matches collapsed sidebar width */
+  transition: margin-left 0.3s ease;
+  background-color: #F1FAEE;
+}
+
+.sidebar:hover ~ .content-container {
+  padding-left: 0; /* Ensure no left padding when expanded */
+}
+
+h1 {
+  color: #1D3557;
+  padding-left: 200px; /* Align with content edge */
+  margin: 0; /* Remove default margin */
+}
+
+.btn-custom {
+  background-color: #A8DADC;
+  color: #1D3557;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-weight: bold;
+}
+
+.btn-custom:hover {
+  background-color: #457B9D;
+}
+
+.table-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.table {
+  background-color: #F1FAEE;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  flex: 1;
+}
+
+.table thead {
+  background-color: #F4F7FA;
+  color: #1D3557;
+}
+
+.table th, .table td {
+  border-bottom: 1px solid #A8DADC;
+  border-right: none;
+  border-left: none;
+  padding: 16px;
+  vertical-align: middle;
+  color: #1D3557;
+  background-color: #F1FAEE;
+}
+
+.table th:last-child, .table td:last-child {
+  border-right: none;
+}
+
+.table th:first-child, .table td:first-child {
+  border-left: none;
+}
+
+.table tbody tr {
+  color: #1D3557;
+}
+
+.status-completed {
+  background-color: #D4EDDA;
+  color: #155724;
+  padding: 5px 10px;
+  border-radius: 15px;
+  display: inline-block;
+}
+
+.status-failed {
+  background-color: #F8D7DA;
+  color: #721c24;
+  padding: 5px 10px;
+  border-radius: 15px;
+  display: inline-block;
+}
+
+.status-pending {
+  background-color: #FFF3CD;
+  color: #856404;
+  padding: 5px 10px;
+  border-radius: 15px;
+  display: inline-block;
+}
+
+/* Search bar styles */
+.search-bar {
+  display: flex;
+  align-items: center;
+  background-color: #A8DADC;
+  border-radius: 10px;
+  padding: 5px 10px;
+  width: 200px;
+  border: 1px solid #A8DADC;
+}
+
+.search-bar:hover {
+  background-color: #457B9D;
+}
+
+.search-bar i {
+  margin-right: 8px;
+  color: #1D3557;
+}
+
+.search-bar input {
+  border: none;
+  background: none;
+  outline: none;
+  width: 100%;
+  font-size: 14px;
+  color: #1D3557;
+}
+
+.search-bar input::placeholder {
+  color: #1D3557;
+  font-weight: bold;
+}
+
+.search-bar, .btn-custom {
+  height: 38px; /* Matches btn-custom height */
+}
