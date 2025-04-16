@@ -59,18 +59,6 @@ public class ShelfControllerJUnitTests {
     // READ: GET /shelfs/getAllShelfs
     @Test
     public void testGetAllShelfs_withExistingShelfs_returnsShelfList() {
-        // Először hozzáadunk egy polcot
-        JSONObject requestBody = new JSONObject()
-                .put("storageId", 1)
-                .put("shelfName", "ListShelf")
-                .put("locationIn", "Aisle 2");
-
-        client.target(BASE_URI)
-                .path("addShelfToStorage")
-                .request(MediaType.APPLICATION_JSON)
-                .post(Entity.json(requestBody.toString()))
-                .close();
-
         Response response = client.target(BASE_URI)
                 .path("getAllShelfs")
                 .request(MediaType.APPLICATION_JSON)
@@ -107,21 +95,9 @@ public class ShelfControllerJUnitTests {
     // READ: GET /shelfs/getShelfsByStorageId
     @Test
     public void testGetShelfsByStorageId_withValidStorageId_returnsShelfs() {
-        // Először hozzáadunk egy polcot
-        JSONObject requestBody = new JSONObject()
-                .put("storageId", 1)
-                .put("shelfName", "StorageShelf")
-                .put("locationIn", "Aisle 4");
-
-        client.target(BASE_URI)
-                .path("addShelfToStorage")
-                .request(MediaType.APPLICATION_JSON)
-                .post(Entity.json(requestBody.toString()))
-                .close();
-
         Response response = client.target(BASE_URI)
                 .path("getShelfsByStorageId")
-                .queryParam("storageId", 1)
+                .queryParam("storageId", 100)
                 .request(MediaType.APPLICATION_JSON)
                 .get();
 
@@ -134,7 +110,7 @@ public class ShelfControllerJUnitTests {
 
         JSONArray shelves = responseBody.getJSONArray("shelves");
         JSONObject firstShelf = shelves.getJSONObject(0);
-        assertEquals("StorageShelf", firstShelf.getString("shelfName"), "A polc nevének meg kell egyeznie");
+        assertEquals("Shelf B", firstShelf.getString("shelfName"), "A polc nevének meg kell egyeznie");
 
         response.close();
     }
@@ -142,21 +118,9 @@ public class ShelfControllerJUnitTests {
     // DELETE: DELETE /shelfs/deleteShelfFromStorage
     @Test
     public void testDeleteShelfFromStorage_withValidId_returnsSuccess() {
-        // Először hozzáadunk egy polcot
-        JSONObject requestBody = new JSONObject()
-                .put("storageId", 1)
-                .put("shelfName", "DeleteShelf")
-                .put("locationIn", "Aisle 5");
-
-        client.target(BASE_URI)
-                .path("addShelfToStorage")
-                .request(MediaType.APPLICATION_JSON)
-                .post(Entity.json(requestBody.toString()))
-                .close();
-
         Response response = client.target(BASE_URI)
                 .path("deleteShelfFromStorage")
-                .queryParam("id", 1)
+                .queryParam("id", 12)
                 .request(MediaType.APPLICATION_JSON)
                 .delete();
 

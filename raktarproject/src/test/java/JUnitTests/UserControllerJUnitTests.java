@@ -39,11 +39,11 @@ public class UserControllerJUnitTests {
     @Test
     public void testRegisterUser_withValidData_returnsSuccess() {
         JSONObject requestBody = new JSONObject()
-                .put("email", "teszt.elekk@example.com")
-                .put("firstName", "Tesztt")
-                .put("lastName", "Elekk")
-                .put("userName", "tesztelekk")
-                .put("picture", "base64imagee")
+                .put("email", "teszt.elek@example.com")
+                .put("firstName", "Teszt")
+                .put("lastName", "Elek")
+                .put("userName", "tesztelek")
+                .put("picture", "base64image")
                 .put("password", "Test123!@#");
 
         Response response = client.target(BASE_URI)
@@ -64,7 +64,7 @@ public class UserControllerJUnitTests {
     @Test
     public void testRegisterAdmin_withValidData_returnsSuccess() {
         JSONObject requestBody = new JSONObject()
-                .put("email", "adminn@example.com")
+                .put("email", "admin@example.com")
                 .put("firstName", "Admin")
                 .put("lastName", "Főnök")
                 .put("userName", "adminfo")
@@ -88,21 +88,6 @@ public class UserControllerJUnitTests {
     // READ: GET /user/getAllUsers
     @Test
     public void testGetAllUsers_withExistingUsers_returnsUserList() {
-        // Először regisztrálunk egy felhasználót
-        JSONObject requestBody = new JSONObject()
-                .put("email", "lista.teszt@example.com")
-                .put("firstName", "Lista")
-                .put("lastName", "Teszt")
-                .put("userName", "listateszt")
-                .put("picture", "base64image")
-                .put("password", "Lista123!@#");
-
-        client.target(BASE_URI)
-                .path("registerUser")
-                .request(MediaType.APPLICATION_JSON)
-                .post(Entity.json(requestBody.toString()))
-                .close();
-
         Response response = client.target(BASE_URI)
                 .path("getAllUsers")
                 .request(MediaType.APPLICATION_JSON)
@@ -136,6 +121,24 @@ public class UserControllerJUnitTests {
 
         response.close();
     }
+    
+    @Test
+    public void testGetUserById_withouthValidId() {
+
+        Response response = client.target(BASE_URI)
+                .path("getUserById")
+                .queryParam("id", 9999)
+                .request(MediaType.APPLICATION_JSON)
+                .get();
+
+        assertEquals(200, response.getStatus(), "A státusznak 200-nak kell lennie");
+
+        JSONObject responseBody = new JSONObject(response.readEntity(String.class));
+        assertTrue(responseBody.has("id"), "A válaszban szerepelnie kell az 'id' mezőnek");
+        assertEquals("user9999@example.com", responseBody.getString("email"), "Az emailnek meg kell egyeznie");
+
+        response.close();
+    }
 
     // UPDATE: PUT /user/passwordChangeByUserId
     @Test
@@ -144,7 +147,7 @@ public class UserControllerJUnitTests {
         // Jelszó módosítása
         JSONObject requestBody = new JSONObject()
                 .put("userId", 2)
-                .put("oldPassword", "password123")
+                .put("oldPassword", "Rosszpassword123")
                 .put("newPassword", "New123!@#");
 
         Response response = client.target(BASE_URI)
@@ -167,7 +170,7 @@ public class UserControllerJUnitTests {
 
         // Felhasználónév módosítása
         JSONObject requestBody = new JSONObject()
-                .put("userId", 3)
+                .put("userId", 1000)
                 .put("newUsername", "ujteszt");
 
         Response response = client.target(BASE_URI)

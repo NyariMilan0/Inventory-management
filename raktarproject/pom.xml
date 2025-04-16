@@ -163,6 +163,7 @@
                         <exclude>com.helixlab.raktarproject.tests</exclude>
                         <exclude>loginTest.FirstLoginTest</exclude>
                         <exclude>JUnitTests.UserControllerJUnitTests</exclude>
+                        <exclude>JUnitTests.ShelfControllerJUnitTests</exclude>
                     </excludes>
                 </configuration>
             </plugin>

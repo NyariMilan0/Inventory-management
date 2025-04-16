@@ -278,22 +278,34 @@ public class Shelfs implements Serializable {
         Boolean toReturn = false;
 
         try {
+            Shelfs shelf = em.find(Shelfs.class, id);
+            if (shelf == null) {
+                System.err.println("Cannot delete: Shelf with ID " + id + " does not exist");
+                return false;
+            }
+
             StoredProcedureQuery spq = em.createStoredProcedureQuery("deleteShelfFromStorage");
             spq.registerStoredProcedureParameter("shelfIdIn", Integer.class, ParameterMode.IN);
             spq.setParameter("shelfIdIn", id);
 
             spq.execute();
 
-            toReturn = true;
+            shelf = em.find(Shelfs.class, id);
+            if (shelf == null) {
+                toReturn = true;
+            } else {
+                System.err.println("Shelf with ID " + id + " still exists after deletion attempt");
+            }
 
         } catch (Exception e) {
-            System.err.println("Error: " + e.getLocalizedMessage());
+            System.err.println("Error deleting shelf with ID " + id + ": " + e.getLocalizedMessage());
             toReturn = false;
         } finally {
             em.clear();
             em.close();
-            return toReturn;
         }
+
+        return toReturn;
     }
 
     public static void addShelfToStorage(String shelfName, String locationIn, Integer storageId) {
