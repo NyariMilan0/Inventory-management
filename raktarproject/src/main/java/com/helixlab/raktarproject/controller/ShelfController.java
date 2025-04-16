@@ -3,7 +3,6 @@ package com.helixlab.raktarproject.controller;
 import com.helixlab.raktarproject.model.PalletShelfDTO;
 import com.helixlab.raktarproject.model.ShelfCapacitySummaryDTO;
 import com.helixlab.raktarproject.model.Shelfs;
-import com.helixlab.raktarproject.model.Users;
 import com.helixlab.raktarproject.service.ShelfService;
 import java.util.ArrayList;
 import java.util.List;
@@ -106,22 +105,49 @@ public class ShelfController {
     @Path("deleteShelfFromStorage")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteShelfFromStorage(@QueryParam("id") Integer id) {
-        Boolean response = layer.deleteShelfFromStorage(id);
-        JSONObject toReturn = new JSONObject();
+        JSONObject responseObj = new JSONObject();
 
-        String result = "";
+        try {
+            if (id == null || id <= 0) {
+                responseObj.put("statusCode", 400);
+                responseObj.put("message", "Invalid or missing shelf ID");
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(responseObj.toString())
+                        .type(MediaType.APPLICATION_JSON)
+                        .build();
+            }
 
-        if (response == false) {
-            result = "fail";
-        } else {
-            result = "success";
+            Boolean result = layer.deleteShelfFromStorage(id);
+
+            if (!result) {
+                responseObj.put("statusCode", 404);
+                responseObj.put("message", "Shelf with ID " + id + " not found or could not be deleted");
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity(responseObj.toString())
+                        .type(MediaType.APPLICATION_JSON)
+                        .build();
+            }
+
+            responseObj.put("statusCode", 200);
+            responseObj.put("message", "Shelf successfully deleted");
+            responseObj.put("result", "success");
+
+            return Response.status(Response.Status.OK)
+                    .entity(responseObj.toString())
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+
+        } catch (Exception e) {
+            responseObj.put("statusCode", 500);
+            responseObj.put("message", "Failed to delete shelf");
+            responseObj.put("error", e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(responseObj.toString())
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
         }
-
-        toReturn.put("result", result);
-
-        return Response.status(Response.Status.OK).entity(toReturn.toString()).type(MediaType.APPLICATION_JSON).build();
-
     }
+
 
     @POST
     @Path("addShelfToStorage")

@@ -203,7 +203,7 @@ public class UserService {
     public Boolean deletUser(Integer id) {
         Users u = getUserById(id);
 
-        if (u != null) {
+        if (u != null && layer.getIsDeleted() == false) {
             return layer.deleteUser(id);
         } else {
             System.err.println("The user doesn't exist");

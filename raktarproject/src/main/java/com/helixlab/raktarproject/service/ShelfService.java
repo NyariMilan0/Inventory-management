@@ -35,14 +35,21 @@ public class ShelfService {
     }
 
     public Boolean deleteShelfFromStorage(Integer id) {
-        Shelfs s = getShelfsById(id);
-
-        if (s != null) {
-            return layer.deleteShelfFromStorage(id);
-        } else {
-            System.err.println("The Shelf doesn't exist");
+        // Validate if shelf exists
+        Shelfs shelf = getShelfsById(id);
+        if (shelf == null) {
+            System.err.println("Cannot delete: Shelf with ID " + id + " does not exist");
             return false;
         }
+
+        // Attempt to delete the shelf
+        Boolean deletionResult = layer.deleteShelfFromStorage(id);
+        if (!deletionResult) {
+            System.err.println("Failed to delete shelf with ID " + id + ": Deletion operation returned false");
+            return false;
+        }
+
+        return true;
     }
 
     public void addShelfToStorage(String shelfName, String locationIn, Integer storageId) {
