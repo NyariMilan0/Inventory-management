@@ -2,7 +2,7 @@
 <div class="sidebar-container roboto-condensed" [class.visible]="isVisible" [class.expanded]="isExpanded">
 
   <!-- Oldalsáv (Sidebar) -->
-    <div class="sidebar">
+  <div class="sidebar" #menuContainer>
   
   <!-- Fő menü (Menu Main) -->
       <a class="menuMain">
@@ -50,9 +50,16 @@
   <div class="main-content">
   
   <!-- Hamburger menü (Hamburger Menu) -->
-    <button *ngIf="isMobile" class="hamburger" (click)="toggleMenu()">
-      <i class="fa-solid fa-bars"></i>
-    </button>
+   <!-- Hamburger menü (Hamburger Menu) -->
+<button
+*ngIf="isMobile"
+class="hamburger"
+#hamburgerButton
+(click)="toggleMenu()"
+>
+<i class="fa-solid fa-bars"></i>
+</button>
+
   
   <!-- Tartalom beágyazás (Content Projection) -->
     <ng-content></ng-content>
