@@ -7,6 +7,12 @@
     font-style: normal;
 }
 
+.sidebar {
+  width: 60px;
+  background-color: #2C3E50;
+  transition: width 0.5s ease;
+}
+
 * {
   margin: 0;
   padding: 0;

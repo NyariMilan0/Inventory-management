@@ -6,7 +6,7 @@
   z-index: 1000;
   visibility: visible;
   opacity: 1;
-  transition: opacity 0.5s linear;
+  transition: opacity 0.6s linear; /* Adjusted to 0.6s for slower animation */
 }
 
 .sidebar-container.visible {
@@ -19,7 +19,7 @@
   width: 100px;
   height: 100vh;
   background: #457B9D;
-  transition: all 0.3s ease;
+  transition: all 0.6s ease; /* Adjusted to 0.6s for slower animation */
   overflow: hidden;
   position: fixed;
   z-index: 1000;
@@ -142,17 +142,6 @@
   width: 100%;
 }
 
-/* Fő tartalom (Main Content) */
-.main-content {
-  margin-left: 100px;
-  transition: margin-left 0.3s ease;
-  position: relative;
-}
-
-.sidebar-container.expanded ~ .main-content {
-  margin-left: 250px;
-}
-
 /* Hamburger menü (Hamburger Menu) */
 .hamburger {
   background-color: #F1FAEE;
@@ -174,16 +163,4 @@
     width: 250px;
     transform: translateX(0);
   }
-  .main-content {
-    margin-left: 0;
-    background-color: #F1FAEE;
-  }
-  .sidebar-container.expanded ~ .main-content {
-    margin-left: 250px;
-  }
-}
-
-/* Egyéb komponens stílusok (Component Specific) */
-app-navbar {
-  width: auto;
 }

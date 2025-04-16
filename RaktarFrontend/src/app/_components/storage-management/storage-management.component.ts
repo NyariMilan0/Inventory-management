@@ -1,4 +1,3 @@
-//Importok és komponens definíció
 import { Component, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
@@ -14,8 +13,6 @@ import { ReactiveFormsModule } from '@angular/forms';
   templateUrl: './storage-management.component.html',
   styleUrls: ['./storage-management.component.css']
 })
-
-//Osztály és változók
 export class StorageManagementComponent implements AfterViewInit, OnDestroy {
   storages: any[] = [];
   selectedStorage: any = null;
@@ -39,7 +36,6 @@ export class StorageManagementComponent implements AfterViewInit, OnDestroy {
   private animationFrameId: number | null = null;
   private eventListeners: any = {};
 
-//Konstruktor és kezdeti betöltés
   constructor(private http: HttpClient) {
     this.loadStorages();
     this.loadOverallCapacity();
@@ -47,7 +43,6 @@ export class StorageManagementComponent implements AfterViewInit, OnDestroy {
     this.loadItems();
   }
 
-//Életciklus hook-ok
   ngAfterViewInit() {
     this.setupDragging();
     this.duplicateItemsForInfiniteScroll();
@@ -61,7 +56,11 @@ export class StorageManagementComponent implements AfterViewInit, OnDestroy {
     this.removeEventListeners();
   }
 
-//Adatok betöltése a backendről
+  // Sidebar állapot kezelése
+  onSidebarToggle(state: boolean) {
+    this.sidebarOpen = state;
+  }
+
   loadStorages() {
     this.http.get('http://127.0.0.1:8080/raktarproject-1.0-SNAPSHOT/webresources/storage/getAllStorages')
       .subscribe({
@@ -76,7 +75,6 @@ export class StorageManagementComponent implements AfterViewInit, OnDestroy {
       });
   }
 
-//Teljes kapacitás betöltése
   loadOverallCapacity() {
     this.http.get('http://127.0.0.1:8080/raktarproject-1.0-SNAPSHOT/webresources/shelfs/getCapacityByShelfUsage')
       .subscribe({
@@ -88,7 +86,6 @@ export class StorageManagementComponent implements AfterViewInit, OnDestroy {
       });
   }
 
-//Raklapok betöltése
   loadPallets() {
     this.http.get('http://127.0.0.1:8080/raktarproject-1.0-SNAPSHOT/webresources/shelfs/getPalletsWithShelfs')
       .subscribe({
@@ -101,7 +98,6 @@ export class StorageManagementComponent implements AfterViewInit, OnDestroy {
       });
   }
 
-//Termékek betöltése
   loadItems() {
     this.http.get('http://127.0.0.1:8080/raktarproject-1.0-SNAPSHOT/webresources/items/getItemList')
       .subscribe({
@@ -113,7 +109,6 @@ export class StorageManagementComponent implements AfterViewInit, OnDestroy {
       });
   }
 
-//Polcok betöltése egy tárolóhoz
   loadShelvesForStorage(storageId: number) {
     this.http.get(`http://127.0.0.1:8080/raktarproject-1.0-SNAPSHOT/webresources/shelfs/getShelfsByStorageId?storageId=${storageId}`)
       .subscribe({
@@ -136,7 +131,6 @@ export class StorageManagementComponent implements AfterViewInit, OnDestroy {
       });
   }
 
-//Polcok frissítése raklapokkal
   updateShelvesWithPallets() {
     if (this.shelves.length === 0 || this.pallets.length === 0) return;
 
@@ -150,7 +144,6 @@ export class StorageManagementComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-//Alacsony készletű termékek frissítése
   updateLowStockItems() {
     if (this.items.length === 0 || this.pallets.length === 0) return;
 
@@ -173,7 +166,6 @@ export class StorageManagementComponent implements AfterViewInit, OnDestroy {
       .filter(item => item.stock < 10);
   }
 
-//Tároló és polc kiválasztása
   selectStorage(storage: any) {
     this.selectedStorage = storage;
     this.loadShelvesForStorage(storage.id);
@@ -185,22 +177,15 @@ export class StorageManagementComponent implements AfterViewInit, OnDestroy {
     this.showPopup = false;
   }
 
-//Felugró ablak és oldalsáv kezelése
   togglePopup() {
     this.showPopup = !this.showPopup;
   }
 
-  toggleSidebar() {
-    this.sidebarOpen = !this.sidebarOpen;
-  }
-
-//Raklapok lekérése egy polchoz
   getPalletsForSelectedShelf() {
     if (!this.selectedShelf) return [];
     return this.pallets.filter(pallet => pallet.shelfId === this.selectedShelf.id);
   }
 
-//Rács generálása
   getSectionSpaces() {
     if (!this.selectedShelf) return [];
     
@@ -231,14 +216,12 @@ export class StorageManagementComponent implements AfterViewInit, OnDestroy {
     return grids;
   }
 
-//Karuszell funkcionalitás
   private duplicateItemsForInfiniteScroll() {
     const items = this.carouselItems.nativeElement.children as HTMLCollectionOf<HTMLElement>;
     const clone = Array.from(items, (item: HTMLElement) => item.cloneNode(true) as HTMLElement);
     clone.forEach((clonedItem: HTMLElement) => this.carouselItems.nativeElement.appendChild(clonedItem));
   }
 
-//Húzás beállítása
   private setupDragging() {
     const carousel = this.carouselItems.nativeElement as HTMLElement;
     const container = this.carouselContainer.nativeElement as HTMLElement;
@@ -289,7 +272,6 @@ export class StorageManagementComponent implements AfterViewInit, OnDestroy {
     this.startAutoScroll();
   }
 
-//Eseménykezelők eltávolítása
   private removeEventListeners() {
     const container = this.carouselContainer.nativeElement as HTMLElement;
     container.removeEventListener('mousedown', this.eventListeners.onMouseDown);
@@ -298,7 +280,6 @@ export class StorageManagementComponent implements AfterViewInit, OnDestroy {
     container.removeEventListener('mouseleave', this.eventListeners.onMouseLeave);
   }
 
-//Pozíció kiszámítása és határok ellenőrzése 
   private getTranslateY(): number {
     const style = window.getComputedStyle(this.carouselItems.nativeElement);
     const transform = style.transform || style.webkitTransform;
@@ -322,7 +303,6 @@ export class StorageManagementComponent implements AfterViewInit, OnDestroy {
     carousel.style.transform = `translateY(${translateY}px)`;
   }
 
-//Automatikus görgetés
   private startAutoScroll() {
     const carousel = this.carouselItems.nativeElement as HTMLElement;
     const containerHeight = this.carouselContainer.nativeElement.offsetHeight;
@@ -346,7 +326,6 @@ export class StorageManagementComponent implements AfterViewInit, OnDestroy {
     this.animationFrameId = requestAnimationFrame(scroll);
   }
 
-//Keresés
   private setupSearch() {
     const input = this.searchInput.nativeElement as HTMLInputElement;
     input.addEventListener('input', () => {

@@ -1,3 +1,5 @@
+<app-admin-panel></app-admin-panel>
+<app-profile></app-profile>
 <div class="page-container">
   <app-navbar class="sidebar"></app-navbar>
   <div class="content-container">
@@ -21,6 +23,7 @@
             <th>Action Type</th>
             <th>Time Limit</th>
             <th>Status</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -32,6 +35,9 @@
             <td>{{ item.timeLimit }}</td>
             <td>
               <span [class]="item.status === 'Completed' ? 'status-completed' : item.status === 'Failed' ? 'status-failed' : 'status-pending'">{{ item.status }}</span>
+            </td>
+            <td>
+              <button *ngIf="item.status === 'Pending'" class="btn btn-complete" (click)="confirmComplete(item)">Complete</button>
             </td>
           </tr>
         </tbody>
