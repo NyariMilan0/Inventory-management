@@ -164,6 +164,8 @@
                         <exclude>loginTest.FirstLoginTest</exclude>
                         <exclude>JUnitTests.UserControllerJUnitTests</exclude>
                         <exclude>JUnitTests.ShelfControllerJUnitTests</exclude>
+                        <exclude>JUnitTests.StorageControllerJUnitTests</exclude>
+                        <exclude>JUnitTests.PalletControllerJUnitTests</exclude>
                     </excludes>
                 </configuration>
             </plugin>

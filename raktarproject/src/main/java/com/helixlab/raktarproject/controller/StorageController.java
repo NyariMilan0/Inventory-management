@@ -56,7 +56,7 @@ public class StorageController {
 
             layer.addStorage(storageName, location);
 
-            responseObj.put("statusCode", 200); // Created
+            responseObj.put("statusCode", 201); // Created
             responseObj.put("message", "Storage successfully added");
             responseObj.put("storageName", storageName);
             responseObj.put("location", location);
