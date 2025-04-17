@@ -17,6 +17,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.ParameterMode;
 import javax.persistence.Persistence;
 import javax.persistence.StoredProcedureQuery;
 import javax.persistence.Table;
@@ -76,7 +77,7 @@ public class MovementRequests implements Serializable {
     @Column(name = "timeLimit")
     @Temporal(TemporalType.TIMESTAMP)
     private Date timeLimit;
-    
+
     static EntityManagerFactory emf = Persistence.createEntityManagerFactory("com.helixLab_raktarproject_war_1.0-SNAPSHOTPU");
 
     public MovementRequests() {
@@ -84,10 +85,10 @@ public class MovementRequests implements Serializable {
 
     public MovementRequests(Integer id) {
         EntityManager em = emf.createEntityManager();
-        
+
         try {
             MovementRequests mr = em.find(MovementRequests.class, id);
-            
+
             this.id = mr.getId();
             this.adminId = mr.getAdminId();
             this.palletId = mr.getPalletId();
@@ -97,14 +98,14 @@ public class MovementRequests implements Serializable {
             this.status = mr.getStatus();
             this.timeLimit = mr.getTimeLimit();
         } catch (Exception ex) {
-        System.err.println("Error: " + ex.getLocalizedMessage());
+            System.err.println("Error: " + ex.getLocalizedMessage());
         } finally {
             em.clear();
             em.close();
         }
     }
-    
-    public MovementRequests(Integer id, int adminId, int palletId, int fromshelfId, int  toShelfId, String actionType, String status, Date timeLimit){
+
+    public MovementRequests(Integer id, int adminId, int palletId, int fromshelfId, int toShelfId, String actionType, String status, Date timeLimit) {
         this.id = id;
         this.adminId = adminId;
         this.palletId = palletId;
@@ -212,29 +213,143 @@ public class MovementRequests implements Serializable {
     public String toString() {
         return "com.helixlab.raktarproject.model.MovementRequests[ id=" + id + " ]";
     }
-    
-    public static ArrayList<MovementRequests> getMovementRequests(){
+
+    public static ArrayList<MovementRequests> getMovementRequests() {
         EntityManager em = emf.createEntityManager();
         ArrayList<MovementRequests> movementList = new ArrayList<>();
-        
+
         try {
             StoredProcedureQuery spq = em.createStoredProcedureQuery("getMovementRequests", MovementRequests.class);
             spq.execute();
             movementList = new ArrayList<>(spq.getResultList());
         } catch (Exception e) {
-        System.err.println("Error: " + e.getLocalizedMessage());
+            System.err.println("Error: " + e.getLocalizedMessage());
         } finally {
             em.clear();
             em.close();
         }
-        
+
         return movementList;
     }
-    
-    
-    
-    
-    
-    
-    
+
+    public boolean completeMovementRequest(Integer movementRequestId, Integer userId) {
+        EntityManager em = emf.createEntityManager();
+        boolean success = false;
+        try {
+            em.getTransaction().begin();
+
+            // Ellenőrizzük, hogy a kérelem létezik-e és pending státuszú-e
+            MovementRequests request = em.find(MovementRequests.class, movementRequestId);
+            if (request == null) {
+                throw new IllegalArgumentException("Movement request with ID " + movementRequestId + " does not exist");
+            }
+            if (!"pending".equalsIgnoreCase(request.getStatus())) {
+                throw new IllegalArgumentException("Movement request with ID " + movementRequestId + " is already completed or invalid");
+            }
+
+            StoredProcedureQuery spq = em.createStoredProcedureQuery("completeMovementRequest");
+            spq.registerStoredProcedureParameter("movementRequestIdIn", Integer.class, ParameterMode.IN);
+            spq.registerStoredProcedureParameter("userIdIn", Integer.class, ParameterMode.IN);
+            spq.setParameter("movementRequestIdIn", movementRequestId);
+            spq.setParameter("userIdIn", userId);
+            spq.execute();
+
+            // Ellenőrizzük, hogy a státusz megváltozott-e
+            em.refresh(request); // Frissítjük az entitást az adatbázis aktuális állapotával
+            if ("completed".equalsIgnoreCase(request.getStatus())) {
+                success = true;
+            }
+
+            em.getTransaction().commit();
+        } catch (IllegalArgumentException e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            System.err.println("Error in completeMovementRequest: " + e.getMessage());
+            throw new RuntimeException("Failed to complete movement request", e);
+        } finally {
+            em.close();
+        }
+        return success;
+    }
+
+    public static void createAddMovementRequest(int adminId, int palletId, int toShelfId, Date timeLimit) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            StoredProcedureQuery spq = em.createStoredProcedureQuery("createAddMovementRequest");
+            spq.registerStoredProcedureParameter("adminIdIn", Integer.class, ParameterMode.IN);
+            spq.registerStoredProcedureParameter("palletIdIn", Integer.class, ParameterMode.IN);
+            spq.registerStoredProcedureParameter("toShelfIdIn", Integer.class, ParameterMode.IN);
+            spq.registerStoredProcedureParameter("timeLimitIn", Date.class, ParameterMode.IN);
+
+            spq.setParameter("adminIdIn", adminId);
+            spq.setParameter("palletIdIn", palletId);
+            spq.setParameter("toShelfIdIn", toShelfId);
+            spq.setParameter("timeLimitIn", timeLimit);
+
+            spq.execute();
+        } catch (Exception e) {
+            System.err.println("Error executing createAddMovementRequest: " + e.getLocalizedMessage());
+            throw e;
+        } finally {
+            em.clear();
+            em.close();
+        }
+    }
+
+    public static void createMoveMovementRequest(int adminId, int palletId, int fromShelfId, int toShelfId, Date timeLimit) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            StoredProcedureQuery spq = em.createStoredProcedureQuery("createMoveMovementRequest");
+            spq.registerStoredProcedureParameter("adminIdIn", Integer.class, ParameterMode.IN);
+            spq.registerStoredProcedureParameter("palletIdIn", Integer.class, ParameterMode.IN);
+            spq.registerStoredProcedureParameter("fromShelfIdIn", Integer.class, ParameterMode.IN);
+            spq.registerStoredProcedureParameter("toShelfIdIn", Integer.class, ParameterMode.IN);
+            spq.registerStoredProcedureParameter("timeLimitIn", Date.class, ParameterMode.IN);
+
+            spq.setParameter("adminIdIn", adminId);
+            spq.setParameter("palletIdIn", palletId);
+            spq.setParameter("fromShelfIdIn", fromShelfId);
+            spq.setParameter("toShelfIdIn", toShelfId);
+            spq.setParameter("timeLimitIn", timeLimit);
+
+            spq.execute();
+        } catch (Exception e) {
+            System.err.println("Error executing createMoveMovementRequest: " + e.getLocalizedMessage());
+            throw e;
+        } finally {
+            em.clear();
+            em.close();
+        }
+    }
+
+    public static void createRemoveMovementRequest(int adminId, int palletId, int fromShelfId, Date timeLimit) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            StoredProcedureQuery spq = em.createStoredProcedureQuery("createRemoveMovementRequest");
+            spq.registerStoredProcedureParameter("adminIdIn", Integer.class, ParameterMode.IN);
+            spq.registerStoredProcedureParameter("palletIdIn", Integer.class, ParameterMode.IN);
+            spq.registerStoredProcedureParameter("fromShelfIdIn", Integer.class, ParameterMode.IN);
+            spq.registerStoredProcedureParameter("timeLimitIn", Date.class, ParameterMode.IN);
+
+            spq.setParameter("adminIdIn", adminId);
+            spq.setParameter("palletIdIn", palletId);
+            spq.setParameter("fromShelfIdIn", fromShelfId);
+            spq.setParameter("timeLimitIn", timeLimit);
+
+            spq.execute();
+        } catch (Exception e) {
+            System.err.println("Error executing createRemoveMovementRequest: " + e.getLocalizedMessage());
+            throw e;
+        } finally {
+            em.clear();
+            em.close();
+        }
+    }
+
 }
