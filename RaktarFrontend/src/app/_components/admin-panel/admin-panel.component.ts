@@ -1,22 +1,21 @@
 import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { ModalService } from '../../_services/modal.service';
-import { AdminPanelService, Storage, Shelf, Item, ApiResponse } from '../../_services/admin-panel.service';
+import { AdminPanelService, Storage, Shelf, Item, ApiResponse, User } from '../../_services/admin-panel.service';
 import { Router, NavigationEnd } from '@angular/router';
 
 @Component({
   selector: 'app-admin-panel',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './admin-panel.component.html',
   styleUrls: ['./admin-panel.component.css']
 })
-
-/* Osztály és változók */
 export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
+  // FormGroup változók
   userForm: FormGroup;
   adminForm: FormGroup;
   itemForm: FormGroup;
@@ -24,28 +23,39 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
   shelfForm: FormGroup;
   deleteShelfForm: FormGroup;
   deleteStorageForm: FormGroup;
+
+  // Állapotváltozók
   showModal: boolean = false;
   activeTab: string = 'registerUser';
-  userMessage: string = '';
-  adminMessage: string = '';
-  itemMessage: string = '';
-  storageMessage: string = '';
-  shelfMessage: string = '';
-  deleteShelfMessage: string = '';
-  deleteStorageMessage: string = '';
-  userMessageClass: string = '';
-  adminMessageClass: string = '';
-  itemMessageClass: string = '';
-  storageMessageClass: string = '';
-  shelfMessageClass: string = '';
-  deleteShelfMessageClass: string = '';
-  deleteStorageMessageClass: string = '';
-  storages: Storage[] = [];
-  shelves: Shelf[] = [];
   private subscription: Subscription = new Subscription();
   private wasClosedByEsc: boolean = false;
+  isAscending: boolean = true; // Új változó a rendezési irányhoz
 
-  /* Konstruktor */
+  // Üzenetváltozók és osztályok
+  userMessage: string = '';
+  userMessageClass: string = '';
+  adminMessage: string = '';
+  adminMessageClass: string = '';
+  itemMessage: string = '';
+  itemMessageClass: string = '';
+  storageMessage: string = '';
+  storageMessageClass: string = '';
+  shelfMessage: string = '';
+  shelfMessageClass: string = '';
+  deleteShelfMessage: string = '';
+  deleteShelfMessageClass: string = '';
+  deleteStorageMessage: string = '';
+  deleteStorageMessageClass: string = '';
+  deleteUserMessage: string = '';
+  deleteUserMessageClass: string = '';
+
+  // Adatváltozók
+  storages: Storage[] = [];
+  shelves: Shelf[] = [];
+  users: User[] = [];
+  filteredUsers: User[] = [];
+  searchTerm: string = '';
+
   constructor(
     private fb: FormBuilder,
     private modalService: ModalService,
@@ -102,7 +112,6 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
-  /* Inicializálás (ngOnInit) */
   ngOnInit(): void {
     this.subscription.add(
       this.modalService.showAdminModal$.subscribe(show => {
@@ -126,7 +135,6 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     );
   }
 
-  /* Nézet inicializálása */
   ngAfterViewInit(): void {
     const modalElement = document.getElementById('adminPanelModal');
     if (modalElement) {
@@ -148,7 +156,6 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  /* Megsemmisítés */
   ngOnDestroy(): void {
     this.modalService.closeAdminModal();
     this.subscription.unsubscribe();
@@ -161,7 +168,6 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-    /* Modál kezelés (Modal Handling) */
   openModal(): void {
     const modalElement = document.getElementById('adminPanelModal');
     if (modalElement && this.showModal) {
@@ -189,7 +195,6 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  /* Validátorok a jelszóra (Validators) */
   passwordComplexityValidator(): ValidatorFn {
     return (control: AbstractControl): { [key: string]: any } | null => {
       const value = control.value || '';
@@ -202,7 +207,6 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     };
   }
 
-  /* Hibakezelés (Error Handling) */
   getErrorMessage(control: AbstractControl | null, fieldName: string): string {
     if (!control || !control.errors || !control.touched) return '';
     const errors = control.errors;
@@ -214,8 +218,6 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     return `Invalid ${fieldName.toLowerCase()}. Please check and try again!`;
   }
 
-
-  /* Adatok betöltése */
   fetchStorages(): void {
     this.adminPanelService.getAllStorages().subscribe({
       next: (response) => this.handleFetchResponse(response, 'storages'),
@@ -234,7 +236,17 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
-   /* Eseménykezelők (Event Handlers) */
+  fetchUsers(): void {
+    this.adminPanelService.getUsers().subscribe({
+      next: (response) => this.handleFetchResponse(response, 'users'),
+      error: (err) => {
+        this.users = [];
+        this.deleteUserMessage = err.status === 404 ? 'No users found.' : 'Error fetching users.';
+        this.deleteUserMessageClass = err.status === 404 ? 'info-message' : 'error-message';
+      }
+    });
+  }
+
   onStorageChange(event: Event): void {
     const storageId = Number((event.target as HTMLSelectElement).value);
     if (storageId) {
@@ -246,8 +258,6 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-
-  /* Űrlap műveletek (Form Actions) */
   onUserSubmit(): void {
     if (this.userForm.invalid) {
       this.userForm.markAllAsTouched();
@@ -333,8 +343,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     };
     this.adminPanelService.addShelf(shelfData).subscribe({
       next: (response) => {
-        this.shelfMessage = response.message;
-        this.shelfMessageClass = response.success ? 'success-message' : 'error-message';
+        this.handleResponse(response, 'shelf');
         if (response.success) {
           this.shelfForm.reset();
           this.fetchStorages();
@@ -394,8 +403,52 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
+  onDeleteUserSubmit(userId: number): void {
+    this.deleteUserMessage = '';
+    this.deleteUserMessageClass = '';
+    this.adminPanelService.deleteUser(userId).subscribe({
+      next: (response) => {
+        this.handleResponse(response, 'deleteUser');
+        if (response.success) {
+          this.fetchUsers();
+        }
+      },
+      error: (err) => {
+        this.deleteUserMessage = 'Failed to delete user.';
+        this.deleteUserMessageClass = 'error-message';
+        console.error('Error deleting user:', err);
+      }
+    });
+  }
 
-  /* Segéd függvények (Helper Functions) */
+  filterUsers(): void {
+    if (!this.searchTerm) {
+      this.filteredUsers = this.users;
+    } else {
+      const term = this.searchTerm.toLowerCase();
+      this.filteredUsers = this.users.filter(user =>
+        user.userName.toLowerCase().includes(term) ||
+        user.firstName.toLowerCase().includes(term) ||
+        user.lastName.toLowerCase().includes(term) ||
+        user.email.toLowerCase().includes(term)
+      );
+    }
+  }
+
+  sortUsers(): void {
+    this.isAscending = !this.isAscending;
+    this.filteredUsers = [...this.filteredUsers].sort((a, b) => {
+        const comparison = a.userName.localeCompare(b.userName);
+        return this.isAscending ? comparison : -comparison;
+    });
+}
+
+  confirmDelete(userId: number): void {
+    if (confirm('Are you sure you want to delete this user?')) {
+      this.onDeleteUserSubmit(userId);
+    }
+  }
+
   private handleResponse(response: ApiResponse, type: string): void {
     switch (type) {
       case 'user':
@@ -433,6 +486,10 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
         this.deleteStorageMessageClass = response.success ? 'success-message' : 'error-message';
         if (response.success) this.deleteStorageForm.reset();
         break;
+      case 'deleteUser':
+        this.deleteUserMessage = response.message;
+        this.deleteUserMessageClass = response.success ? 'success-message' : 'error-message';
+        break;
     }
   }
 
@@ -465,12 +522,20 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
         this.deleteShelfMessage = response.success && this.shelves.length === 0 ? 'No shelves found for this storage.' : '';
         this.deleteShelfMessageClass = response.success && this.shelves.length === 0 ? 'info-message' : '';
         break;
+      case 'users':
+        this.users = response.data || [];
+        this.filteredUsers = this.users;
+        this.deleteUserMessage = response.success && this.users.length === 0 ? 'No users found.' : '';
+        this.deleteUserMessageClass = response.success && this.users.length === 0 ? 'info-message' : '';
+        break;
     }
   }
 
   private loadTabData(): void {
     if (this.activeTab === 'addShelf' || this.activeTab === 'deleteShelf' || this.activeTab === 'deleteStorage') {
       this.fetchStorages();
+    } else if (this.activeTab === 'deleteUser') {
+      this.fetchUsers();
     }
   }
 }

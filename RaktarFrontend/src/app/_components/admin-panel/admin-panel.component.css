@@ -252,3 +252,118 @@ h3 {
 .badge.bg-secondary {
     background-color: #6c757d;
 }
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    height: 50px;
+    width: 220px;
+    border-radius: 10px;
+  }
+  .search-bar i {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 50px;
+    background-color: #A8DADC;
+    border: 1px solid #457B9D;
+    border-right: none;
+    color: #1D3557;
+    padding: 0 10px;
+    border-radius: 5px 0px 0px 5px;
+    border-right: #1D3557 solid 1px;
+  }
+  .search-bar input {
+    flex: 1;
+    height: 50px;
+    border: 1px solid #457B9D;
+    border-left: none;
+    color: #1D3557;
+    padding-left: 10px;
+    outline: none;
+    border-radius: 0px 5px 5px 0px;
+  }
+  .search-bar input::placeholder {
+    color: #4a5568;
+  }
+  .search-bar input:focus {
+    box-shadow: 0 0 0 0.2rem #A8DADC;
+    border-color: #457B9D;
+  }
+  .btn-custom {
+    border-color: #457B9D;
+    color: #1D3557;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 80px;
+    height: 50px;
+    padding: 0 12px;
+    border-radius: 8px;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+  }
+  .btn-custom:focus {
+    box-shadow: 0 0 0 0.2rem #A8DADC;
+    outline: none;
+  }
+  .btn-custom:hover {
+    background-color: #457B9D;
+    border-color: #457B9D;
+    color: white;
+  }
+  .abc-icon {
+    margin-right: 5px;
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+}
+
+.abc-icon i {
+    transition: all 0.3s ease;
+}
+
+.abc-button:hover .abc-icon {
+    transform: scale(1.1);
+}
+
+.abc-button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 80px;
+    height: 50px;
+    padding: 0 12px;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.abc-text {
+    font-weight: 500;
+    transition: transform 0.3s ease;
+}
+  @media (max-width: 630px) {
+    .d-flex.gap-2 {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .search-bar, .btn-custom {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
+@media (max-width: 630px) {
+    .custom-modal-dialog {
+        max-width: 95%;
+    }
+}
+
+@media (max-width: 630px) {
+    .table {
+        font-size: 12px;
+    }
+    .table th:nth-child(2), .table td:nth-child(2) {
+        display: none;
+    }
+}

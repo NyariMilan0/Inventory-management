@@ -37,7 +37,7 @@ export class TransferRequestsComponent implements OnInit {
 
   ngOnInit() {
     this.updateExpiredStatuses();
-    setInterval(() => this.updateExpiredStatuses(), 60000); // Check every minute
+    setInterval(() => this.updateExpiredStatuses(), 60000); // Percenként frissiti hogy a task nem-e járt még le
   }
 
   updateExpiredStatuses() {
@@ -70,12 +70,12 @@ export class TransferRequestsComponent implements OnInit {
   }
 
   sortTable() {
-    this.sortDirection = this.sortDirection === 'newest' ? 'oldest' : 'newest';
+    this.sortDirection = this.sortDirection === ' Newest' ? ' Oldest' : ' Newest';
     this.sortDirectionLabel = this.sortDirection.charAt(0).toUpperCase() + this.sortDirection.slice(1);
     this.filteredData.sort((a, b) => {
       const timeA = new Date(a.timeLimit);
       const timeB = new Date(b.timeLimit);
-      return this.sortDirection === 'newest' ? timeB.getTime() - timeA.getTime() : timeA.getTime() - timeB.getTime();
+      return this.sortDirection === ' Newest' ? timeB.getTime() - timeA.getTime() : timeA.getTime() - timeB.getTime();
     });
   }
 

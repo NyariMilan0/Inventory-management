@@ -50,6 +50,10 @@
                 <a class="nav-link" [class.active]="activeTab === 'deleteStorage'" (click)="setActiveTab('deleteStorage')"
                   data-bs-toggle="tab" href="#deleteStorage">Delete Storage</a>
               </li>
+              <li class="nav-item">
+                <a class="nav-link" [class.active]="activeTab === 'deleteUser'" (click)="setActiveTab('deleteUser')"
+                   data-bs-toggle="tab" href="#deleteUser">Delete User</a>
+              </li>
             </ul>
 
 <!-- Tab tartalmak (Tab Content) -->
@@ -463,6 +467,54 @@
                     </div>
                     <button type="submit" class="btn btn-danger w-100 mt-3" [disabled]="deleteStorageForm.invalid">Delete Storage</button>
                   </form>
+                </div>
+              </div>
+<!-- User törlése tab -->
+              <div class="tab-pane" [class.active]="activeTab === 'deleteUser'" id="deleteUser">
+                <div class="register-section">
+                  <div class="text-center">
+                    <h3 class="mb-4">Delete User</h3>
+                  </div>
+                  @if (deleteUserMessage) {
+                    <div [class]="deleteUserMessageClass">
+                      <i class="fas fa-exclamation-circle"></i> {{ deleteUserMessage }}
+                    </div>
+                  }
+                  <div class="d-flex gap-2 mb-3">
+                    <div class="search-bar roboto-condensed">
+                      <i class="fas fa-search"></i>
+                      <input type="text" placeholder="Search users..." [(ngModel)]="searchTerm" (input)="filterUsers()">
+                    </div>
+                  
+                    <button class="btn btn-custom" (click)="sortUsers()">  <span class="abc-icon"><i class="fas" [ngClass]="{'fa-sort-alpha-down': !isAscending, 'fa-sort-alpha-up': isAscending}"></i></span>Sort ABC</button>
+                  </div>
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Username</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (user of filteredUsers; track user.id) {
+                        <tr>
+                          <td>{{ user.userName }}</td>
+                          <td>{{ user.firstName }} {{ user.lastName }}</td>
+                          <td>{{ user.email }}</td>
+                          <td>
+                            <button class="btn btn-danger" (click)="confirmDelete(user.id)">Delete</button>
+                          </td>
+                        </tr>
+                      }
+                      @if (filteredUsers.length === 0) {
+                        <tr>
+                          <td colspan="4" class="text-center text-muted">No users found.</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>

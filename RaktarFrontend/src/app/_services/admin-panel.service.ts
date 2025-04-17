@@ -38,6 +38,18 @@ export interface Item {
   description: string;
 }
 
+export interface User {
+  id: number;
+  userName: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  isAdmin: boolean;
+  createdAt: string;
+  picture?: string;
+  isDeleted: boolean;
+}
+
 export interface ApiResponse {
   success: boolean;
   message: string;
@@ -176,6 +188,40 @@ export class AdminPanelService {
     return this.http.delete(`${this.baseUrl}/storage/deleteStorageById?id=${storageId}`).pipe(
       map(() => ({ success: true, message: 'Storage deleted successfully!' })),
       catchError(this.handleHttpError('deleting storage'))
+    );
+  }
+
+  getUsers(): Observable<ApiResponse> {
+    return this.http.get<{ users: User[] }>(`${this.baseUrl}/user/getAllUsers`).pipe(
+      map(response => {
+        if (response && Array.isArray(response.users)) {
+          const users: User[] = response.users.map(user => ({
+            id: user.id,
+            userName: user.userName,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            isAdmin: user.isAdmin,
+            createdAt: user.createdAt,
+            picture: user.picture,
+            isDeleted: user.isDeleted
+          }));
+          return {
+            success: true,
+            message: 'Users loaded successfully',
+            data: users
+          };
+        }
+        return { success: false, message: 'Invalid users data', data: [] };
+      }),
+      catchError(this.handleHttpError('fetching users', []))
+    );
+  }
+
+  deleteUser(id: number): Observable<ApiResponse> {
+    return this.http.delete(`${this.baseUrl}/user/deleteUser?id=${id}`).pipe(
+      map(() => ({ success: true, message: 'User deleted successfully!' })),
+      catchError(this.handleHttpError('deleting user'))
     );
   }
 
