@@ -29,9 +29,9 @@ export class TransferRequestsComponent implements OnInit {
     { pallet: 'Pallet 15', location: 'Shelf 23', targetLocation: 'Shelf 7', actionType: 'Add', timeLimit: '2025-04-17 16:30:00', status: 'Pending' },
     { pallet: 'Pallet 6', location: 'Shelf 3', targetLocation: 'Shelf 15', actionType: 'Add', timeLimit: '2025-04-15 16:30:00', status: 'Pending' },
     { pallet: 'Pallet 11', location: 'Shelf 1', targetLocation: 'Shelf 21', actionType: 'Update', timeLimit: '2025-04-16 16:30:00', status: 'Pending' },
-    { pallet: 'Pallet 5', location: 'Shelf 17', targetLocation: 'Shelf 4', actionType: 'Remove', timeLimit: '2025-04-15 16:30:00', status: 'Pending' },
-    { pallet: 'Pallet 13', location: 'Shelf 6', targetLocation: 'Shelf 18', actionType: 'Move', timeLimit: '2025-04-17 16:30:00', status: 'Pending' },
-    { pallet: 'Pallet 17', location: 'Shelf 8', targetLocation: 'Shelf 9', actionType: 'Remove', timeLimit: '2025-04-16 16:30:00', status: 'Pending' }
+    { pallet: 'Pallet 5', location: 'Shelf 17', targetLocation: 'Shelf 4', actionType: 'Remove', timeLimit: '2025-05-15 16:30:00', status: 'Pending' },
+    { pallet: 'Pallet 13', location: 'Shelf 6', targetLocation: 'Shelf 18', actionType: 'Move', timeLimit: '2025-04-30 16:30:00', status: 'Pending' },
+    { pallet: 'Pallet 17', location: 'Shelf 8', targetLocation: 'Shelf 9', actionType: 'Remove', timeLimit: '2025-04-20 16:30:00', status: 'Pending' }
   ];
   filteredData: TransferItem[] = [...this.transferData];
 
