@@ -159,27 +159,37 @@ h3 {
 }
 
 /* Üzenetek (Messages) */
-.success-message {
-    color: green;
+.alert-success {
+    background-color: #28a745 !important;
+    color: #ffffff !important;
+    border: 1px solid #218838 !important;
+    border-radius: 6px;
+    padding: 8px 12px;
     font-size: 14px;
     margin-bottom: 15px;
-    padding: 8px 12px;
-    border: 1px solid #457B9D;
-    border-radius: 6px;
-    background-color: rgba(207, 255, 207, 0.699);
 }
 
-.error-message {
-    color: #ff4444;
+.alert-danger {
+    background-color: #ff4444 !important;
+    color: #ffffff !important;
+    border: 1px solid #cc0000 !important;
+    border-radius: 6px;
+    padding: 8px 12px;
     font-size: 14px;
     margin-bottom: 15px;
-    padding: 8px 12px;
-    border: 1px solid #ff4444;
-    border-radius: 6px;
-    background-color: rgba(255, 68, 68, 0.1);
 }
 
-.success-message i, .error-message i {
+.alert-info {
+    background-color: #d1ecf1 !important;
+    color: #0c5460 !important;
+    border: 1px solid #457B9D !important;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.alert-success i, .alert-danger i, .alert-info i {
     margin-right: 8px;
 }
 
@@ -253,117 +263,191 @@ h3 {
     background-color: #6c757d;
 }
 
+/* Kereső sáv (Search Bar) */
 .search-bar {
     display: flex;
     align-items: center;
     height: 50px;
     width: 220px;
     border-radius: 10px;
-  }
-  .search-bar i {
+    background-color: #F1FAEE;
+    border: 1px solid #A8DADC;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.search-bar i {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 40px;
     height: 50px;
     background-color: #A8DADC;
-    border: 1px solid #457B9D;
-    border-right: none;
     color: #1D3557;
-    padding: 0 10px;
-    border-radius: 5px 0px 0px 5px;
-    border-right: #1D3557 solid 1px;
-  }
-  .search-bar input {
+    font-size: 16px;
+}
+
+.search-bar input {
     flex: 1;
-    height: 50px;
-    border: 1px solid #457B9D;
-    border-left: none;
-    color: #1D3557;
-    padding-left: 10px;
+    border: none;
+    background: none;
+    padding: 10px;
+    font-size: 14px;
+    color: #2c3e50;
     outline: none;
-    border-radius: 0px 5px 5px 0px;
-  }
-  .search-bar input::placeholder {
-    color: #4a5568;
-  }
-  .search-bar input:focus {
-    box-shadow: 0 0 0 0.2rem #A8DADC;
-    border-color: #457B9D;
-  }
-  .btn-custom {
-    border-color: #457B9D;
-    color: #1D3557;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 80px;
-    height: 50px;
-    padding: 0 12px;
-    border-radius: 8px;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
-  }
-  .btn-custom:focus {
-    box-shadow: 0 0 0 0.2rem #A8DADC;
-    outline: none;
-  }
-  .btn-custom:hover {
-    background-color: #457B9D;
-    border-color: #457B9D;
-    color: white;
-  }
-  .abc-icon {
-    margin-right: 5px;
-    font-size: 1.2rem;
-    transition: transform 0.3s ease;
 }
 
-.abc-icon i {
+.search-bar input::placeholder {
+    color: #6c757d;
+}
+
+/* ABC rendezés gomb (ABC Sort Button) */
+.btn-custom.abc-button {
+    display: flex;
+    align-items: center;
+    height: 50px;
+    border-radius: 10px;
+    background-color: #F1FAEE;
+    border: 1px solid #A8DADC;
+    padding: 0 15px;
     transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.abc-button:hover .abc-icon {
-    transform: scale(1.1);
+.btn-custom.abc-button:hover {
+    background-color: #A8DADC;
+    transform: translateY(-2px);
 }
 
-.abc-button {
-    position: relative;
+.abc-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 80px;
-    height: 50px;
-    padding: 0 12px;
-    border-radius: 8px;
-    overflow: hidden;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
+    width: 30px;
+    height: 30px;
+    background-color: #457B9D;
+    border-radius: 50%;
+    color: #FFFFFF;
+    margin-right: 8px;
 }
 
 .abc-text {
+    color: #1D3557;
+    font-size: 14px;
     font-weight: 500;
-    transition: transform 0.3s ease;
-}
-  @media (max-width: 630px) {
-    .d-flex.gap-2 {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    .search-bar, .btn-custom {
-        width: 100%;
-        margin-bottom: 10px;
-    }
-}
-@media (max-width: 630px) {
-    .custom-modal-dialog {
-        max-width: 95%;
-    }
 }
 
-@media (max-width: 630px) {
-    .table {
-        font-size: 12px;
+/* Táblázat (Table) */
+.table {
+    background-color: #FFFFFF;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.table th {
+    background-color: #457B9D;
+    color: #FFFFFF;
+    font-weight: 500;
+    padding: 12px;
+}
+
+.table td {
+    padding: 12px;
+    vertical-align: middle;
+    color: #2c3e50;
+}
+
+.table tr:nth-child(even) {
+    background-color: #F1FAEE;
+}
+
+/* Kereshető dropdown (Searchable Dropdown) */
+.dropdown-menu {
+    max-height: 300px;
+    overflow-y: auto;
+    background-color: #F1FAEE;
+    border: 1px solid #A8DADC;
+    border-radius: 6px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+.dropdown-item {
+    color: #2c3e50;
+    padding: 8px 12px;
+    transition: background-color 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #A8DADC;
+    color: #1D3557;
+    cursor: pointer;
+}
+
+.dropdown-divider {
+    border-top: 1px solid #A8DADC;
+}
+
+.dropdown-menu .form-control {
+    margin: 8px;
+    background-color: #FFFFFF;
+    border: 1px solid #A8DADC;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.dropdown-menu .form-control:focus {
+    border-color: #457B9D;
+    box-shadow: 0 0 8px rgba(69, 123, 157, 0.3);
+}
+
+.btn-outline-secondary {
+    border-color: #A8DADC;
+    color: #457B9D;
+    background-color: #F1FAEE;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #A8DADC;
+    color: #1D3557;
+}
+
+/* Reszponzív design (Responsive Design) */
+@media (max-width: 768px) {
+    .custom-modal-dialog {
+        max-width: 95%;
+        margin: 10px auto;
     }
-    .table th:nth-child(2), .table td:nth-child(2) {
-        display: none;
+
+    .nav-tabs .nav-link {
+        padding: 8px 10px;
+        font-size: 14px;
+    }
+
+    .register-section {
+        padding: 15px;
+    }
+
+    h3 {
+        font-size: 20px;
+    }
+
+    .avatar {
+        width: 80px;
+        height: 80px;
+    }
+
+    .search-bar {
+        width: 100%;
+    }
+
+    .btn-custom.abc-button {
+        padding: 0 10px;
+    }
+
+    .modal-title {
+        padding-left: 0;
+        text-align: left;
     }
 }

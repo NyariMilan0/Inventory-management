@@ -225,6 +225,43 @@ export class AdminPanelService {
     );
   }
 
+  createAddMovementRequest(request: {
+    adminId: number;
+    palletId: number;
+    toShelfId: number;
+    timeLimit: string;
+  }): Observable<ApiResponse> {
+    return this.http.post(`${this.baseUrl}/movementrequests/createAddMovementRequest`, request).pipe(
+      map(() => ({ success: true, message: 'Add movement request created successfully!' })),
+      catchError(this.handleHttpError('creating add movement request'))
+    );
+  }
+
+  createRemoveMovementRequest(request: {
+    adminId: number;
+    palletId: number;
+    fromShelfId: number;
+    timeLimit: string;
+  }): Observable<ApiResponse> {
+    return this.http.post(`${this.baseUrl}/movementrequests/createRemoveMovementRequest`, request).pipe(
+      map(() => ({ success: true, message: 'Remove movement request created successfully!' })),
+      catchError(this.handleHttpError('creating remove movement request'))
+    );
+  }
+
+  createMoveMovementRequest(request: {
+    adminId: number;
+    palletId: number;
+    fromShelfId: number;
+    toShelfId: number;
+    timeLimit: string;
+  }): Observable<ApiResponse> {
+    return this.http.post(`${this.baseUrl}/movementrequests/createMoveMovementRequest`, request).pipe(
+      map(() => ({ success: true, message: 'Move movement request created successfully!' })),
+      catchError(this.handleHttpError('creating move movement request'))
+    );
+  }
+
   private handleHttpError(operation: string, defaultData: any = []): (error: HttpErrorResponse) => Observable<ApiResponse> {
     return (error: HttpErrorResponse) => {
       let message = `An error occurred while ${operation}.`;
