@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
@@ -14,7 +14,7 @@ import { Router, NavigationEnd } from '@angular/router';
   templateUrl: './admin-panel.component.html',
   styleUrls: ['./admin-panel.component.css']
 })
-export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
+export class AdminPanelComponent implements OnInit, OnDestroy {
   // FormGroup változók
   userForm: FormGroup;
   adminForm: FormGroup;
@@ -28,8 +28,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
   showModal: boolean = false;
   activeTab: string = 'registerUser';
   private subscription: Subscription = new Subscription();
-  private wasClosedByEsc: boolean = false;
-  isAscending: boolean = true; // Új változó a rendezési irányhoz
+  isAscending: boolean = true;
 
   // Üzenetváltozók és osztályok
   userMessage: string = '';
@@ -113,6 +112,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnInit(): void {
+    // ModalService feliratkozás
     this.subscription.add(
       this.modalService.showAdminModal$.subscribe(show => {
         this.showModal = show;
@@ -125,35 +125,14 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
       })
     );
 
+    // Router események figyelése, csak akkor zárjuk a modált, ha szükséges
     this.subscription.add(
       this.router.events.subscribe(event => {
-        if (event instanceof NavigationEnd) {
+        if (event instanceof NavigationEnd && this.showModal) {
           this.modalService.closeAdminModal();
-          this.showModal = false;
         }
       })
     );
-  }
-
-  ngAfterViewInit(): void {
-    const modalElement = document.getElementById('adminPanelModal');
-    if (modalElement) {
-      modalElement.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') {
-          this.wasClosedByEsc = true;
-          this.modalService.closeAdminModal();
-        }
-      });
-      modalElement.addEventListener('hidden.bs.modal', () => {
-        if (!this.wasClosedByEsc) {
-          const triggerButton = document.querySelector('.admin-panel-btn') as HTMLElement;
-          if (triggerButton) {
-            triggerButton.focus();
-          }
-        }
-        this.wasClosedByEsc = false;
-      });
-    }
   }
 
   ngOnDestroy(): void {
@@ -170,14 +149,15 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
 
   openModal(): void {
     const modalElement = document.getElementById('adminPanelModal');
-    if (modalElement && this.showModal) {
+    if (modalElement) {
       const bootstrap = (window as any).bootstrap;
       if (bootstrap && bootstrap.Modal) {
-        const modalInstance = bootstrap.Modal.getInstance(modalElement);
-        if (!modalInstance) {
-          const modal = new bootstrap.Modal(modalElement);
-          modal.show();
-        }
+        // Mindig új modál példányt hozunk létre
+        const modalInstance = new bootstrap.Modal(modalElement, {
+          backdrop: 'static',
+          keyboard: true
+        });
+        modalInstance.show();
       }
     }
   }
@@ -187,12 +167,22 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
     if (modalElement) {
       const bootstrap = (window as any).bootstrap;
       if (bootstrap && bootstrap.Modal) {
-        const modal = bootstrap.Modal.getInstance(modalElement);
-        if (modal) {
-          modal.hide();
+        const modalInstance = bootstrap.Modal.getInstance(modalElement);
+        if (modalInstance) {
+          modalInstance.hide();
+          // Biztosítjuk, hogy a modál teljesen bezáródjon
+          modalElement.classList.remove('show');
+          modalElement.style.display = 'none';
+          document.body.classList.remove('modal-open');
+          const backdrop = document.querySelector('.modal-backdrop');
+          if (backdrop) {
+            backdrop.remove();
+          }
         }
       }
     }
+    // Szinkronizáljuk a ModalService állapotot
+    this.modalService.closeAdminModal();
   }
 
   passwordComplexityValidator(): ValidatorFn {
@@ -438,10 +428,10 @@ export class AdminPanelComponent implements OnInit, OnDestroy, AfterViewInit {
   sortUsers(): void {
     this.isAscending = !this.isAscending;
     this.filteredUsers = [...this.filteredUsers].sort((a, b) => {
-        const comparison = a.userName.localeCompare(b.userName);
-        return this.isAscending ? comparison : -comparison;
+      const comparison = a.userName.localeCompare(b.userName);
+      return this.isAscending ? comparison : -comparison;
     });
-}
+  }
 
   confirmDelete(userId: number): void {
     if (confirm('Are you sure you want to delete this user?')) {
