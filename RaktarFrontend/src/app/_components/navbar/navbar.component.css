@@ -1,3 +1,4 @@
+/* Külső konténer (Sidebar Container) */
 .sidebar-container {
   position: fixed;
   top: 0;
@@ -5,7 +6,7 @@
   z-index: 1000;
   visibility: visible;
   opacity: 1;
-  transition: opacity 0.5s linear;
+  transition: opacity 0.6s linear;
 }
 
 .sidebar-container.visible {
@@ -13,11 +14,12 @@
   opacity: 1;
 }
 
+/* Oldalsáv (Sidebar) */
 .sidebar-container .sidebar {
   width: 100px;
   height: 100vh;
   background: #457B9D;
-  transition: all 0.3s ease;
+  transition: all 0.6s ease;
   overflow: hidden;
   position: fixed;
   z-index: 1000;
@@ -36,6 +38,7 @@
   align-items: flex-start;
 }
 
+/* Fő menü (Menu Main) */
 .menuMain {
   display: flex;
   align-items: center;
@@ -46,11 +49,6 @@
   color: inherit;
 }
 
-.navbarIcons {
-  padding-left: 8px;
-  color: white;
-}
-
 .navbarCompanyLogo {
   width: 35px;
   height: 35px;
@@ -58,18 +56,6 @@
   margin-left: 15px;
   margin-top: 15px;
   margin-bottom: 0px;
-}
-
-.menu-items p {
-  margin-left: 17px;
-  color: white;
-  padding-bottom: 0px;
-  margin-top: 10px;
-  margin-bottom: 0px;
-  font-size: 14px;
-  font-weight: lighter;
-  text-transform: uppercase;
-  user-select: none;
 }
 
 .navbarLogoText {
@@ -88,6 +74,7 @@
   opacity: 1;
 }
 
+/* Menü elemek (Menu Items) */
 .menu-items {
   width: 100%;
   padding: 0 15px;
@@ -111,6 +98,23 @@
   cursor: pointer;
 }
 
+.navbarIcons {
+  padding-left: 8px;
+  color: white;
+}
+
+.menu-items p {
+  margin-left: 17px;
+  color: white;
+  padding-bottom: 0px;
+  margin-top: 10px;
+  margin-bottom: 0px;
+  font-size: 14px;
+  font-weight: lighter;
+  text-transform: uppercase;
+  user-select: none;
+}
+
 .bi {
   font-size: 1.8rem;
   min-width: 35px;
@@ -129,6 +133,7 @@
   opacity: 1;
 }
 
+/* Elválasztó */
 .navbarSeparatorLine {
   border: 0;
   height: 2px;
@@ -137,44 +142,61 @@
   width: 100%;
 }
 
-.main-content {
-  margin-left: 100px;
-  transition: margin-left 0.3s ease;
-  position: relative;
-}
 
-.sidebar-container.expanded ~ .main-content {
-  margin-left: 250px;
-}
-
-app-navbar {
-  width: auto;
-}
-
+/* Hamburger menü (Hamburger Menu) */
 .hamburger {
   background-color: #F1FAEE;
   border: none;
   color: #457B9D;
   font-size: 24px;
   cursor: pointer;
-  padding: 10px;
-  display: inline-block;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1001;
+  display: none; /* Hidden by default, shown on mobile */
 }
 
+/* Hide hamburger icon when sidebar is expanded */
+.sidebar-container.expanded ~ .main-content .hamburger {
+  display: none;
+}
+
+/* Reszponzív média lekérdezések */
 @media (max-width: 768px) {
   .sidebar-container .sidebar {
     width: 0;
     transform: translateX(-100%);
   }
+
   .sidebar-container.expanded .sidebar {
     width: 250px;
     transform: translateX(0);
   }
+
   .main-content {
     margin-left: 0;
-    background-color: #F1FAEE;
   }
+
   .sidebar-container.expanded ~ .main-content {
-    margin-left: 250px;
+    margin-left: 0;
+  }
+
+  /* Show hamburger icon on mobile when sidebar is not expanded */
+  .hamburger {
+    display: block;
+  }
+
+  /* Overlay when sidebar is expanded on mobile */
+  .sidebar-container.expanded ~ .main-content::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 999;
+    pointer-events: auto;
   }
 }

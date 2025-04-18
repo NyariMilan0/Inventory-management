@@ -4,11 +4,12 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { ProfileComponent } from '../profile/profile.component';
 import { AdminPanelComponent } from '../admin-panel/admin-panel.component';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-storage-management',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, NavbarComponent, ProfileComponent, AdminPanelComponent],
+  imports: [CommonModule, HttpClientModule, NavbarComponent, ProfileComponent, AdminPanelComponent, ReactiveFormsModule],
   templateUrl: './storage-management.component.html',
   styleUrls: ['./storage-management.component.css']
 })
@@ -53,6 +54,11 @@ export class StorageManagementComponent implements AfterViewInit, OnDestroy {
       cancelAnimationFrame(this.animationFrameId);
     }
     this.removeEventListeners();
+  }
+
+  // Sidebar állapot kezelése
+  onSidebarToggle(state: boolean) {
+    this.sidebarOpen = state;
   }
 
   loadStorages() {
@@ -173,10 +179,6 @@ export class StorageManagementComponent implements AfterViewInit, OnDestroy {
 
   togglePopup() {
     this.showPopup = !this.showPopup;
-  }
-
-  toggleSidebar() {
-    this.sidebarOpen = !this.sidebarOpen;
   }
 
   getPalletsForSelectedShelf() {
@@ -305,7 +307,7 @@ export class StorageManagementComponent implements AfterViewInit, OnDestroy {
     const carousel = this.carouselItems.nativeElement as HTMLElement;
     const containerHeight = this.carouselContainer.nativeElement.offsetHeight;
     const contentHeight = carousel.offsetHeight / 2;
-    const speed = 0.15;
+    const speed = 0.2;
 
     const scroll = () => {
       if (this.isDragging) return;

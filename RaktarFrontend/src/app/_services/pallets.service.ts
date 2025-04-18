@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { Storage, Shelf, Item, ApiResponse } from '..//_services/admin-panel.service';
+import { Storage, Shelf, Item, ApiResponse } from '../_services/admin-panel.service';
 
 export interface PalletWithShelf {
   shelfId: number;
@@ -19,22 +19,46 @@ export class PalletsService {
   constructor(private http: HttpClient) {}
 
   getAllItems(): Observable<ApiResponse> {
-    return this.http.get<Item[]>(`${this.baseUrl}/items/getItemList`).pipe(
+    return this.http.get<any>(`${this.baseUrl}/items/getItemList`).pipe(
       map(response => {
+        let items: Item[] = [];
+
         if (Array.isArray(response)) {
-          return { success: true, message: 'Items loaded successfully', data: response };
+          items = response;
+        } else if (response && Array.isArray(response.items)) {
+          items = response.items;
+        } else {
+          console.error('Unexpected response format:', response);
+          return { success: false, message: 'Invalid items data format', data: [] };
         }
-        return { success: false, message: 'Invalid items data', data: [] };
+
+        return {
+          success: true,
+          message: items.length > 0 ? 'Items loaded successfully' : 'No items found',
+          data: items
+        };
       }),
       catchError(this.handleHttpError('fetching items', []))
     );
   }
 
   getAllShelfs(): Observable<ApiResponse> {
-    return this.http.get<Shelf[]>(`${this.baseUrl}/shelfs/getAllShelfs`).pipe(
+    return this.http.get<any>(`${this.baseUrl}/shelfs/getAllShelfs`).pipe(
       map(response => {
-        if (Array.isArray(response)) {
-          return { success: true, message: 'Shelves loaded successfully', data: response };
+        if (response && Array.isArray(response.shelfs)) {
+          const shelves: Shelf[] = response.shelfs.map((shelf: any) => ({
+            id: shelf.id,
+            shelfName: shelf.name,
+            shelfLocation: shelf.locationInStorage,
+            shelfIsFull: shelf.isFull,
+            shelfMaxCapacity: shelf.maxCapacity,
+            currentCapacity: shelf.currentCapacity,
+            length: shelf.length,
+            width: shelf.width,
+            levels: shelf.levels,
+            height: shelf.height
+          }));
+          return { success: true, message: 'Shelves loaded successfully', data: shelves };
         }
         return { success: false, message: 'Invalid shelves data', data: [] };
       }),
@@ -43,17 +67,19 @@ export class PalletsService {
   }
 
   getAllStorages(): Observable<ApiResponse> {
-    return this.http.get<{ Storages: Storage[] }>(`${this.baseUrl}/storage/getAllStorages`).pipe(
+    return this.http.get<{ Storages: any[] }>(`${this.baseUrl}/storage/getAllStorages`).pipe(
       map(response => {
         if (response && Array.isArray(response.Storages)) {
-          return {
-            success: true,
-            message: 'Storages loaded successfully',
-            data: response.Storages.map(storage => ({
-              ...storage,
-              hasShelves: false
-            }))
-          };
+          const storages: Storage[] = response.Storages.map(storage => ({
+            id: storage.id,
+            storageName: storage.name,
+            location: storage.location,
+            currentCapacity: storage.currentCapacity,
+            maxCapacity: storage.maxCapacity,
+            isFull: storage.isFull,
+            hasShelves: false
+          }));
+          return { success: true, message: 'Storages loaded successfully', data: storages };
         }
         return { success: false, message: 'Invalid storages data', data: [] };
       }),
@@ -69,10 +95,17 @@ export class PalletsService {
   }
 
   getPalletsWithShelfs(): Observable<ApiResponse> {
-    return this.http.get<{ palletsAndShelfs: PalletWithShelf[] }>(`${this.baseUrl}/shelfs/getPalletsWithShelfs`).pipe(
+    return this.http.get<any>(`${this.baseUrl}/shelfs/getPalletsWithShelfs`).pipe(
       map(response => {
         if (response && Array.isArray(response.palletsAndShelfs)) {
-          return { success: true, message: 'Pallets with shelves loaded successfully', data: response };
+          const pallets: PalletWithShelf[] = response.palletsAndShelfs.map((pallet: any) => ({
+            shelfId: pallet.shelfId,
+            shelfLocation: pallet.shelfLocation,
+            palletId: pallet.palletId,
+            palletName: pallet.palletName,
+            shelfName: pallet.shelfName
+          }));
+          return { success: true, message: 'Pallets with shelves loaded successfully', data: pallets };
         }
         return { success: false, message: 'Invalid pallets data', data: [] };
       }),
@@ -87,28 +120,37 @@ export class PalletsService {
     );
   }
 
-  getShelvesByStorage(storageId: number): Observable<ApiResponse> {
-    return this.http.get<Shelf[]>(`${this.baseUrl}/shelfs/getShelvesByStorage?storageId=${storageId}`).pipe(
+  getShelfsByStorageId(storageId: number): Observable<ApiResponse> {
+    return this.http.get<any>(`${this.baseUrl}/shelfs/getShelfsByStorageId?storageId=${storageId}`).pipe(
       map(response => {
-        if (Array.isArray(response)) {
-          return { success: true, message: 'Shelves loaded successfully', data: response };
+        if (response && Array.isArray(response.shelves)) {
+          const shelves: Shelf[] = response.shelves.map((shelf: any) => ({
+            id: shelf.shelfId,
+            shelfName: shelf.shelfName,
+            shelfLocation: shelf.shelfLocation,
+            shelfIsFull: shelf.shelfIsFull,
+            shelfMaxCapacity: shelf.shelfMaxCapacity
+          }));
+          return { success: true, message: 'Shelves loaded successfully', data: shelves };
         }
-        return { success: false, message: 'Invalid shelves data', data: [] };
+        return { success: false, message: 'No shelves found', data: [] };
       }),
-      catchError(this.handleHttpError('fetching shelves', []))
+      catchError(this.handleHttpError('fetching shelves by storage id', []))
     );
   }
 
-  /* 
-   * movePallet metódus kikommentálva, mert nincs API endpoint
-   * Ezt a szerver oldalon kell implementálni (pl. POST /pallet/movePallet)
-   */
-  // movePallet(palletId: number, targetShelfId: number): Observable<ApiResponse> {
-  //   return this.http.post(`${this.baseUrl}/pallet/movePallet`, { palletId, targetShelfId }).pipe(
-  //     map(() => ({ success: true, message: 'Pallet moved successfully!' })),
-  //     catchError(this.handleHttpError('moving pallet'))
-  //   );
-  // }
+  movePallet(palletId: number, fromShelfId: number, toShelfId: number, userId: number): Observable<ApiResponse> {
+    const moveData = { palletId, fromShelfId, toShelfId, userId };
+    return this.http.post<any>(`${this.baseUrl}/pallet/movePalletBetweenShelfs`, moveData).pipe(
+      map(response => ({
+        success: response.statusCode === 200,
+        message: response.message || 'Pallet moved successfully!',
+        data: null,
+        statusCode: response.statusCode
+      })),
+      catchError(this.handleHttpError('moving pallet'))
+    );
+  }
 
   private handleHttpError(operation: string, defaultData: any = []): (error: HttpErrorResponse) => Observable<ApiResponse> {
     return (error: HttpErrorResponse) => {

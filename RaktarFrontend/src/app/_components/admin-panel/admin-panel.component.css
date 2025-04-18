@@ -1,3 +1,4 @@
+/* Külső konténer (Modal Container) */
 .custom-modal-dialog {
     max-width: 900px;
 }
@@ -11,6 +12,7 @@
     background-color: #A8DADC;
 }
 
+/* Felugró ablak tartalma (Modal Body) */
 .belsobox {
     background-color: #F1FAEE;
     border-radius: 15px;
@@ -18,6 +20,7 @@
     padding: 10px;
 }
 
+/* Felugró ablak fejléce (Modal Header) */
 .popup-header {
     color: #1D3557;
     background-color: #A8DADC;
@@ -54,6 +57,7 @@
     box-shadow: 0 5px 10px rgba(0,0,0,0.2);
 }
 
+/* Navigációs fülek (Navigation Tabs) */
 .nav-tabs {
     border-bottom: 2px solid #457B9D;
     margin-bottom: 20px;
@@ -75,16 +79,18 @@
 }
 
 .nav-tabs .nav-link.active {
-    background-color: #F1FAEE;
-    color: #457B9D;
+    background-color: #1D3557;
+    color: white;
     border-bottom: 2px solid #457B9D;
     font-weight: 600;
 }
 
+/* Tab tartalom (Tab Content) */
 .tab-content {
     padding: 20px;
 }
 
+/* Regisztrációs szekció (Registration Section) */
 .register-section {
     background: #FFFFFF;
     border-radius: 12px;
@@ -97,6 +103,7 @@
     transform: translateY(-3px);
 }
 
+/* Szövegek és címek (Text and Titles) */
 h3 {
     color: #457B9D;
     font-weight: 600;
@@ -104,6 +111,7 @@ h3 {
     letter-spacing: 0.5px;
 }
 
+/* Profil kép (Profile Image) */
 .avatar {
     width: 100px;
     height: 100px;
@@ -113,6 +121,7 @@ h3 {
     border: 3px solid #457B9D;
 }
 
+/* Űrlap elemek (Form Elements) */
 .form-label {
     color: #457B9D;
     font-weight: 500;
@@ -149,30 +158,42 @@ h3 {
     font-weight: 400;
 }
 
-.success-message {
-    color: #457B9D;
+/* Üzenetek (Messages) */
+.alert-success {
+    background-color: #28a745 !important;
+    color: #ffffff !important;
+    border: 1px solid #218838 !important;
+    border-radius: 6px;
+    padding: 8px 12px;
     font-size: 14px;
     margin-bottom: 15px;
-    padding: 8px 12px;
-    border: 1px solid #457B9D;
-    border-radius: 6px;
-    background-color: rgba(69, 123, 157, 0.1);
 }
 
-.error-message {
-    color: #ff4444;
+.alert-danger {
+    background-color: #ff4444 !important;
+    color: #ffffff !important;
+    border: 1px solid #cc0000 !important;
+    border-radius: 6px;
+    padding: 8px 12px;
     font-size: 14px;
     margin-bottom: 15px;
-    padding: 8px 12px;
-    border: 1px solid #ff4444;
-    border-radius: 6px;
-    background-color: rgba(255, 68, 68, 0.1);
 }
 
-.success-message i, .error-message i {
+.alert-info {
+    background-color: #d1ecf1 !important;
+    color: #0c5460 !important;
+    border: 1px solid #457B9D !important;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.alert-success i, .alert-danger i, .alert-info i {
     margin-right: 8px;
 }
 
+/* Gombok (Buttons) */
 .btn-success {
     background: #A8DADC;
     border: none;
@@ -223,6 +244,7 @@ h3 {
     cursor: not-allowed;
 }
 
+/* Lista elemek (List Items) */
 .shelf-list, .storage-list {
     margin-top: 20px;
 }
@@ -239,4 +261,193 @@ h3 {
 
 .badge.bg-secondary {
     background-color: #6c757d;
+}
+
+/* Kereső sáv (Search Bar) */
+.search-bar {
+    display: flex;
+    align-items: center;
+    height: 50px;
+    width: 220px;
+    border-radius: 10px;
+    background-color: #F1FAEE;
+    border: 1px solid #A8DADC;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.search-bar i {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 50px;
+    background-color: #A8DADC;
+    color: #1D3557;
+    font-size: 16px;
+}
+
+.search-bar input {
+    flex: 1;
+    border: none;
+    background: none;
+    padding: 10px;
+    font-size: 14px;
+    color: #2c3e50;
+    outline: none;
+}
+
+.search-bar input::placeholder {
+    color: #6c757d;
+}
+
+/* ABC rendezés gomb (ABC Sort Button) */
+.btn-custom.abc-button {
+    display: flex;
+    align-items: center;
+    height: 50px;
+    border-radius: 10px;
+    background-color: #F1FAEE;
+    border: 1px solid #A8DADC;
+    padding: 0 15px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-custom.abc-button:hover {
+    background-color: #A8DADC;
+    transform: translateY(-2px);
+}
+
+.abc-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    background-color: #457B9D;
+    border-radius: 50%;
+    color: #FFFFFF;
+    margin-right: 8px;
+}
+
+.abc-text {
+    color: #1D3557;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Táblázat (Table) */
+.table {
+    background-color: #FFFFFF;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.table th {
+    background-color: #457B9D;
+    color: #FFFFFF;
+    font-weight: 500;
+    padding: 12px;
+}
+
+.table td {
+    padding: 12px;
+    vertical-align: middle;
+    color: #2c3e50;
+}
+
+.table tr:nth-child(even) {
+    background-color: #F1FAEE;
+}
+
+/* Kereshető dropdown (Searchable Dropdown) */
+.dropdown-menu {
+    max-height: 300px;
+    overflow-y: auto;
+    background-color: #F1FAEE;
+    border: 1px solid #A8DADC;
+    border-radius: 6px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+.dropdown-item {
+    color: #2c3e50;
+    padding: 8px 12px;
+    transition: background-color 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #A8DADC;
+    color: #1D3557;
+    cursor: pointer;
+}
+
+.dropdown-divider {
+    border-top: 1px solid #A8DADC;
+}
+
+.dropdown-menu .form-control {
+    margin: 8px;
+    background-color: #FFFFFF;
+    border: 1px solid #A8DADC;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.dropdown-menu .form-control:focus {
+    border-color: #457B9D;
+    box-shadow: 0 0 8px rgba(69, 123, 157, 0.3);
+}
+
+.btn-outline-secondary {
+    border-color: #A8DADC;
+    color: #457B9D;
+    background-color: #F1FAEE;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #A8DADC;
+    color: #1D3557;
+}
+
+/* Reszponzív design (Responsive Design) */
+@media (max-width: 768px) {
+    .custom-modal-dialog {
+        max-width: 95%;
+        margin: 10px auto;
+    }
+
+    .nav-tabs .nav-link {
+        padding: 8px 10px;
+        font-size: 14px;
+    }
+
+    .register-section {
+        padding: 15px;
+    }
+
+    h3 {
+        font-size: 20px;
+    }
+
+    .avatar {
+        width: 80px;
+        height: 80px;
+    }
+
+    .search-bar {
+        width: 100%;
+    }
+
+    .btn-custom.abc-button {
+        padding: 0 10px;
+    }
+
+    .modal-title {
+        padding-left: 0;
+        text-align: left;
+    }
 }

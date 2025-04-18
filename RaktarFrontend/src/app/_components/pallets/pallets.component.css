@@ -1,35 +1,40 @@
+/* Alapbeállítások (Base Styles) */
 body {
-    background-color: #F1FAEE;
-  }
-  
+  background-color: #F1FAEE;
+}
+
+/* Fő tartalom (Main Content) */
+.main-content {
+  margin-left: 100px;
+  transition: margin-left 0.3s ease;
+  min-height: 100vh;
+  background-color: #F1FAEE;
+  padding: 20px 10px;
+}
+
+/* Reszponzív média lekérdezések (Responsive Media Queries) */
+@media (max-width: 768px) {
   .main-content {
-    margin-left: 100px;
-    transition: margin-left 0.3s ease;
-    min-height: 100vh;
-    background-color: #F1FAEE;
-    padding: 20px 10px;
-  }
-  
-  @media (max-width: 768px) {
-    .main-content {
       margin-left: 0;
       padding: 10px;
-    }
   }
-  
-  .card {
-    border-radius: 12px;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-  
-  .enhanced-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  }
-  
-  .custom-nav-tabs {
-    border-bottom: 2px solid #457B9D;
-  }
+}
+
+/* Kártyák (Cards) */
+.card {
+  border-radius: 12px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.enhanced-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Navigációs fülek (Navigation Tabs) */
+.custom-nav-tabs {
+  border-bottom: 2px solid #457B9D;
+}
   
   .custom-nav-tabs .nav-link {
     color: #1D3557;
@@ -52,7 +57,8 @@ body {
     border-bottom: 3px solid #457B9D;
     font-weight: 600;
   }
-  
+ 
+  /* Űrlap elemek (Form Elements) */
   .form-label {
     color: #1D3557;
     font-weight: 500;
@@ -75,6 +81,7 @@ body {
     outline: none;
   }
   
+  
   .form-control.is-invalid {
     border-color: #E63946;
     background-color: #ffe6e6;
@@ -85,16 +92,23 @@ body {
     font-size: 12px;
   }
   
+  /* Üzenetek Error / Success (Messages) */
   .message-box {
     font-size: 14px;
     padding: 8px;
   }
   
   .success-message {
-    color: #457B9D;
-    background-color: rgba(69, 123, 157, 0.1);
+    color: green;
+    background-color: rgba(220, 255, 220, 0.699);
     border: 1px solid #457B9D;
+    padding: 5px;
     border-radius: 6px;
+  }
+  
+  .invalid {
+    color: red;
+    font-size: 12px;
   }
   
   .error-message {
@@ -102,8 +116,10 @@ body {
     background-color: rgba(255, 68, 68, 0.1);
     border: 1px solid #E63946;
     border-radius: 6px;
+    padding: 5px;
   }
   
+  /* Gombok (Buttons) */
   .custom-btn {
     font-size: 16px;
     padding: 12px 20px;
@@ -130,7 +146,7 @@ body {
     color: #1D3557;
   }
   
-
+/* Szövegek és címek (Text and Titles) */
   .section-title {
     color: #457B9D;
     font-size: 24px;
