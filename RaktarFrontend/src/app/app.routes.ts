@@ -18,7 +18,7 @@ export const routes: Routes = [
   {path: 'navbar', component: NavbarComponent,canActivate: [authGuard]},
   {path: 'profileAdmin', component: ProfileComponent, canActivate: [authGuard]},
   {path: 'adminPanel', component: AdminPanelComponent, canActivate: [authGuard]},
-  {path: 'transferRequest', component: TransferRequestsComponent},
+  {path: 'transferRequest', component: TransferRequestsComponent, canActivate: [authGuard]},
   { path: '**', redirectTo: 'login' }
     
 ];
