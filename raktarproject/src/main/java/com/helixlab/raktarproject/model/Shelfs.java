@@ -289,13 +289,7 @@ public class Shelfs implements Serializable {
             spq.setParameter("shelfIdIn", id);
 
             spq.execute();
-
-            shelf = em.find(Shelfs.class, id);
-            if (shelf == null) {
-                toReturn = true;
-            } else {
-                System.err.println("Shelf with ID " + id + " still exists after deletion attempt");
-            }
+            toReturn = true;
 
         } catch (Exception e) {
             System.err.println("Error deleting shelf with ID " + id + ": " + e.getLocalizedMessage());
