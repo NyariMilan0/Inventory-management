@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Gép: localhost:3306
--- Létrehozás ideje: 2025. Már 06. 08:27
+-- Létrehozás ideje: 2025. Ápr 18. 21:57
 -- Kiszolgáló verziója: 5.7.24
 -- PHP verzió: 8.3.1
 
@@ -387,6 +387,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `getFullShelfs` ()   SELECT `shelfs`
 FROM `shelfs`
 WHERE `shelfs`.`isFull` = 1$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getInventoryMovement` ()   SELECT `inventorymovement`.* FROM `inventorymovement`$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `getItemList` ()   SELECT `items`.*
 FROM `items`
 WHERE `items`.`amount` IS NOT NULL$$
@@ -451,6 +453,8 @@ END$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `getItemsByType` (IN `typeIn` VARCHAR(255))   SELECT `items`.*
 FROM `items`
 WHERE `items`.`type` = `typeIn`$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getMovementRequests` ()   SELECT * FROM `movement_requests`$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `getPalletByShelfId` (IN `shelfIdIn` INT)   BEGIN
 SELECT 
@@ -630,8 +634,24 @@ WHERE `users`.`id` = idIn$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `registerAdmin` (IN `emailIn` VARCHAR(255) CHARSET utf8mb4, IN `firstNameIn` VARCHAR(255) CHARSET utf8mb4, IN `lastNameIn` VARCHAR(255) CHARSET utf8mb4, IN `userNameIn` VARCHAR(255) CHARSET utf8mb4, IN `pictureIn` TEXT CHARSET utf8mb4, IN `passwordIn` VARCHAR(255) CHARSET utf8mb4)   INSERT INTO `users` (`email`, `firstName`, `lastName`, `userName`, `picture`, `password`, `isAdmin`)
 VALUES (emailIn, firstNameIn, lastNameIn, userNameIn, pictureIn, passwordIn, 1)$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `registerUser` (IN `emailIn` VARCHAR(255) CHARSET utf8mb4, IN `firstNameIn` VARCHAR(255) CHARSET utf8mb4, IN `lastNameIn` VARCHAR(255) CHARSET utf8mb4, IN `userNameIn` VARCHAR(255) CHARSET utf8mb4, IN `pictureIn` TEXT CHARSET utf8mb4, IN `passwordIn` VARCHAR(255) CHARSET utf8mb4)   INSERT INTO `users` (`users`.`email`, `users`.`firstName`, `users`.`lastName`, `users`.`userName`, `users`.`picture`, `users`.`password`, `users`.`isAdmin`)
-VALUES (emailIn, firstNameIn, lastNameIn, userNameIn, pictureIn, passwordIn, 0)$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `registerUser` (IN `emailIn` VARCHAR(255) CHARSET utf8mb4, IN `firstNameIn` VARCHAR(255) CHARSET utf8mb4, IN `lastNameIn` VARCHAR(255) CHARSET utf8mb4, IN `userNameIn` VARCHAR(255) CHARSET utf8mb4, IN `pictureIn` TEXT CHARSET utf8mb4, IN `passwordIn` VARCHAR(255) CHARSET utf8mb4)   INSERT INTO `users` (
+    `email`, 
+    `firstName`, 
+    `lastName`, 
+    `userName`, 
+    `picture`, 
+    `password`, 
+    `isAdmin`
+) 
+VALUES (
+    emailIn, 
+    firstNameIn, 
+    lastNameIn, 
+    userNameIn, 
+    pictureIn, 
+    passwordIn, 
+    0
+)$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `updateItem` (IN `itemIdIn` INT(11), IN `skuIn` VARCHAR(100), IN `typeIn` VARCHAR(100), IN `nameIn` VARCHAR(100), IN `amountIn` INT(100), IN `priceIn` DECIMAL(65), IN `weightIn` DECIMAL(65), IN `sizeIn` DECIMAL(65), IN `descriptionIn` TEXT)   UPDATE `items`
 SET `items`.`sku` = skuIn, `items`.`type` = typeIn ,
@@ -701,7 +721,23 @@ INSERT INTO `inventorymovement` (`id`, `movementDate`, `actionType`, `storageFro
 (22, '2025-03-03 20:42:27', 'move', 1, 2, 1, 12, 'SKU040', 3),
 (23, '2025-03-03 20:47:01', 'move', 1, 1, 1, 2, 'SKU012', 3),
 (24, '2025-03-04 13:52:42', 'move', 1, 3, 1, 25, 'SKU010', 3),
-(25, '2025-03-04 13:53:40', 'move', 1, 3, 5, 21, 'SKU024', 3);
+(25, '2025-03-04 13:53:40', 'move', 1, 3, 5, 21, 'SKU024', 3),
+(27, '2025-04-14 08:07:34', 'add', NULL, 3, NULL, 25, 'SKU015', 3),
+(28, '2025-04-17 13:16:38', 'add', NULL, 1, NULL, 7, 'SKU007', 3),
+(29, '2025-04-17 14:50:10', 'add', NULL, 6, NULL, 51, 'SKU015', 3),
+(30, '2025-04-17 18:09:23', 'move', 1, 1, 2, 10, 'SKU012', 3),
+(31, '2025-04-17 18:09:25', 'add', NULL, 1, NULL, 5, 'SKU028', 3),
+(32, '2025-04-18 11:39:04', 'add', NULL, 1, NULL, 5, 'SKU009', 3),
+(33, '2025-04-18 11:39:06', 'add', NULL, 1, NULL, 5, 'SKU009', 3),
+(34, '2025-04-18 11:39:08', 'add', NULL, 2, NULL, 13, 'SKU025', 3),
+(35, '2025-04-18 11:39:11', 'remove', 1, NULL, 1, NULL, 'SKU019', 3),
+(36, '2025-04-18 11:39:12', 'add', NULL, 2, NULL, 20, 'SKU028', 3),
+(37, '2025-04-18 11:39:13', 'add', NULL, 1, NULL, 7, 'SKU004', 3),
+(38, '2025-04-18 11:39:15', 'add', NULL, 2, NULL, 19, 'SKU028', 3),
+(39, '2025-04-18 11:39:17', 'add', NULL, 1, NULL, 9, 'SKU028', 3),
+(40, '2025-04-18 11:39:18', 'add', NULL, 6, NULL, 51, 'SKU025', 3),
+(41, '2025-04-18 11:39:18', 'add', NULL, 2, NULL, 12, 'SKU036', 3),
+(42, '2025-04-18 11:39:19', 'remove', 1, NULL, 1, NULL, 'SKU025', 3);
 
 -- --------------------------------------------------------
 
@@ -729,7 +765,23 @@ INSERT INTO `inventorymovement_x_pallets` (`id`, `inventory_id`, `pallet_id`, `a
 (15, 22, 34, 'move'),
 (16, 23, 35, 'move'),
 (17, 24, 40, 'move'),
-(18, 25, 90, 'move');
+(18, 25, 90, 'move'),
+(19, 27, 30, 'add'),
+(20, 28, 32, 'add'),
+(21, 29, 30, 'add'),
+(22, 30, 35, 'move'),
+(23, 31, 36, 'add'),
+(24, 32, 47, 'add'),
+(25, 33, 47, 'add'),
+(26, 34, 41, 'add'),
+(27, 35, 38, 'remove'),
+(28, 36, 36, 'add'),
+(29, 37, 37, 'add'),
+(30, 38, 36, 'add'),
+(31, 39, 36, 'add'),
+(32, 40, 41, 'add'),
+(33, 41, 39, 'add'),
+(34, 42, 41, 'remove');
 
 -- --------------------------------------------------------
 
@@ -794,7 +846,8 @@ INSERT INTO `items` (`id`, `sku`, `type`, `name`, `amount`, `price`, `weight`, `
 (38, 'SKU038', 'Plastic', 'Plastic Handle', 200, 1.8, 0.5, 6, 'Durable plastic handle for various uses.'),
 (39, 'SKU039', 'Plastic', 'ABS Panel', 45, 18, 3, 55, 'ABS plastic panel for industrial use.'),
 (40, 'SKU040', 'Plastic', 'Plastic Spacer', 350, 0.6, 0.1, 2.5, 'Small plastic spacer for precision alignment.'),
-(41, 'SKU01245', 'Wood', 'Small wooden box', 15, 15, 55, 25, 'Boxes');
+(41, 'SKU01245', 'Wood', 'Small wooden box', 15, 15, 55, 25, 'Boxes'),
+(42, 'SKU056', 'Metal', 'Metal screws', 100, 10, 2, 1, 'Metal screws');
 
 -- --------------------------------------------------------
 
@@ -813,6 +866,37 @@ CREATE TABLE `movement_requests` (
   `timeLimit` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- A tábla adatainak kiíratása `movement_requests`
+--
+
+INSERT INTO `movement_requests` (`id`, `adminId`, `pallet_id`, `fromShelfId`, `toShelfId`, `actionType`, `status`, `timeLimit`) VALUES
+(1, 3, 30, NULL, 25, 'add', 'completed', '2025-04-22 13:23:44'),
+(2, 3, 32, NULL, 7, 'add', 'completed', '2025-04-22 13:23:44'),
+(3, 3, 30, NULL, 51, 'add', 'completed', '2025-04-18 12:00:00'),
+(4, 3, 30, NULL, 51, 'add', 'pending', '2025-04-18 12:00:00'),
+(5, 3, 47, NULL, 5, 'add', 'completed', '2025-05-22 16:11:00'),
+(6, 3, 47, NULL, 5, 'add', 'completed', '2025-05-22 16:11:00'),
+(7, 3, 36, NULL, 5, 'add', 'completed', '2025-05-09 16:59:00'),
+(8, 3, 41, NULL, 13, 'add', 'completed', '2025-05-01 17:14:00'),
+(9, 3, 41, NULL, 51, 'add', 'completed', '2025-04-28 17:20:00'),
+(10, 3, 39, NULL, 12, 'add', 'completed', '2025-05-01 17:22:00'),
+(11, 3, 36, NULL, 9, 'add', 'completed', '2025-05-27 18:03:00'),
+(12, 3, 36, NULL, 19, 'add', 'completed', '2025-04-25 19:05:00'),
+(13, 3, 37, NULL, 7, 'add', 'completed', '2025-04-23 19:27:00'),
+(14, 3, 36, NULL, 20, 'add', 'completed', '2025-04-23 19:36:00'),
+(15, 3, 38, 1, NULL, 'remove', 'completed', '2025-04-23 20:03:00'),
+(16, 3, 35, 2, 10, 'move', 'completed', '2025-05-08 20:04:00'),
+(17, 3, 41, 1, NULL, 'remove', 'completed', '2025-04-30 20:07:00'),
+(18, 3, 36, NULL, 1, 'add', 'pending', '2025-04-24 13:40:00'),
+(19, 3, 37, NULL, 17, 'add', 'pending', '2025-05-20 13:40:00'),
+(20, 3, 36, NULL, 5, 'add', 'pending', '2025-04-30 13:41:00'),
+(21, 3, 37, NULL, 8, 'add', 'pending', '2025-05-01 13:42:00'),
+(22, 3, 36, NULL, 8, 'add', 'pending', '2025-05-01 13:44:00'),
+(23, 3, 36, NULL, 9, 'add', 'pending', '2025-04-30 17:01:00'),
+(24, 3, 164, 10, NULL, 'remove', 'pending', '2025-05-06 17:01:00'),
+(25, 3, 44, 2, 68, 'move', 'pending', '2025-04-30 17:13:00');
+
 -- --------------------------------------------------------
 
 --
@@ -824,6 +908,37 @@ CREATE TABLE `movement_requests_x_pallets` (
   `movement_requests_id` int(11) NOT NULL,
   `pallet_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- A tábla adatainak kiíratása `movement_requests_x_pallets`
+--
+
+INSERT INTO `movement_requests_x_pallets` (`id`, `movement_requests_id`, `pallet_id`) VALUES
+(1, 1, 30),
+(2, 2, 32),
+(3, 3, 30),
+(4, 4, 30),
+(5, 5, 47),
+(6, 6, 47),
+(7, 7, 36),
+(8, 8, 41),
+(9, 9, 41),
+(10, 10, 39),
+(11, 11, 36),
+(12, 12, 36),
+(13, 13, 37),
+(14, 14, 36),
+(15, 15, 38),
+(16, 16, 35),
+(17, 17, 41),
+(18, 18, 36),
+(19, 19, 37),
+(20, 20, 36),
+(21, 21, 37),
+(22, 22, 36),
+(23, 23, 36),
+(24, 24, 164),
+(25, 25, 44);
 
 -- --------------------------------------------------------
 
@@ -5725,7 +5840,7 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`id`, `email`, `firstName`, `lastName`, `userName`, `picture`, `password`, `isAdmin`, `createdAt`, `is_deleted`, `deletedAt`) VALUES
 (3, 'kovacs.janos@gmail.com', 'János', 'Kovács', 'kovacsj', 'https://example.com/pics/janos.jpg', 'asd', 1, '2025-03-03 10:39:13', 0, NULL),
 (4, 'nagy.eszter@freemail.hu', 'Eszter', 'Nagy', 'esztern', 'https://example.com/pics/eszter.jpg', 'Admin456', 1, '2025-03-03 10:39:13', 0, NULL),
-(5, 'szabo.peter@yahoo.com', 'Péter', 'Szabó', 'szabop', 'https://example.com/pics/peter.jpg', 'Pass789', 1, '2025-03-03 10:39:13', 0, NULL),
+(5, 'szabo.peter@yahoo.com', 'Péter', 'Szabó', 'szabop', 'https://example.com/pics/peter.jpg', 'Pass789', 1, '2025-03-03 10:39:13', 1, '2025-04-18 13:32:16'),
 (6, 'toth.klara@outlook.com', 'Klára', 'Tóth', 'klarat', 'https://example.com/pics/klara.jpg', 'Secure101', 1, '2025-03-03 10:39:13', 0, NULL),
 (7, 'horvath.gabor@gmail.com', 'Gábor', 'Horváth', 'hgabor', 'https://example.com/pics/gabor.jpg', 'Gabor2023', 1, '2025-03-03 10:39:13', 0, NULL),
 (8, 'kiss.maria@citromail.hu', 'Mária', 'Kiss', 'mariak', 'https://example.com/pics/maria.jpg', 'Maria321', 1, '2025-03-03 10:39:13', 0, NULL),
@@ -5746,9 +5861,12 @@ INSERT INTO `users` (`id`, `email`, `firstName`, `lastName`, `userName`, `pictur
 (23, 'bodor.mate@yahoo.com', 'Máté', 'Bodor', 'matb', 'https://example.com/pics/mate.jpg', 'Mate789', 0, '2025-03-03 10:39:13', 0, NULL),
 (24, 'gulyas.katalin@outlook.com', 'Katalin', 'Gulyás', 'katig', 'https://example.com/pics/katalin.jpg', 'Kati101', 0, '2025-03-03 10:39:13', 0, NULL),
 (25, 'sipos.balazs@gmail.com', 'Balázs', 'Sipos', 'balazss', 'https://example.com/pics/balazs.jpg', 'Balazs2023', 0, '2025-03-03 10:39:14', 0, NULL),
-(26, 'jakab.agnes@freemail.hu', 'Ágnes', 'Jakab', 'agnesj', 'https://example.com/pics/agnes.jpg', 'Agnes321', 0, '2025-03-03 10:39:14', 0, NULL),
-(27, 'a@a.com', 'asd', 'asddas', 'https://www.w3schools.com/howto/img_avatar.png', 'CSiruszfiam', 'AsdasdA@1', 0, '2025-03-03 19:59:01', 0, NULL),
-(28, 'gmail@gmail.com', 'Test', 'User', 'https://www.w3schools.com/howto/img_avatar.png', 'TestUser', 'Asd@115Aa', 0, '2025-03-04 11:34:50', 0, NULL);
+(26, 'jakab.agnes@freemail.hu', 'Ágnes', 'Jakab', 'agnesj', 'https://example.com/pics/agnes.jpg', 'Agnes321', 0, '2025-03-03 10:39:14', 1, '2025-04-17 07:02:10'),
+(41, 'tasggdihhl@gmail.com', 'Testes', 'Kismargo', 'Testesikismargit', 'https//:margitka', 'A@assword3211', 0, '2025-04-14 11:50:43', 0, NULL),
+(42, 'teszt.elekk@example.com', 'Tesztt', 'Elekk', 'tesztelekk', 'base64imagee', 'Test123!@#', 0, '2025-04-17 10:24:03', 0, NULL),
+(43, 'asd@gmail.com', 'Elet', 'Telen', 'Elettelen', 'https://www.w3schools.com/howto/img_avatar.png', 'NyaRi245215@v123', 0, '2025-04-18 13:42:14', 1, '2025-04-18 13:32:38'),
+(44, 'birogyula@gmail.com', 'Bíró', 'Gyula', 'birogyula15', 'https://www.w3schools.com/howto/img_avatar.png', 'BiroGyula@1958$', 0, '2025-04-18 15:54:56', 0, NULL),
+(45, 'klaszlo@gmail.com', 'Kiss', 'László', 'adminlaszlo15', 'https://www.w3schools.com/howto/img_avatar.png', 'kissLaci@5558$', 1, '2025-04-18 16:02:30', 1, '2025-04-18 14:57:49');
 
 -- --------------------------------------------------------
 
@@ -5872,31 +5990,31 @@ ALTER TABLE `user_x_storage`
 -- AUTO_INCREMENT a táblához `inventorymovement`
 --
 ALTER TABLE `inventorymovement`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- AUTO_INCREMENT a táblához `inventorymovement_x_pallets`
 --
 ALTER TABLE `inventorymovement_x_pallets`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT a táblához `items`
 --
 ALTER TABLE `items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- AUTO_INCREMENT a táblához `movement_requests`
 --
 ALTER TABLE `movement_requests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT a táblához `movement_requests_x_pallets`
 --
 ALTER TABLE `movement_requests_x_pallets`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT a táblához `pallets`
@@ -5920,13 +6038,13 @@ ALTER TABLE `pallets_x_shelfs`
 -- AUTO_INCREMENT a táblához `shelfs`
 --
 ALTER TABLE `shelfs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=101;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=103;
 
 --
 -- AUTO_INCREMENT a táblához `shelfs_x_storage`
 --
 ALTER TABLE `shelfs_x_storage`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=101;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=103;
 
 --
 -- AUTO_INCREMENT a táblához `storage`
@@ -5938,7 +6056,7 @@ ALTER TABLE `storage`
 -- AUTO_INCREMENT a táblához `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
 
 --
 -- AUTO_INCREMENT a táblához `user_x_storage`
