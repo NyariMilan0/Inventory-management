@@ -166,21 +166,22 @@ public class UserController {
     @Path("deleteUser")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteUser(@QueryParam("id") Integer id) {
-        Boolean response = layer.deletUser(id);
+        Boolean response = layer.deleteUser(id);
         JSONObject toReturn = new JSONObject();
 
-        String result = "";
-
-        if (response == false) {
-            result = "fail";
+        if (response) {
+            toReturn.put("result", "success");
+            return Response.status(Response.Status.OK)
+                    .entity(toReturn.toString())
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
         } else {
-            result = "success";
+            toReturn.put("result", "fail");
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(toReturn.toString())
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
         }
-
-        toReturn.put("result", result);
-
-        return Response.status(Response.Status.OK).entity(toReturn.toString()).type(MediaType.APPLICATION_JSON).build();
-
     }
 
     @PUT

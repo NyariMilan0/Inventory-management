@@ -5,6 +5,10 @@ import com.helixlab.raktarproject.model.Users;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.NoResultException;
+import javax.persistence.Persistence;
 import org.json.JSONObject;
 
 public class UserService {
@@ -200,14 +204,35 @@ public class UserService {
         return layer.getUserById(id);
     }
 
-    public Boolean deletUser(Integer id) {
-        Users u = getUserById(id);
+    public Boolean deleteUser(Integer id) {
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("com.helixLab_raktarproject_war_1.0-SNAPSHOTPU");
+        EntityManager em = emf.createEntityManager();
+        try {
+            // Ellenőrizzük, hogy a felhasználó létezik-e
+            Users user = em.createNamedQuery("Users.findById", Users.class)
+                    .setParameter("id", id)
+                    .getSingleResult();
 
-        if (u != null && layer.getIsDeleted() == false) {
-            return layer.deleteUser(id);
-        } else {
-            System.err.println("The user doesn't exist");
+            if (user != null) {
+                // Ellenőrizzük, hogy a felhasználó nincs-e már törölve
+                Boolean isDeleted = user.getIsDeleted();
+                if (isDeleted == null || !isDeleted) {
+                    // Ha nincs törölve, töröljük
+                    return layer.deleteUser(id);
+                } else {
+                    System.err.println("The user with ID " + id + " is already deleted");
+                    return false;
+                }
+            } else {
+                System.err.println("The user with ID " + id + " doesn't exist");
+                return false;
+            }
+        } catch (Exception e) {
+            System.err.println("Error checking user existence: " + e.getLocalizedMessage());
             return false;
+        } finally {
+            em.clear();
+            em.close();
         }
     }
 
@@ -302,7 +327,5 @@ public class UserService {
         toReturn.put("statusCode", statusCode);
         return toReturn;
     }
-    
-    
 
 }
